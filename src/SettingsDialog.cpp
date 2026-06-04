@@ -244,7 +244,6 @@ void SettingsDialog::onAccept()
     // Apply socket path change on OK (not live)
     const QString newPath = m_socketEdit->text().trimmed();
     if (!newPath.isEmpty() && newPath != m_config->socketPath()) {
-        QString oldPath = m_config->socketPath();
         if (m_ipcServer->restart(newPath)) {
             m_config->setSocketPath(newPath);
         } else {

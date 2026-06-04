@@ -278,6 +278,33 @@ private slots:
         ConfigManager cm(m_configPath);
         QCOMPARE(cm.timeoutSec(), 30); // clamped to min
     }
+
+    void normalizeLegacyDefaultSocketPath()
+    {
+        const bool hadSocketEnv = qEnvironmentVariableIsSet("TL4AI_SOCKET");
+        const QByteArray originalSocketEnv = qgetenv("TL4AI_SOCKET");
+        qunsetenv("TL4AI_SOCKET");
+
+        QFile f(m_configPath);
+        f.open(QIODevice::WriteOnly);
+        f.write(R"({"socket":{"path":"/tmp/trafficlight4ai.sock"}})");
+        f.close();
+
+        QString runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+        QString expected;
+        if (!runtimeDir.isEmpty())
+            expected = runtimeDir + "/trafficlight4ai.sock";
+        else
+            expected = QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
+
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.socketPath(), expected);
+
+        if (hadSocketEnv)
+            qputenv("TL4AI_SOCKET", originalSocketEnv);
+        else
+            qunsetenv("TL4AI_SOCKET");
+    }
 };
 
 QTEST_MAIN(TestConfigManager)

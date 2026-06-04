@@ -1,8 +1,9 @@
 #pragma once
 
 #include <QObject>
-#include <QLocalServer>
+#include <memory>
 
+class QLocalServer;
 class StateManager;
 
 class IpcServer : public QObject {
@@ -20,7 +21,9 @@ private slots:
     void onNewConnection();
 
 private:
-    QLocalServer m_server;
+    void connectServer();
+
+    std::unique_ptr<QLocalServer> m_server;
     StateManager *m_stateManager;
     QString m_socketPath;
     bool m_ownsSocket = false; // true only if this instance successfully listen()ed

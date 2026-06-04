@@ -201,6 +201,8 @@ private slots:
         QVERIFY(!server.restart(badPath));
         // Old socket should still be working (rolled back)
         QVERIFY(server.isListening());
+        QVERIFY(QFile::exists(m_socketPath));
+        QVERIFY(QFile::exists(badPath));
         sendCommand("RED\n");
         QCOMPARE(sm.state(), LightState::Working);
     }

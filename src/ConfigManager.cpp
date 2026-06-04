@@ -10,6 +10,7 @@
 
 static const QStringList kValidSizes = {"small", "medium", "large"};
 static const QStringList kValidModes = {"breathing", "classic"};
+static const QString kLegacyDefaultSocketPath = "/tmp/trafficlight4ai.sock";
 
 static QString defaultSocketPath()
 {
@@ -227,7 +228,9 @@ void ConfigManager::normalize()
 
     // Validate socket.path
     QJsonObject socket = m_root["socket"].toObject();
-    if (socket["path"].toString().isEmpty())
+    const QString socketPath = socket["path"].toString();
+    if (socketPath.isEmpty()
+        || (socketPath == kLegacyDefaultSocketPath && qgetenv("TL4AI_SOCKET").isEmpty()))
         socket["path"] = defaultSocketPath();
     m_root["socket"] = socket;
 
