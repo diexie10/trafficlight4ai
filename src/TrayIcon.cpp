@@ -55,8 +55,11 @@ void TrayIcon::onStateChanged(LightState newState)
 
 void TrayIcon::onActiveAlphaChanged(qreal alpha)
 {
-    if (m_state == LightState::Idle)
-        return; // green stays steady
+    // Idle state: always show solid green regardless of alpha
+    if (m_state == LightState::Idle) {
+        setIcon(createIcon(m_currentColor));
+        return;
+    }
     QColor color = m_currentColor;
     color.setAlphaF(alpha);
     setIcon(createIcon(color));
