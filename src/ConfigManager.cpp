@@ -4,7 +4,6 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QStandardPaths>
 #include <unistd.h>
 #include <algorithm>
 
@@ -14,9 +13,9 @@ static const QString kLegacyDefaultSocketPath = "/tmp/trafficlight4ai.sock";
 
 static QString defaultSocketPath()
 {
-    QString runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+    const QByteArray runtimeDir = qgetenv("XDG_RUNTIME_DIR");
     if (!runtimeDir.isEmpty())
-        return runtimeDir + "/trafficlight4ai.sock";
+        return QString::fromLocal8Bit(runtimeDir) + "/trafficlight4ai.sock";
     return QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
 }
 

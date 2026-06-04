@@ -1,6 +1,5 @@
 #include <QtTest>
 #include <QTemporaryDir>
-#include <QStandardPaths>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -14,6 +13,14 @@ private:
     QTemporaryDir m_tempDir;
     int m_testIndex = 0;
     QString m_configPath;
+
+    QString expectedDefaultSocketPath() const
+    {
+        const QByteArray runtimeDir = qgetenv("XDG_RUNTIME_DIR");
+        if (!runtimeDir.isEmpty())
+            return QString::fromLocal8Bit(runtimeDir) + "/trafficlight4ai.sock";
+        return QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
+    }
 
 private slots:
     void init()
@@ -54,14 +61,22 @@ private slots:
     void defaultSocketPath()
     {
         ConfigManager cm(m_configPath);
-        // Default should be XDG_RUNTIME_DIR or /tmp with UID
-        QString runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
-        QString expected;
-        if (!runtimeDir.isEmpty())
-            expected = runtimeDir + "/trafficlight4ai.sock";
+        QCOMPARE(cm.socketPath(), expectedDefaultSocketPath());
+    }
+
+    void defaultSocketPathWithoutXdgRuntimeDir()
+    {
+        const bool hadRuntimeEnv = qEnvironmentVariableIsSet("XDG_RUNTIME_DIR");
+        const QByteArray originalRuntimeEnv = qgetenv("XDG_RUNTIME_DIR");
+        qunsetenv("XDG_RUNTIME_DIR");
+
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.socketPath(), QString("/tmp/trafficlight4ai-%1.sock").arg(getuid()));
+
+        if (hadRuntimeEnv)
+            qputenv("XDG_RUNTIME_DIR", originalRuntimeEnv);
         else
-            expected = QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
-        QCOMPARE(cm.socketPath(), expected);
+            qunsetenv("XDG_RUNTIME_DIR");
     }
 
     void setAndGetWindowSize()
@@ -290,15 +305,8 @@ private slots:
         f.write(R"({"socket":{"path":"/tmp/trafficlight4ai.sock"}})");
         f.close();
 
-        QString runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
-        QString expected;
-        if (!runtimeDir.isEmpty())
-            expected = runtimeDir + "/trafficlight4ai.sock";
-        else
-            expected = QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
-
         ConfigManager cm(m_configPath);
-        QCOMPARE(cm.socketPath(), expected);
+        QCOMPARE(cm.socketPath(), expectedDefaultSocketPath());
 
         if (hadSocketEnv)
             qputenv("TL4AI_SOCKET", originalSocketEnv);
