@@ -52,11 +52,12 @@ int main(int argc, char *argv[])
         trayIcon->setToolTip("Traffic Light for " + strategy->displayName());
     trayIcon->show();
 
-    // Connect state changes to UI
-    QObject::connect(&stateManager, &StateManager::stateChanged,
-                     lightWidget, &TrafficLightWidget::onStateChanged);
+    // Connect state changes to UI (trayIcon first so m_state is updated
+    // before lightWidget's animation stop triggers activeAlphaChanged)
     QObject::connect(&stateManager, &StateManager::stateChanged,
                      trayIcon, &TrayIcon::onStateChanged);
+    QObject::connect(&stateManager, &StateManager::stateChanged,
+                     lightWidget, &TrafficLightWidget::onStateChanged);
 
     // Connect animation alpha to tray icon blinking
     QObject::connect(lightWidget, &TrafficLightWidget::activeAlphaChanged,

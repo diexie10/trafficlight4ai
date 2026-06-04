@@ -113,6 +113,7 @@ void TrafficLightWidget::startAnimation()
 void TrafficLightWidget::stopAnimation()
 {
     if (m_animation) {
+        m_animation->disconnect(); // prevent stale alpha updates after stop
         m_animation->stop();
         m_animation->deleteLater();
         m_animation = nullptr;
