@@ -223,6 +223,51 @@ private slots:
         ConfigManager cm2(m_configPath);
         QCOMPARE(cm2.timeoutSec(), 120);
     }
+
+    void normalizeInvalidWindowSize()
+    {
+        // Write valid JSON with invalid window.size
+        QFile f(m_configPath);
+        f.open(QIODevice::WriteOnly);
+        f.write(R"({"window":{"size":"huge","posX":20,"posY":20}})");
+        f.close();
+
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.windowSize(), QString("small")); // normalized to default
+    }
+
+    void normalizeInvalidAnimationMode()
+    {
+        QFile f(m_configPath);
+        f.open(QIODevice::WriteOnly);
+        f.write(R"({"animation":{"mode":"rainbow","periodMs":1000}})");
+        f.close();
+
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.animationMode(), QString("breathing"));
+    }
+
+    void normalizeOutOfRangeAnimationPeriod()
+    {
+        QFile f(m_configPath);
+        f.open(QIODevice::WriteOnly);
+        f.write(R"({"animation":{"mode":"breathing","periodMs":99999}})");
+        f.close();
+
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.animationPeriodMs(), 5000); // clamped
+    }
+
+    void normalizeNegativeTimeout()
+    {
+        QFile f(m_configPath);
+        f.open(QIODevice::WriteOnly);
+        f.write(R"({"timeoutSec":-100})");
+        f.close();
+
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.timeoutSec(), 30); // clamped to min
+    }
 };
 
 QTEST_MAIN(TestConfigManager)

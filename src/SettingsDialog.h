@@ -22,6 +22,9 @@ public:
 signals:
     void aiToolChanged(const QString &displayName);
 
+public slots:
+    void reject() override;
+
 protected:
     void showEvent(QShowEvent *event) override;
 

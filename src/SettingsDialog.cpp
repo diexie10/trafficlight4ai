@@ -287,8 +287,13 @@ void SettingsDialog::onShowHooksTemplate()
     dlg->show();
 }
 
-void SettingsDialog::onCancel()
+void SettingsDialog::reject()
 {
     restoreSnapshot();
+    QDialog::reject();
+}
+
+void SettingsDialog::onCancel()
+{
     reject();
 }

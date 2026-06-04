@@ -164,6 +164,31 @@ private slots:
         QTest::qWait(800);
         QCOMPARE(sm.state(), LightState::Idle); // now timed out
     }
+
+    void duplicateCommandRefreshesTimeout()
+    {
+        StateManager sm;
+        sm.setTimeoutSec(1);
+        sm.setState(LightState::Working);
+        // Wait 700ms, send same state again — should refresh timeout
+        QTest::qWait(700);
+        sm.setState(LightState::Working); // duplicate, but should reset timer
+        // Wait another 700ms — only 700ms since refresh, should not timeout
+        QTest::qWait(700);
+        QCOMPARE(sm.state(), LightState::Working); // still working
+        // Wait for the full timeout from last refresh
+        QTest::qWait(800);
+        QCOMPARE(sm.state(), LightState::Idle); // now timed out
+    }
+
+    void duplicateCommandDoesNotEmitSignal()
+    {
+        StateManager sm;
+        sm.setState(LightState::Working);
+        QSignalSpy spy(&sm, &StateManager::stateChanged);
+        sm.setState(LightState::Working); // duplicate
+        QCOMPARE(spy.count(), 0); // no signal for same state
+    }
 };
 
 QTEST_MAIN(TestStateManager)

@@ -37,6 +37,7 @@ private:
     void load();
     void save();
     void applyDefaults();
+    void normalize();
 
     QString m_configPath;
     QJsonObject m_root;

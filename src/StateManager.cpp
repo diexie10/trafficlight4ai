@@ -14,11 +14,13 @@ LightState StateManager::state() const
 
 void StateManager::setState(LightState newState)
 {
-    if (m_state == newState)
-        return;
+    const bool changed = (m_state != newState);
     m_state = newState;
-    emit stateChanged(m_state);
 
+    if (changed)
+        emit stateChanged(m_state);
+
+    // Always refresh timeout, even on duplicate commands (e.g. repeated RED from hooks)
     if (m_state == LightState::Idle)
         stopTimer();
     else

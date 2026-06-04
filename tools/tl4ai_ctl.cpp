@@ -42,6 +42,10 @@ int main(int argc, char *argv[])
 
     struct sockaddr_un addr{};
     addr.sun_family = AF_UNIX;
+    if (strlen(socketPath) >= sizeof(addr.sun_path)) {
+        close(fd);
+        return 0; // path too long, cannot connect
+    }
     strncpy(addr.sun_path, socketPath, sizeof(addr.sun_path) - 1);
 
     // Connect (non-blocking)

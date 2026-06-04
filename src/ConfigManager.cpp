@@ -70,6 +70,8 @@ void ConfigManager::load()
     const QJsonObject loaded = doc.object();
     for (auto it = loaded.begin(); it != loaded.end(); ++it)
         m_root[it.key()] = it.value();
+
+    normalize();
 }
 
 void ConfigManager::save()
@@ -187,5 +189,36 @@ void ConfigManager::setTimeoutSec(int sec)
     if (sec != 0)
         sec = std::clamp(sec, 30, 3600);
     m_root["timeoutSec"] = sec;
+    save();
+}
+
+void ConfigManager::normalize()
+{
+    // Validate window.size
+    QJsonObject window = m_root["window"].toObject();
+    if (!kValidSizes.contains(window["size"].toString()))
+        window["size"] = "small";
+    m_root["window"] = window;
+
+    // Validate animation.mode and animation.periodMs
+    QJsonObject animation = m_root["animation"].toObject();
+    if (!kValidModes.contains(animation["mode"].toString()))
+        animation["mode"] = "breathing";
+    int periodMs = animation["periodMs"].toInt(1000);
+    animation["periodMs"] = std::clamp(periodMs, 200, 5000);
+    m_root["animation"] = animation;
+
+    // Validate timeoutSec
+    int timeout = m_root["timeoutSec"].toInt(300);
+    if (timeout != 0)
+        timeout = std::clamp(timeout, 30, 3600);
+    m_root["timeoutSec"] = timeout;
+
+    // Validate socket.path
+    QJsonObject socket = m_root["socket"].toObject();
+    if (socket["path"].toString().isEmpty())
+        socket["path"] = "/tmp/trafficlight4ai.sock";
+    m_root["socket"] = socket;
+
     save();
 }
