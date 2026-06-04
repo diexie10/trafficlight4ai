@@ -54,34 +54,26 @@ void ConfigManager::applyDefaults()
 
 void ConfigManager::load()
 {
+    bool loaded = false;
     QFile file(m_configPath);
-    if (!file.exists()) {
-        applyDefaults();
-        save();
-        return;
+
+    if (file.exists() && file.open(QIODevice::ReadOnly)) {
+        QJsonParseError err;
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &err);
+        file.close();
+
+        if (err.error == QJsonParseError::NoError && doc.isObject()) {
+            // Apply defaults first, then overlay loaded values to fill missing keys
+            applyDefaults();
+            const QJsonObject obj = doc.object();
+            for (auto it = obj.begin(); it != obj.end(); ++it)
+                m_root[it.key()] = it.value();
+            loaded = true;
+        }
     }
 
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!loaded)
         applyDefaults();
-        save();
-        return;
-    }
-
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &err);
-    file.close();
-
-    if (err.error != QJsonParseError::NoError || !doc.isObject()) {
-        applyDefaults();
-        save();
-        return;
-    }
-
-    // Apply defaults first, then overlay loaded values to fill missing keys
-    applyDefaults();
-    const QJsonObject loaded = doc.object();
-    for (auto it = loaded.begin(); it != loaded.end(); ++it)
-        m_root[it.key()] = it.value();
 
     normalize();
 }

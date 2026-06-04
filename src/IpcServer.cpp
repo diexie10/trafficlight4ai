@@ -109,14 +109,5 @@ void IpcServer::onNewConnection()
             client->deleteLater();
         });
         connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
-
-        // Handle data already available at connection time
-        if (client->bytesAvailable()) {
-            QByteArray data = client->readAll();
-            if (!data.isEmpty())
-                m_stateManager->handleCommand(QString::fromUtf8(data));
-            client->disconnectFromServer();
-            client->deleteLater();
-        }
     }
 }

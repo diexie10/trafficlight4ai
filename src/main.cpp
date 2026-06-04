@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
     floatingWindow->setSettingsDialog(settingsDialog);
 
     // Tray icon with dynamic tooltip
-    auto *strategy = AiToolRegistry::find(config.aiTool());
     auto *trayIcon = new TrayIcon(floatingWindow, settingsDialog);
-    trayIcon->setToolTip("Traffic Light for " + strategy->displayName());
+    if (auto *strategy = AiToolRegistry::find(config.aiTool()))
+        trayIcon->setToolTip("Traffic Light for " + strategy->displayName());
     trayIcon->show();
 
     // Connect state changes to UI

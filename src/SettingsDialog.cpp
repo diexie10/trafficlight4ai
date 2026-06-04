@@ -170,8 +170,8 @@ void SettingsDialog::restoreSnapshot()
 {
     // Restore AI tool
     m_config->setAiTool(m_snapAiTool);
-    auto *strategy = AiToolRegistry::find(m_snapAiTool);
-    emit aiToolChanged(strategy->displayName());
+    if (auto *strategy = AiToolRegistry::find(m_snapAiTool))
+        emit aiToolChanged(strategy->displayName());
 
     // Restore timeout
     m_config->setTimeoutSec(m_snapTimeoutSec);
@@ -199,8 +199,8 @@ void SettingsDialog::onAiToolChanged(int index)
 {
     const QString toolId = m_aiToolCombo->itemData(index).toString();
     m_config->setAiTool(toolId);
-    auto *strategy = AiToolRegistry::find(toolId);
-    emit aiToolChanged(strategy->displayName());
+    if (auto *strategy = AiToolRegistry::find(toolId))
+        emit aiToolChanged(strategy->displayName());
 }
 
 void SettingsDialog::onTimeoutChanged(int value)
@@ -260,6 +260,8 @@ void SettingsDialog::onShowHooksTemplate()
 {
     const QString toolId = m_aiToolCombo->currentData().toString();
     auto *strategy = AiToolRegistry::find(toolId);
+    if (!strategy)
+        return;
 
     auto *dlg = new QDialog(this);
     dlg->setWindowTitle("推荐 Hooks 配置 - " + strategy->displayName());
