@@ -23,4 +23,5 @@ private:
     QLocalServer m_server;
     StateManager *m_stateManager;
     QString m_socketPath;
+    bool m_ownsSocket = false; // true only if this instance successfully listen()ed
 };

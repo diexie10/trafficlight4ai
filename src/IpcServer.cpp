@@ -3,28 +3,41 @@
 #include <QLocalSocket>
 #include <QFile>
 #include <QFileInfo>
+#include <sys/stat.h>
 
-static bool isSocketFile(const QString &path)
+static bool isUnixSocket(const QString &path)
 {
-    if (!QFile::exists(path))
+    struct stat st;
+    if (stat(path.toLocal8Bit().constData(), &st) != 0)
         return false;
-    QFileInfo fi(path);
-    // QLocalServer creates socket files; regular files should not be deleted
-    return fi.isFile() || fi.isSymLink()
-           || (!fi.isDir() && QFile::exists(path));
+    return S_ISSOCK(st.st_mode);
 }
 
-static void removeStaleSocket(const QString &path)
+static bool isLiveSocket(const QString &path)
 {
-    // Try to connect — if it succeeds, another instance is using it
     QLocalSocket probe;
     probe.connectToServer(path);
     if (probe.waitForConnected(100)) {
         probe.disconnectFromServer();
-        return; // socket is live, don't remove
+        return true;
     }
-    // Stale socket or leftover file — safe to remove
-    QLocalServer::removeServer(path);
+    return false;
+}
+
+static void removeStaleSocket(const QString &path)
+{
+    if (!QFile::exists(path))
+        return;
+
+    // Only remove actual Unix sockets, never regular files
+    if (!isUnixSocket(path))
+        return;
+
+    // Don't remove if another instance is actively listening
+    if (isLiveSocket(path))
+        return;
+
+    QFile::remove(path);
 }
 
 IpcServer::IpcServer(StateManager *stateManager, const QString &socketPath, QObject *parent)
@@ -33,7 +46,8 @@ IpcServer::IpcServer(StateManager *stateManager, const QString &socketPath, QObj
     removeStaleSocket(m_socketPath);
 
     connect(&m_server, &QLocalServer::newConnection, this, &IpcServer::onNewConnection);
-    if (!m_server.listen(m_socketPath))
+    m_ownsSocket = m_server.listen(m_socketPath);
+    if (!m_ownsSocket)
         qWarning("IpcServer: failed to listen on %s: %s",
                  qPrintable(m_socketPath), qPrintable(m_server.errorString()));
 }
@@ -41,7 +55,8 @@ IpcServer::IpcServer(StateManager *stateManager, const QString &socketPath, QObj
 IpcServer::~IpcServer()
 {
     m_server.close();
-    QLocalServer::removeServer(m_socketPath);
+    if (m_ownsSocket)
+        QFile::remove(m_socketPath);
 }
 
 bool IpcServer::isListening() const
@@ -52,11 +67,13 @@ bool IpcServer::isListening() const
 void IpcServer::restart(const QString &newPath)
 {
     m_server.close();
-    QLocalServer::removeServer(m_socketPath);
+    if (m_ownsSocket)
+        QFile::remove(m_socketPath);
 
     m_socketPath = newPath;
     removeStaleSocket(m_socketPath);
-    if (!m_server.listen(m_socketPath))
+    m_ownsSocket = m_server.listen(m_socketPath);
+    if (!m_ownsSocket)
         qWarning("IpcServer: failed to listen on %s: %s",
                  qPrintable(m_socketPath), qPrintable(m_server.errorString()));
 }
