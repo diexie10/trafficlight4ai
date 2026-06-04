@@ -102,12 +102,29 @@ private slots:
         QCOMPARE(sm.state(), LightState::Idle);
     }
 
-    void removesStaleSocketOnStart()
+    void doesNotDeleteRegularFile()
     {
+        // A regular file at the socket path should NOT be deleted
         QFile f(m_socketPath);
         f.open(QIODevice::WriteOnly);
-        f.write("stale");
+        f.write("not a socket");
         f.close();
+        QVERIFY(QFile::exists(m_socketPath));
+
+        StateManager sm;
+        IpcServer server(&sm, m_socketPath);
+        QVERIFY(!server.isListening()); // should fail to listen
+        QVERIFY(QFile::exists(m_socketPath)); // file must still exist
+    }
+
+    void removesStaleSocketOnStart()
+    {
+        // Create a real stale socket using QLocalServer directly
+        QLocalServer staleServer;
+        staleServer.listen(m_socketPath);
+        QVERIFY(staleServer.isListening());
+        // Close without removing — simulates crash leaving stale socket file
+        staleServer.close();
         QVERIFY(QFile::exists(m_socketPath));
 
         StateManager sm;
