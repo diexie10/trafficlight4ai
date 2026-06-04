@@ -104,7 +104,7 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 
 ### Socket 协议
 
-路径：`/tmp/trafficlight4ai.sock`（可通过 config.json 或 `TL4AI_SOCKET` 环境变量覆盖）
+默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`）。可通过 config.json 或 `TL4AI_SOCKET` 环境变量覆盖。
 
 指令为单行纯文本：`RED\n` / `YELLOW\n` / `GREEN\n`，大小写不敏感，无法识别的指令静默忽略。
 

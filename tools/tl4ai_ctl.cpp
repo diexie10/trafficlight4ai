@@ -1,3 +1,5 @@
+#include <cctype>
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -7,7 +9,14 @@
 #include <fcntl.h>
 #include <poll.h>
 
-static const char *defaultSocketPath = "/tmp/trafficlight4ai.sock";
+static std::string computeDefaultSocketPath()
+{
+    // Priority: $XDG_RUNTIME_DIR/trafficlight4ai.sock, fallback /tmp/trafficlight4ai-$UID.sock
+    const char *xdg = std::getenv("XDG_RUNTIME_DIR");
+    if (xdg && xdg[0] != '\0')
+        return std::string(xdg) + "/trafficlight4ai.sock";
+    return "/tmp/trafficlight4ai-" + std::to_string(getuid()) + ".sock";
+}
 
 int main(int argc, char *argv[])
 {
@@ -21,9 +30,10 @@ int main(int argc, char *argv[])
     if (argc < 2)
         return 0;
 
-    // Determine socket path from env or default
+    // Determine socket path: env var > default (XDG_RUNTIME_DIR > /tmp with UID)
     const char *envPath = std::getenv("TL4AI_SOCKET");
-    const char *socketPath = envPath ? envPath : defaultSocketPath;
+    std::string defaultPath = computeDefaultSocketPath();
+    const char *socketPath = envPath ? envPath : defaultPath.c_str();
 
     // Build command: uppercase the argument, append newline
     std::string command = argv[1];

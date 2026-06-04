@@ -1,12 +1,23 @@
 #include "ConfigManager.h"
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QStandardPaths>
+#include <unistd.h>
 #include <algorithm>
 
 static const QStringList kValidSizes = {"small", "medium", "large"};
 static const QStringList kValidModes = {"breathing", "classic"};
+
+static QString defaultSocketPath()
+{
+    QString runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+    if (!runtimeDir.isEmpty())
+        return runtimeDir + "/trafficlight4ai.sock";
+    return QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
+}
 
 ConfigManager::ConfigManager(const QString &configPath, QObject *parent)
     : QObject(parent), m_configPath(configPath)
@@ -31,7 +42,7 @@ void ConfigManager::applyDefaults()
     animation["periodMs"] = 1000;
 
     QJsonObject socket;
-    socket["path"] = "/tmp/trafficlight4ai.sock";
+    socket["path"] = defaultSocketPath();
 
     m_root["window"] = window;
     m_root["animation"] = animation;
@@ -155,7 +166,7 @@ QString ConfigManager::socketPath() const
     const QByteArray envPath = qgetenv("TL4AI_SOCKET");
     if (!envPath.isEmpty())
         return QString::fromLocal8Bit(envPath);
-    return m_root["socket"].toObject()["path"].toString("/tmp/trafficlight4ai.sock");
+    return m_root["socket"].toObject()["path"].toString(defaultSocketPath());
 }
 
 void ConfigManager::setSocketPath(const QString &path)
@@ -217,7 +228,7 @@ void ConfigManager::normalize()
     // Validate socket.path
     QJsonObject socket = m_root["socket"].toObject();
     if (socket["path"].toString().isEmpty())
-        socket["path"] = "/tmp/trafficlight4ai.sock";
+        socket["path"] = defaultSocketPath();
     m_root["socket"] = socket;
 
     save();

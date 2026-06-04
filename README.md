@@ -136,7 +136,7 @@ Config file: `~/.config/trafficlight4ai/config.json`
     "periodMs": 1000
   },
   "socket": {
-    "path": "/tmp/trafficlight4ai.sock"
+    "path": "$XDG_RUNTIME_DIR/trafficlight4ai.sock"
   }
 }
 ```

@@ -2,6 +2,7 @@
 #include <QLocalSocket>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include <cstring>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -164,7 +165,7 @@ private slots:
         QVERIFY(server.isListening());
 
         const QString newPath = m_tempDir.path() + "/restarted.sock";
-        server.restart(newPath);
+        QVERIFY(server.restart(newPath));
         QVERIFY(server.isListening());
 
         sendCommandTo(newPath, "RED\n");
@@ -178,10 +179,30 @@ private slots:
         const QString oldPath = m_socketPath;
 
         const QString newPath = m_tempDir.path() + "/restarted2.sock";
-        server.restart(newPath);
+        QVERIFY(server.restart(newPath));
 
         QVERIFY(!QFile::exists(oldPath));
         QVERIFY(!tryConnect(oldPath));
+    }
+
+    void restartFailsKeepsOldSocket()
+    {
+        StateManager sm;
+        IpcServer server(&sm, m_socketPath);
+        QVERIFY(server.isListening());
+
+        // Create a regular file at the new path — restart should fail
+        const QString badPath = m_tempDir.path() + "/blocked.sock";
+        QFile f(badPath);
+        f.open(QIODevice::WriteOnly);
+        f.write("not a socket");
+        f.close();
+
+        QVERIFY(!server.restart(badPath));
+        // Old socket should still be working (rolled back)
+        QVERIFY(server.isListening());
+        sendCommand("RED\n");
+        QCOMPARE(sm.state(), LightState::Working);
     }
 };
 

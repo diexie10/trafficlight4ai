@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QDialog>
 #include <QClipboard>
+#include <QMessageBox>
 #include <QApplication>
 
 SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightWidget,
@@ -100,11 +101,9 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
             this, &SettingsDialog::onAnimationPeriodChanged);
     connect(m_periodSpin, &QSpinBox::valueChanged,
             this, &SettingsDialog::onAnimationPeriodChanged);
-    connect(m_socketEdit, &QLineEdit::editingFinished,
-            this, &SettingsDialog::onSocketPathEdited);
     connect(hooksBtn, &QPushButton::clicked,
             this, &SettingsDialog::onShowHooksTemplate);
-    connect(okBtn, &QPushButton::clicked, this, &QDialog::accept);
+    connect(okBtn, &QPushButton::clicked, this, &SettingsDialog::onAccept);
     connect(cancelBtn, &QPushButton::clicked, this, &SettingsDialog::onCancel);
 }
 
@@ -193,11 +192,7 @@ void SettingsDialog::restoreSnapshot()
     m_lightWidget->setAnimationPeriodMs(m_snapPeriodMs);
     m_config->setAnimationPeriodMs(m_snapPeriodMs);
 
-    // Restore socket path
-    if (m_config->socketPath() != m_snapSocketPath) {
-        m_config->setSocketPath(m_snapSocketPath);
-        m_ipcServer->restart(m_snapSocketPath);
-    }
+    // Socket path is not applied live — nothing to restore
 }
 
 void SettingsDialog::onAiToolChanged(int index)
@@ -244,13 +239,22 @@ void SettingsDialog::onAnimationPeriodChanged(int value)
     m_lightWidget->setAnimationPeriodMs(value);
 }
 
-void SettingsDialog::onSocketPathEdited()
+void SettingsDialog::onAccept()
 {
+    // Apply socket path change on OK (not live)
     const QString newPath = m_socketEdit->text().trimmed();
-    if (newPath.isEmpty() || newPath == m_config->socketPath())
-        return;
-    m_config->setSocketPath(newPath);
-    m_ipcServer->restart(newPath);
+    if (!newPath.isEmpty() && newPath != m_config->socketPath()) {
+        QString oldPath = m_config->socketPath();
+        if (m_ipcServer->restart(newPath)) {
+            m_config->setSocketPath(newPath);
+        } else {
+            m_socketEdit->setText(m_config->socketPath());
+            QMessageBox::warning(this, "Socket 错误",
+                "无法监听新路径: " + newPath + "\n已保留原路径。");
+            return; // don't close dialog
+        }
+    }
+    accept();
 }
 
 void SettingsDialog::onShowHooksTemplate()

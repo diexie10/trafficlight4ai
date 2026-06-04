@@ -14,7 +14,7 @@ public:
     ~IpcServer() override;
 
     bool isListening() const;
-    void restart(const QString &newPath);
+    bool restart(const QString &newPath);
 
 private slots:
     void onNewConnection();

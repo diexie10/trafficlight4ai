@@ -1,8 +1,10 @@
 #include <QtTest>
 #include <QTemporaryDir>
+#include <QStandardPaths>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <unistd.h>
 #include "ConfigManager.h"
 
 class TestConfigManager : public QObject {
@@ -52,7 +54,14 @@ private slots:
     void defaultSocketPath()
     {
         ConfigManager cm(m_configPath);
-        QCOMPARE(cm.socketPath(), QString("/tmp/trafficlight4ai.sock"));
+        // Default should be XDG_RUNTIME_DIR or /tmp with UID
+        QString runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+        QString expected;
+        if (!runtimeDir.isEmpty())
+            expected = runtimeDir + "/trafficlight4ai.sock";
+        else
+            expected = QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
+        QCOMPARE(cm.socketPath(), expected);
     }
 
     void setAndGetWindowSize()
@@ -158,8 +167,9 @@ private slots:
     void rejectsEmptySocketPath()
     {
         ConfigManager cm(m_configPath);
+        const QString originalPath = cm.socketPath();
         cm.setSocketPath("");
-        QCOMPARE(cm.socketPath(), QString("/tmp/trafficlight4ai.sock")); // unchanged
+        QCOMPARE(cm.socketPath(), originalPath); // unchanged
     }
 
     void defaultAiTool()

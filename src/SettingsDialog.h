@@ -34,8 +34,8 @@ private slots:
     void onWindowSizeChanged(int index);
     void onAnimationModeChanged(int index);
     void onAnimationPeriodChanged(int value);
-    void onSocketPathEdited();
     void onShowHooksTemplate();
+    void onAccept();
     void onCancel();
 
 private:

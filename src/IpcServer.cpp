@@ -2,7 +2,6 @@
 #include "StateManager.h"
 #include <QLocalSocket>
 #include <QFile>
-#include <QFileInfo>
 #include <sys/stat.h>
 
 static bool isUnixSocket(const QString &path)
@@ -64,18 +63,29 @@ bool IpcServer::isListening() const
     return m_server.isListening();
 }
 
-void IpcServer::restart(const QString &newPath)
+bool IpcServer::restart(const QString &newPath)
 {
-    m_server.close();
-    if (m_ownsSocket)
-        QFile::remove(m_socketPath);
+    // Save old state for rollback
+    const QString oldPath = m_socketPath;
+    const bool oldOwned = m_ownsSocket;
 
+    m_server.close();
+    if (oldOwned)
+        QFile::remove(oldPath);
+
+    removeStaleSocket(newPath);
     m_socketPath = newPath;
-    removeStaleSocket(m_socketPath);
     m_ownsSocket = m_server.listen(m_socketPath);
-    if (!m_ownsSocket)
-        qWarning("IpcServer: failed to listen on %s: %s",
-                 qPrintable(m_socketPath), qPrintable(m_server.errorString()));
+
+    if (m_ownsSocket)
+        return true;
+
+    // Failed — rollback to old path
+    qWarning("IpcServer: failed to listen on %s: %s",
+             qPrintable(newPath), qPrintable(m_server.errorString()));
+    m_socketPath = oldPath;
+    m_ownsSocket = m_server.listen(m_socketPath);
+    return false;
 }
 
 void IpcServer::onNewConnection()
