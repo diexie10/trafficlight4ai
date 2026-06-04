@@ -16,6 +16,7 @@ public:
 public slots:
     void onStateChanged(LightState newState);
     void onAiToolChanged(const QString &displayName);
+    void onActiveAlphaChanged(qreal alpha);
 
 private slots:
     void onActivated(QSystemTrayIcon::ActivationReason reason);
@@ -24,4 +25,6 @@ private:
     QIcon createIcon(const QColor &color) const;
 
     FloatingWindow *m_window;
+    LightState m_state = LightState::Idle;
+    QColor m_currentColor{40, 200, 40};
 };

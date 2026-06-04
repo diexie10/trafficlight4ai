@@ -21,6 +21,9 @@ public:
     qreal activeAlpha() const;
     void setActiveAlpha(qreal alpha);
 
+signals:
+    void activeAlphaChanged(qreal alpha);
+
 public slots:
     void onStateChanged(LightState newState);
 

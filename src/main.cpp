@@ -58,6 +58,10 @@ int main(int argc, char *argv[])
     QObject::connect(&stateManager, &StateManager::stateChanged,
                      trayIcon, &TrayIcon::onStateChanged);
 
+    // Connect animation alpha to tray icon blinking
+    QObject::connect(lightWidget, &TrafficLightWidget::activeAlphaChanged,
+                     trayIcon, &TrayIcon::onActiveAlphaChanged);
+
     // Connect AI tool changes to tray tooltip
     QObject::connect(settingsDialog, &SettingsDialog::aiToolChanged,
                      trayIcon, &TrayIcon::onAiToolChanged);

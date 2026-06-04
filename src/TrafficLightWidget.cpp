@@ -69,6 +69,7 @@ qreal TrafficLightWidget::activeAlpha() const
 void TrafficLightWidget::setActiveAlpha(qreal alpha)
 {
     m_activeAlpha = alpha;
+    emit activeAlphaChanged(m_activeAlpha);
     update();
 }
 

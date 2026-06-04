@@ -38,17 +38,28 @@ TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObje
 
 void TrayIcon::onStateChanged(LightState newState)
 {
+    m_state = newState;
     switch (newState) {
     case LightState::Working:
-        setIcon(createIcon(QColor(220, 40, 40)));
+        m_currentColor = QColor(220, 40, 40);
         break;
     case LightState::WaitingConfirm:
-        setIcon(createIcon(QColor(240, 200, 20)));
+        m_currentColor = QColor(240, 200, 20);
         break;
     case LightState::Idle:
-        setIcon(createIcon(QColor(40, 200, 40)));
+        m_currentColor = QColor(40, 200, 40);
         break;
     }
+    setIcon(createIcon(m_currentColor));
+}
+
+void TrayIcon::onActiveAlphaChanged(qreal alpha)
+{
+    if (m_state == LightState::Idle)
+        return; // green stays steady
+    QColor color = m_currentColor;
+    color.setAlphaF(alpha);
+    setIcon(createIcon(color));
 }
 
 void TrayIcon::onAiToolChanged(const QString &displayName)
