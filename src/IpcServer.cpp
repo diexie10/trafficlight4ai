@@ -101,13 +101,22 @@ void IpcServer::connectServer()
 void IpcServer::onNewConnection()
 {
     while (QLocalSocket *client = m_server->nextPendingConnection()) {
-        connect(client, &QLocalSocket::readyRead, this, [this, client]() {
+        auto processData = [this, client]() {
             QByteArray data = client->readAll();
             if (!data.isEmpty())
                 m_stateManager->handleCommand(QString::fromUtf8(data));
             client->disconnectFromServer();
             client->deleteLater();
-        });
+        };
+
         connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
+
+        // Data may arrive before readyRead is connected (fast CLI sender).
+        // Check immediately; otherwise wait for the signal. Mutually exclusive.
+        if (client->bytesAvailable()) {
+            processData();
+        } else {
+            connect(client, &QLocalSocket::readyRead, this, processData);
+        }
     }
 }
