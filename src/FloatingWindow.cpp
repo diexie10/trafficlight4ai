@@ -1,0 +1,70 @@
+#include "FloatingWindow.h"
+#include "TrafficLightWidget.h"
+#include "ConfigManager.h"
+#include "SettingsDialog.h"
+#include <QVBoxLayout>
+#include <QMouseEvent>
+#include <QContextMenuEvent>
+#include <QMenu>
+#include <QApplication>
+
+FloatingWindow::FloatingWindow(TrafficLightWidget *lightWidget, ConfigManager *config,
+                               QWidget *parent)
+    : QWidget(parent), m_config(config)
+{
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setAttribute(Qt::WA_TranslucentBackground);
+
+    auto *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(lightWidget);
+
+    move(m_config->windowPosX(), m_config->windowPosY());
+}
+
+void FloatingWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_dragging = true;
+        m_dragStartPos = event->globalPosition().toPoint() - frameGeometry().topLeft();
+        event->accept();
+    }
+}
+
+void FloatingWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_dragging && (event->buttons() & Qt::LeftButton)) {
+        move(event->globalPosition().toPoint() - m_dragStartPos);
+        event->accept();
+    }
+}
+
+void FloatingWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && m_dragging) {
+        m_dragging = false;
+        m_config->setWindowPos(x(), y());
+        event->accept();
+    }
+}
+
+void FloatingWindow::setSettingsDialog(SettingsDialog *dialog)
+{
+    m_settingsDialog = dialog;
+}
+
+void FloatingWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu;
+    if (m_settingsDialog) {
+        auto *settingsAction = menu.addAction("设置");
+        connect(settingsAction, &QAction::triggered, this, [this]() {
+            m_settingsDialog->show();
+            m_settingsDialog->raise();
+            m_settingsDialog->activateWindow();
+        });
+    }
+    auto *quitAction = menu.addAction("退出");
+    connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    menu.exec(event->globalPos());
+}
