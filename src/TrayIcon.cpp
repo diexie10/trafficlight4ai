@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPixmap>
+#include <QTimer>
 #include <QDebug>
 
 TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObject *parent)
@@ -55,6 +56,15 @@ void TrayIcon::onStateChanged(LightState newState)
     qDebug("[TrayIcon] setIcon color=(%d,%d,%d) alpha=1.0",
            m_currentColor.red(), m_currentColor.green(), m_currentColor.blue());
     setIcon(createIcon(m_currentColor));
+
+    // Ubuntu SNI tray may not refresh after rapid icon updates from animation.
+    // Re-apply icon after a short delay to force tray refresh.
+    if (newState == LightState::Idle) {
+        QTimer::singleShot(150, this, [this]() {
+            qDebug("[TrayIcon] delayed re-apply green icon");
+            setIcon(createIcon(m_currentColor));
+        });
+    }
 }
 
 void TrayIcon::onActiveAlphaChanged(qreal alpha)
