@@ -72,10 +72,13 @@ void ConfigManager::load()
         }
     }
 
-    if (!loaded)
+    if (!loaded) {
         applyDefaults();
-
-    normalize();
+        normalize();
+        save(); // create config file on first run or corrupt file
+    } else {
+        normalize(); // only saves if values were corrected
+    }
 }
 
 void ConfigManager::save()
@@ -198,6 +201,8 @@ void ConfigManager::setTimeoutSec(int sec)
 
 void ConfigManager::normalize()
 {
+    const QJsonObject before = m_root;
+
     // Validate window.size
     QJsonObject window = m_root["window"].toObject();
     if (!kValidSizes.contains(window["size"].toString()))
@@ -226,5 +231,6 @@ void ConfigManager::normalize()
         socket["path"] = defaultSocketPath();
     m_root["socket"] = socket;
 
-    save();
+    if (m_root != before)
+        save();
 }

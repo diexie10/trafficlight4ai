@@ -79,7 +79,6 @@ public:
             if (s->id() == id)
                 return s;
         }
-        const auto &list = strategies();
-        return list.isEmpty() ? nullptr : list.first();
+        return nullptr;
     }
 };

@@ -80,11 +80,10 @@ private slots:
         QCOMPARE(s->id(), QString("claude-code"));
     }
 
-    void registryFallbackForUnknown()
+    void registryReturnsNullForUnknown()
     {
         auto *s = AiToolRegistry::find("unknown-tool");
-        QVERIFY(s != nullptr); // fallback to first
-        QCOMPARE(s->id(), QString("codex"));
+        QVERIFY(s == nullptr);
     }
 
     void registryStrategiesNotEmpty()
