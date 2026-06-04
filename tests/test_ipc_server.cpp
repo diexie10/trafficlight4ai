@@ -2,6 +2,9 @@
 #include <QLocalSocket>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 #include "IpcServer.h"
 #include "StateManager.h"
 
@@ -119,12 +122,15 @@ private slots:
 
     void removesStaleSocketOnStart()
     {
-        // Create a real stale socket using QLocalServer directly
-        QLocalServer staleServer;
-        staleServer.listen(m_socketPath);
-        QVERIFY(staleServer.isListening());
-        // Close without removing — simulates crash leaving stale socket file
-        staleServer.close();
+        // Create a real stale Unix socket via POSIX API: bind but only close fd (no unlink)
+        int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        QVERIFY(fd >= 0);
+        struct sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, m_socketPath.toLocal8Bit().constData(), sizeof(addr.sun_path) - 1);
+        QCOMPARE(bind(fd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)), 0);
+        close(fd); // close fd without unlinking — leaves stale socket file
+
         QVERIFY(QFile::exists(m_socketPath));
 
         StateManager sm;
