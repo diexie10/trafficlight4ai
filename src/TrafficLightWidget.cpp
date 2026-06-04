@@ -1,29 +1,50 @@
 #include "TrafficLightWidget.h"
 #include <QPainter>
-#include <QPainterPath>
 
 TrafficLightWidget::TrafficLightWidget(QWidget *parent)
     : QWidget(parent)
 {
-    setSizePreset(Small);
+    m_imgOff = QPixmap(":/images/images/light_off.png");
+    m_imgRed = QPixmap(":/images/images/light_red.png");
+    m_imgYellow = QPixmap(":/images/images/light_yellow.png");
+    m_imgGreen = QPixmap(":/images/images/light_green.png");
+
     setAttribute(Qt::WA_TranslucentBackground);
+    setSizePreset(Small);
 }
 
 void TrafficLightWidget::setSizePreset(SizePreset preset)
 {
     m_sizePreset = preset;
     setFixedSize(sizeForPreset(preset));
+    rescalePixmaps();
     update();
 }
 
 QSize TrafficLightWidget::sizeForPreset(SizePreset preset) const
 {
+    int targetWidth = 80;
     switch (preset) {
-    case Small:  return {80, 200};
-    case Medium: return {100, 260};
-    case Large:  return {130, 340};
+    case Small:  targetWidth = 80;  break;
+    case Medium: targetWidth = 100; break;
+    case Large:  targetWidth = 130; break;
     }
-    return {80, 200};
+
+    if (m_imgOff.isNull() || m_imgOff.width() == 0)
+        return {targetWidth, targetWidth * 3}; // fallback
+
+    const qreal ratio = static_cast<qreal>(m_imgOff.height()) / m_imgOff.width();
+    return {targetWidth, static_cast<int>(targetWidth * ratio)};
+}
+
+void TrafficLightWidget::rescalePixmaps()
+{
+    const QSize sz = size();
+    const auto mode = Qt::SmoothTransformation;
+    m_scaledOff = m_imgOff.scaled(sz, Qt::KeepAspectRatio, mode);
+    m_scaledRed = m_imgRed.scaled(sz, Qt::KeepAspectRatio, mode);
+    m_scaledYellow = m_imgYellow.scaled(sz, Qt::KeepAspectRatio, mode);
+    m_scaledGreen = m_imgGreen.scaled(sz, Qt::KeepAspectRatio, mode);
 }
 
 void TrafficLightWidget::setAnimationMode(const QString &mode)
@@ -97,67 +118,25 @@ void TrafficLightWidget::stopAnimation()
     }
 }
 
-QColor TrafficLightWidget::colorForLight(LightState light, bool active) const
-{
-    const QColor dimColor(60, 60, 60);
-    if (!active)
-        return dimColor;
-
-    switch (light) {
-    case LightState::Working:       return QColor(220, 40, 40);
-    case LightState::WaitingConfirm: return QColor(240, 200, 20);
-    case LightState::Idle:          return QColor(40, 200, 40);
-    }
-    return dimColor;
-}
-
 void TrafficLightWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    const int w = width();
-    const int h = height();
-    const int margin = w / 10;
-    const int lightDiameter = (w - margin * 2) * 4 / 5;
-    const int spacing = (h - margin * 2 - lightDiameter * 3) / 4;
+    // Draw the "all off" base image
+    painter.drawPixmap(0, 0, m_scaledOff);
 
-    // Background housing
-    QPainterPath housing;
-    housing.addRoundedRect(QRectF(0, 0, w, h), w / 6.0, w / 6.0);
-    painter.fillPath(housing, QColor(45, 45, 45));
+    // Select the active light image
+    const QPixmap *activeImg = nullptr;
+    switch (m_state) {
+    case LightState::Working:       activeImg = &m_scaledRed;    break;
+    case LightState::WaitingConfirm: activeImg = &m_scaledYellow; break;
+    case LightState::Idle:          activeImg = &m_scaledGreen;  break;
+    }
 
-    // Draw three lights: Red (top), Yellow (middle), Green (bottom)
-    const LightState lights[] = {LightState::Working, LightState::WaitingConfirm, LightState::Idle};
-    for (int i = 0; i < 3; ++i) {
-        const int cx = w / 2;
-        const int cy = margin + spacing + lightDiameter / 2 + i * (lightDiameter + spacing);
-
-        const bool isActive = (lights[i] == m_state);
-        QColor color = colorForLight(lights[i], isActive);
-
-        if (isActive && m_state != LightState::Idle) {
-            // Apply alpha for animation
-            color.setAlphaF(m_activeAlpha);
-        } else if (!isActive) {
-            color.setAlphaF(0.3);
-        }
-
-        // Glow effect for active light
-        if (isActive && m_activeAlpha > 0.5) {
-            QRadialGradient glow(cx, cy, lightDiameter * 0.7);
-            QColor glowColor = color;
-            glowColor.setAlphaF(m_activeAlpha * 0.3);
-            glow.setColorAt(0, glowColor);
-            glow.setColorAt(1, Qt::transparent);
-            painter.setBrush(glow);
-            painter.setPen(Qt::NoPen);
-            painter.drawEllipse(QPointF(cx, cy), lightDiameter * 0.7, lightDiameter * 0.7);
-        }
-
-        // Light circle
-        painter.setBrush(color);
-        painter.setPen(QPen(QColor(30, 30, 30), 2));
-        painter.drawEllipse(QPointF(cx, cy), lightDiameter / 2.0, lightDiameter / 2.0);
+    // Overlay the active light with animated opacity
+    if (activeImg && !activeImg->isNull()) {
+        painter.setOpacity(m_activeAlpha);
+        painter.drawPixmap(0, 0, *activeImg);
     }
 }

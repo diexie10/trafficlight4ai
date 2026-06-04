@@ -15,4 +15,13 @@ add_executable(trafficlight4ai
     TrayIcon.cpp
     SettingsDialog.cpp
 )
+qt_add_resources(trafficlight4ai "images"
+    PREFIX "/images"
+    BASE "${CMAKE_SOURCE_DIR}/resources"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/images/light_off.png"
+        "${CMAKE_SOURCE_DIR}/resources/images/light_red.png"
+        "${CMAKE_SOURCE_DIR}/resources/images/light_yellow.png"
+        "${CMAKE_SOURCE_DIR}/resources/images/light_green.png"
+)
 target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets)

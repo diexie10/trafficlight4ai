@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QPixmap>
 #include <QPropertyAnimation>
 #include "StateManager.h"
 
@@ -29,7 +30,7 @@ protected:
 private:
     void startAnimation();
     void stopAnimation();
-    QColor colorForLight(LightState light, bool active) const;
+    void rescalePixmaps();
     QSize sizeForPreset(SizePreset preset) const;
 
     LightState m_state = LightState::Idle;
@@ -38,4 +39,16 @@ private:
     int m_animationPeriodMs = 1000;
     qreal m_activeAlpha = 1.0;
     QPropertyAnimation *m_animation = nullptr;
+
+    // Original images
+    QPixmap m_imgOff;
+    QPixmap m_imgRed;
+    QPixmap m_imgYellow;
+    QPixmap m_imgGreen;
+
+    // Cached scaled images
+    QPixmap m_scaledOff;
+    QPixmap m_scaledRed;
+    QPixmap m_scaledYellow;
+    QPixmap m_scaledGreen;
 };
