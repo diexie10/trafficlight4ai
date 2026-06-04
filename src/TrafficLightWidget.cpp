@@ -1,5 +1,6 @@
 #include "TrafficLightWidget.h"
 #include <QPainter>
+#include <QDebug>
 
 TrafficLightWidget::TrafficLightWidget(QWidget *parent)
     : QWidget(parent)
@@ -69,17 +70,20 @@ qreal TrafficLightWidget::activeAlpha() const
 void TrafficLightWidget::setActiveAlpha(qreal alpha)
 {
     m_activeAlpha = alpha;
+    qDebug("[Widget] setActiveAlpha: %.2f state=%d", alpha, static_cast<int>(m_state));
     emit activeAlphaChanged(m_activeAlpha);
     update();
 }
 
 void TrafficLightWidget::onStateChanged(LightState newState)
 {
+    qDebug("[Widget] onStateChanged: %d -> %d", static_cast<int>(m_state), static_cast<int>(newState));
     m_state = newState;
 
     if (m_state == LightState::Idle) {
         stopAnimation();
         m_activeAlpha = 1.0;
+        qDebug("[Widget] set alpha=1.0 directly (no signal)");
     } else {
         startAnimation();
     }

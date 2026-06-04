@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPixmap>
+#include <QDebug>
 
 TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObject *parent)
     : QSystemTrayIcon(parent), m_window(window)
@@ -38,6 +39,7 @@ TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObje
 
 void TrayIcon::onStateChanged(LightState newState)
 {
+    qDebug("[TrayIcon] onStateChanged: %d -> %d", static_cast<int>(m_state), static_cast<int>(newState));
     m_state = newState;
     switch (newState) {
     case LightState::Working:
@@ -50,12 +52,16 @@ void TrayIcon::onStateChanged(LightState newState)
         m_currentColor = QColor(40, 200, 40);
         break;
     }
+    qDebug("[TrayIcon] setIcon color=(%d,%d,%d) alpha=1.0",
+           m_currentColor.red(), m_currentColor.green(), m_currentColor.blue());
     setIcon(createIcon(m_currentColor));
 }
 
 void TrayIcon::onActiveAlphaChanged(qreal alpha)
 {
-    // Idle state: always show solid green regardless of alpha
+    qDebug("[TrayIcon] onActiveAlphaChanged: alpha=%.2f state=%d color=(%d,%d,%d)",
+           alpha, static_cast<int>(m_state),
+           m_currentColor.red(), m_currentColor.green(), m_currentColor.blue());
     if (m_state == LightState::Idle) {
         setIcon(createIcon(m_currentColor));
         return;
