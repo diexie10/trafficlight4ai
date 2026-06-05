@@ -13,6 +13,7 @@
     <message><source>Small</source><translation>小</translation></message>
     <message><source>Medium</source><translation>中</translation></message>
     <message><source>Large</source><translation>大</translation></message>
+    <message><source>Extra Large</source><translation>超大</translation></message>
     <message><source>Animation Mode:</source><translation>动画模式:</translation></message>
     <message><source>Breathing</source><translation>呼吸灯</translation></message>
     <message><source>Classic Blink</source><translation>经典闪烁</translation></message>

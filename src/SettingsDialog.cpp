@@ -184,7 +184,7 @@ void SettingsDialog::retranslateUi()
     const int sizeIdx = m_sizeCombo->currentIndex();
     m_sizeCombo->blockSignals(true);
     m_sizeCombo->clear();
-    m_sizeCombo->addItems({tr("Small"), tr("Medium"), tr("Large")});
+    m_sizeCombo->addItems({tr("Small"), tr("Medium"), tr("Large"), tr("Extra Large")});
     if (sizeIdx >= 0) m_sizeCombo->setCurrentIndex(sizeIdx);
     m_sizeCombo->blockSignals(false);
 
@@ -250,7 +250,7 @@ void SettingsDialog::showEvent(QShowEvent *event)
     m_timeoutSpin->blockSignals(false);
 
     // Window size
-    const QStringList sizes = {"small", "medium", "large"};
+    const QStringList sizes = {"small", "medium", "large", "xlarge"};
     m_sizeCombo->blockSignals(true);
     m_sizeCombo->setCurrentIndex(sizes.indexOf(m_config->windowSize()));
     m_sizeCombo->blockSignals(false);
@@ -318,14 +318,17 @@ void SettingsDialog::restoreSnapshot()
     m_config->setTimeoutSec(m_snapTimeoutSec);
     m_stateManager->setTimeoutSec(m_snapTimeoutSec);
 
-    // Restore window size
+    // Restore window size (preserve position)
+    QWidget *window = m_lightWidget->window();
+    QPoint pos = window->pos();
     m_config->setWindowSize(m_snapSize);
-    const QStringList sizes = {"small", "medium", "large"};
+    const QStringList sizes = {"small", "medium", "large", "xlarge"};
     int idx = sizes.indexOf(m_snapSize);
     TrafficLightWidget::SizePreset presets[] = {
-        TrafficLightWidget::Small, TrafficLightWidget::Medium, TrafficLightWidget::Large
+        TrafficLightWidget::Small, TrafficLightWidget::Medium, TrafficLightWidget::Large, TrafficLightWidget::ExtraLarge
     };
     m_lightWidget->setSizePreset(presets[idx >= 0 ? idx : 0]);
+    window->move(pos);
 
     // Restore animation
     m_lightWidget->setAnimationMode(m_snapMode);
@@ -363,12 +366,20 @@ void SettingsDialog::onTimeoutChanged(int value)
 
 void SettingsDialog::onWindowSizeChanged(int index)
 {
-    const QStringList sizes = {"small", "medium", "large"};
+    const QStringList sizes = {"small", "medium", "large", "xlarge"};
     TrafficLightWidget::SizePreset presets[] = {
-        TrafficLightWidget::Small, TrafficLightWidget::Medium, TrafficLightWidget::Large
+        TrafficLightWidget::Small, TrafficLightWidget::Medium, TrafficLightWidget::Large, TrafficLightWidget::ExtraLarge
     };
+
+    // Preserve window position across size change
+    QWidget *window = m_lightWidget->window();
+    QPoint pos = window->pos();
+
     m_config->setWindowSize(sizes.at(index));
     m_lightWidget->setSizePreset(presets[index]);
+
+    window->move(pos);
+    m_config->setWindowPos(pos.x(), pos.y());
 }
 
 void SettingsDialog::onAnimationModeChanged(int index)

@@ -13,6 +13,7 @@
     <message><source>Small</source><translation>小</translation></message>
     <message><source>Medium</source><translation>中</translation></message>
     <message><source>Large</source><translation>大</translation></message>
+    <message><source>Extra Large</source><translation>特大</translation></message>
     <message><source>Animation Mode:</source><translation>アニメーション:</translation></message>
     <message><source>Breathing</source><translation>ブリージング</translation></message>
     <message><source>Classic Blink</source><translation>クラシック点滅</translation></message>

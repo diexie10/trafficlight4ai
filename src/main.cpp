@@ -64,6 +64,8 @@ int main(int argc, char *argv[])
         lightWidget->setSizePreset(TrafficLightWidget::Medium);
     else if (size == "large")
         lightWidget->setSizePreset(TrafficLightWidget::Large);
+    else if (size == "xlarge")
+        lightWidget->setSizePreset(TrafficLightWidget::ExtraLarge);
 
     auto *floatingWindow = new FloatingWindow(lightWidget, &config);
     floatingWindow->show();

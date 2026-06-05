@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <algorithm>
 
-static const QStringList kValidSizes = {"small", "medium", "large"};
+static const QStringList kValidSizes = {"small", "medium", "large", "xlarge"};
 static const QStringList kValidModes = {"breathing", "classic"};
 static const QString kLegacyDefaultSocketPath = "/tmp/trafficlight4ai.sock";
 
@@ -33,7 +33,7 @@ ConfigManager::~ConfigManager()
 void ConfigManager::applyDefaults()
 {
     QJsonObject window;
-    window["size"] = "small";
+    window["size"] = "medium";
     window["posX"] = 20;
     window["posY"] = 20;
 
@@ -103,7 +103,7 @@ void ConfigManager::save()
 
 QString ConfigManager::windowSize() const
 {
-    return m_root["window"].toObject()["size"].toString("small");
+    return m_root["window"].toObject()["size"].toString("medium");
 }
 
 void ConfigManager::setWindowSize(const QString &size)
@@ -276,7 +276,7 @@ void ConfigManager::normalize()
     // Validate window.size
     QJsonObject window = m_root["window"].toObject();
     if (!kValidSizes.contains(window["size"].toString()))
-        window["size"] = "small";
+        window["size"] = "medium";
     m_root["window"] = window;
 
     // Validate animation.mode and animation.periodMs
