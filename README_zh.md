@@ -119,6 +119,8 @@ tl4ai-ctl green    # 绿灯常亮
   - 动画周期（200~5000ms）
   - Socket 路径
 - **策略模式** — 轻松添加新 AI 工具（实现 `AiToolStrategy` 接口，注册到 `AiToolRegistry`）
+- **提示音** — 黄灯（需确认）和绿灯（完成）时播放提示音，支持 WAV/MP3/OGG，fallback 系统 beep
+- **国际化** — 英语（默认）、中文、日语，运行时切换
 - **轻量 CLI** — `tl4ai-ctl` 纯 POSIX C++ 实现，不依赖 Qt，执行 <100ms
 
 ## 配置文件
@@ -127,10 +129,11 @@ tl4ai-ctl green    # 绿灯常亮
 
 ```json
 {
+  "language": "en",
   "aiTool": "codex",
   "timeoutSec": 300,
   "window": {
-    "size": "small",
+    "size": "medium",
     "posX": 20,
     "posY": 20
   },
@@ -140,6 +143,12 @@ tl4ai-ctl green    # 绿灯常亮
   },
   "socket": {
     "path": "$XDG_RUNTIME_DIR/trafficlight4ai.sock"
+  },
+  "sound": {
+    "yellowEnabled": true,
+    "greenEnabled": true,
+    "yellowFile": "",
+    "greenFile": ""
   }
 }
 ```

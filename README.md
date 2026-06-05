@@ -119,6 +119,8 @@ tl4ai-ctl green    # Green light steady
   - Animation period (200–5000ms)
   - Socket path
 - **Strategy pattern** — Easy to add new AI tools (implement `AiToolStrategy`, register in `AiToolRegistry`)
+- **Sound notifications** — Plays sound on yellow (confirmation needed) and green (done), supports WAV/MP3/OGG with system beep fallback
+- **i18n** — English (default), Chinese, Japanese, switchable at runtime
 - **Lightweight CLI** — `tl4ai-ctl` is pure POSIX C++, no Qt dependency, <100ms execution
 
 ## Configuration
@@ -127,10 +129,11 @@ Config file: `~/.config/trafficlight4ai/config.json`
 
 ```json
 {
+  "language": "en",
   "aiTool": "codex",
   "timeoutSec": 300,
   "window": {
-    "size": "small",
+    "size": "medium",
     "posX": 20,
     "posY": 20
   },
@@ -140,6 +143,12 @@ Config file: `~/.config/trafficlight4ai/config.json`
   },
   "socket": {
     "path": "$XDG_RUNTIME_DIR/trafficlight4ai.sock"
+  },
+  "sound": {
+    "yellowEnabled": true,
+    "greenEnabled": true,
+    "yellowFile": "",
+    "greenFile": ""
   }
 }
 ```
