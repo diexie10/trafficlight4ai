@@ -34,7 +34,8 @@ Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right mo
 ```bash
 # qt6-base-dev: provides Core, Widgets, Network, Test modules (GUI, IPC, testing)
 # qt6-multimedia-dev: provides Multimedia module (sound notification playback)
-sudo apt install qt6-base-dev qt6-multimedia-dev    # Ubuntu/Debian
+# qt6-tools-dev: provides LinguistTools module (i18n translation compilation)
+sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev    # Ubuntu/Debian
 
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)

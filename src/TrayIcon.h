@@ -3,6 +3,7 @@
 #include <QSystemTrayIcon>
 #include "StateManager.h"
 
+class QAction;
 class FloatingWindow;
 class SettingsDialog;
 

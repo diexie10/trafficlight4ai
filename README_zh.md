@@ -34,7 +34,8 @@ AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，
 ```bash
 # qt6-base-dev: 提供 Core, Widgets, Network, Test 模块（GUI、IPC、测试）
 # qt6-multimedia-dev: 提供 Multimedia 模块（提示音播放）
-sudo apt install qt6-base-dev qt6-multimedia-dev    # Ubuntu/Debian
+# qt6-tools-dev: 提供 LinguistTools 模块（国际化翻译编译）
+sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev    # Ubuntu/Debian
 
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
