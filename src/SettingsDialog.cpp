@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QFileDialog>
+#include <QTimer>
 #include <QApplication>
 
 SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightWidget,
@@ -329,6 +330,9 @@ void SettingsDialog::restoreSnapshot()
     };
     m_lightWidget->setSizePreset(presets[idx >= 0 ? idx : 0]);
     window->move(pos);
+    QTimer::singleShot(0, window, [window, pos]() {
+        window->move(pos);
+    });
 
     // Restore animation
     m_lightWidget->setAnimationMode(m_snapMode);
@@ -378,8 +382,12 @@ void SettingsDialog::onWindowSizeChanged(int index)
     m_config->setWindowSize(sizes.at(index));
     m_lightWidget->setSizePreset(presets[index]);
 
+    // Defer move to after layout recalculation completes
     window->move(pos);
-    m_config->setWindowPos(pos.x(), pos.y());
+    QTimer::singleShot(0, window, [window, pos, this]() {
+        window->move(pos);
+        m_config->setWindowPos(pos.x(), pos.y());
+    });
 }
 
 void SettingsDialog::onAnimationModeChanged(int index)
