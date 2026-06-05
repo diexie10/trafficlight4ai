@@ -3,8 +3,12 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QFile>
+#include <QtGlobal>
+#ifdef Q_OS_UNIX
 #include <sys/stat.h>
+#endif
 
+#ifdef Q_OS_UNIX
 static bool isUnixSocket(const QString &path)
 {
     struct stat st;
@@ -12,6 +16,7 @@ static bool isUnixSocket(const QString &path)
         return false;
     return S_ISSOCK(st.st_mode);
 }
+#endif
 
 static bool isLiveSocket(const QString &path)
 {
@@ -26,18 +31,29 @@ static bool isLiveSocket(const QString &path)
 
 static void removeStaleSocket(const QString &path)
 {
-    if (!QFile::exists(path))
+    if (isLiveSocket(path))
         return;
 
+#ifdef Q_OS_UNIX
+    if (!QFile::exists(path))
+        return;
     // Only remove actual Unix sockets, never regular files
     if (!isUnixSocket(path))
         return;
 
-    // Don't remove if another instance is actively listening
-    if (isLiveSocket(path))
-        return;
-
     QFile::remove(path);
+#else
+    QLocalServer::removeServer(path);
+#endif
+}
+
+static void removeOwnedServer(const QString &path)
+{
+#ifdef Q_OS_UNIX
+    QFile::remove(path);
+#else
+    QLocalServer::removeServer(path);
+#endif
 }
 
 IpcServer::IpcServer(StateManager *stateManager, const QString &socketPath, QObject *parent)
@@ -57,7 +73,7 @@ IpcServer::~IpcServer()
 {
     m_server->close();
     if (m_ownsSocket)
-        QFile::remove(m_socketPath);
+        removeOwnedServer(m_socketPath);
 }
 
 bool IpcServer::isListening() const
@@ -84,7 +100,7 @@ bool IpcServer::restart(const QString &newPath)
 
     m_server->close();
     if (oldOwned)
-        QFile::remove(oldPath);
+        removeOwnedServer(oldPath);
 
     m_server = std::move(newServer);
     m_socketPath = newPath;

@@ -17,7 +17,7 @@ AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code
 ## 工作原理
 
 ```
-AI 工具 Hooks → tl4ai-ctl (CLI) → Unix Domain Socket → trafficlight4ai (GUI)
+AI 工具 Hooks → tl4ai-ctl (CLI) → 本地 IPC socket → trafficlight4ai (GUI)
 ```
 
 AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，GUI 即时更新。
@@ -56,7 +56,7 @@ Release 构建会定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移
 | 可执行文件 | 路径 | 说明 |
 |---|---|---|
 | `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI 主程序 — 悬浮窗口 + 系统托盘图标，内嵌 IPC 服务端接收状态指令 |
-| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | 轻量 CLI — 纯 POSIX C++ 实现（不依赖 Qt），通过 Unix Domain Socket 向 GUI 发送 `RED`/`YELLOW`/`GREEN` 指令 |
+| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | 轻量 Qt CLI，通过 `QLocalSocket` 向 GUI 发送 `RED`/`YELLOW`/`GREEN` 指令 |
 
 ## 快速开始
 
@@ -156,7 +156,7 @@ tl4ai-ctl green    # 绿灯常亮
 - **策略模式** — 轻松添加新 AI 工具（实现 `AiToolStrategy` 接口，注册到 `AiToolRegistry`）
 - **提示音** — 黄灯（需确认）和绿灯（完成）时播放提示音，支持 WAV/MP3/OGG，fallback 系统 beep
 - **国际化** — 英语（默认）、中文、日语，运行时切换
-- **轻量 CLI** — `tl4ai-ctl` 纯 POSIX C++ 实现，不依赖 Qt，执行 <100ms
+- **轻量 CLI** — `tl4ai-ctl` 使用 Qt Core/Network 和 `QLocalSocket` 实现跨平台本地 IPC
 
 ## 配置文件
 
@@ -188,7 +188,7 @@ tl4ai-ctl green    # 绿灯常亮
 }
 ```
 
-Socket 路径也可通过 `TL4AI_SOCKET` 环境变量覆盖。
+Socket 路径或名称也可通过 `TL4AI_SOCKET` 环境变量覆盖。
 
 ## 测试
 

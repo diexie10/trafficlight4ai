@@ -17,8 +17,8 @@ trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、C
 - **语言**：C++17
 - **GUI 框架**：Qt 6（Core, Widgets, Network, Multimedia, Test）
 - **构建系统**：CMake（最低 3.20）
-- **目标平台**：Linux
-- **状态检测**：AI 工具 Hooks → tl4ai-ctl CLI → Unix Domain Socket
+- **目标平台**：Linux，Windows 支持开发中
+- **状态检测**：AI 工具 Hooks → tl4ai-ctl CLI → Qt local IPC socket
 - **国际化**：Qt Linguist（QTranslator + .ts/.qm），支持英语/中文/日语
 
 ## 构建依赖（Ubuntu/Debian）
@@ -61,7 +61,7 @@ trafficlight4ai/
 │   ├── CMakeLists.txt             # tl4ai_core 静态库 + trafficlight4ai 可执行文件
 │   ├── StateManager.h/cpp         # 状态机（纯逻辑，含超时机制）
 │   ├── ConfigManager.h/cpp        # JSON 配置管理
-│   ├── IpcServer.h/cpp            # Unix Domain Socket 服务端
+│   ├── IpcServer.h/cpp            # QLocalServer 本地 IPC 服务端
 │   ├── AiToolStrategy.h           # AI 工具策略接口 + Registry
 │   ├── TrafficLightWidget.h/cpp   # 红绿灯绘制控件
 │   ├── FloatingWindow.h/cpp       # 可拖动悬浮窗口
@@ -78,7 +78,7 @@ trafficlight4ai/
 │   └── test_tl4ai_ctl.cpp         # CLI 集成测试
 ├── tools/
 │   ├── CMakeLists.txt
-│   └── tl4ai_ctl.cpp              # 纯 POSIX CLI，不依赖 Qt
+│   └── tl4ai_ctl.cpp              # Qt QLocalSocket CLI
 ├── translations/
 │   ├── trafficlight4ai_zh.ts      # 中文翻译
 │   └── trafficlight4ai_ja.ts      # 日语翻译
@@ -92,7 +92,7 @@ trafficlight4ai/
 ### 两个可执行文件
 
 - **trafficlight4ai**（`src/`）— Qt GUI 主进程，内嵌 IPC Server
-- **tl4ai-ctl**（`tools/`）— 纯 POSIX 轻量 CLI，不依赖 Qt，通过 socket 发送状态指令
+- **tl4ai-ctl**（`tools/`）— Qt 轻量 CLI，通过 QLocalSocket 发送状态指令
 
 ### 核心类（`src/`）
 
@@ -100,7 +100,7 @@ trafficlight4ai/
 |---|------|------|
 | `StateManager` | 状态机（Working/WaitingConfirm/Idle），超时自动回 Idle | Qt Core |
 | `ConfigManager` | JSON 配置读写（`~/.config/trafficlight4ai/config.json`） | Qt Core |
-| `IpcServer` | QLocalServer 监听 Unix Domain Socket，解析指令转发给 StateManager | Qt Network |
+| `IpcServer` | QLocalServer 监听本地 IPC socket，解析指令转发给 StateManager | Qt Network |
 | `AiToolStrategy` | 策略接口，封装各 AI 工具的差异（hooks 模板、默认超时等） | 无 |
 | `TrafficLightWidget` | 自定义 QWidget，绘制三灯 UI，支持呼吸灯/经典闪烁 | Qt Widgets |
 | `FloatingWindow` | 无边框置顶窗口，可拖动，记忆位置 | Qt Widgets |
@@ -111,7 +111,7 @@ trafficlight4ai/
 ### 数据流
 
 ```
-AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer → StateManager → TrafficLightWidget + TrayIcon
+AI Tool Hooks → tl4ai-ctl (Qt CLI) → local IPC socket → IpcServer → StateManager → TrafficLightWidget + TrayIcon
 ```
 
 ### 库分层
@@ -120,7 +120,7 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 
 ### Socket 协议
 
-默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`）。可通过 config.json 或 `TL4AI_SOCKET` 环境变量覆盖。
+Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`）。Windows 默认名称：`trafficlight4ai`。可通过 config.json 或 `TL4AI_SOCKET` 环境变量覆盖。
 
 指令为单行纯文本：`RED\n` / `YELLOW\n` / `GREEN\n`，大小写不敏感，无法识别的指令静默忽略。
 

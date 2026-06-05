@@ -1,0 +1,60 @@
+name: Windows Build
+
+on:
+  push:
+    branches:
+      - main
+      - feature/windows-build-support
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.3"
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          modules: "qtmultimedia qttools"
+          cache: true
+
+      - name: Configure
+        run: >
+          cmake -S . -B build-windows
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTING=OFF
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+
+      - name: Build
+        run: cmake --build build-windows --config Release --parallel
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force windows-package/bin, windows-package/docs | Out-Null
+          Copy-Item build-windows/src/Release/trafficlight4ai.exe windows-package/bin/
+          Copy-Item build-windows/tools/Release/tl4ai-ctl.exe windows-package/bin/
+          Copy-Item README.md, README_zh.md, LICENSE windows-package/docs/
+          windeployqt --release --dir windows-package/bin windows-package/bin/trafficlight4ai.exe
+          windeployqt --release --dir windows-package/bin windows-package/bin/tl4ai-ctl.exe
+          Compress-Archive -Path windows-package/* -DestinationPath trafficlight4ai-windows-x86_64.zip -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trafficlight4ai-windows-x86_64
+          path: trafficlight4ai-windows-x86_64.zip
+          if-no-files-found: error

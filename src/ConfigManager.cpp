@@ -4,7 +4,10 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QtGlobal>
+#ifndef Q_OS_WIN
 #include <unistd.h>
+#endif
 #include <algorithm>
 
 static const QStringList kValidSizes = {"xsmall", "small", "medium", "large", "xlarge"};
@@ -13,10 +16,14 @@ static const QString kLegacyDefaultSocketPath = "/tmp/trafficlight4ai.sock";
 
 static QString defaultSocketPath()
 {
+#ifdef Q_OS_WIN
+    return "trafficlight4ai";
+#else
     const QByteArray runtimeDir = qgetenv("XDG_RUNTIME_DIR");
     if (!runtimeDir.isEmpty())
         return QString::fromLocal8Bit(runtimeDir) + "/trafficlight4ai.sock";
     return QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
+#endif
 }
 
 ConfigManager::ConfigManager(const QString &configPath, QObject *parent)

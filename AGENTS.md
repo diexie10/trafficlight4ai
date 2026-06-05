@@ -2,7 +2,7 @@
 
 ## 项目结构与模块组织
 
-本项目是 Linux 桌面工具，使用 Qt 6、CMake 和 C++17 构建。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供纯 POSIX CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放交通灯 PNG，`translations/` 存放中文和日语 `.ts` 翻译，`docs/` 存放问题记录和设计说明。
+本项目是 Qt 6 桌面工具，使用 CMake 和 C++17 构建。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供基于 Qt `QLocalSocket` 的 CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放交通灯 PNG，`translations/` 存放中文和日语 `.ts` 翻译，`docs/` 存放问题记录和设计说明。
 
 ## 构建、测试与开发命令
 
@@ -39,7 +39,7 @@ Release 构建可使用 `cmake -B build-release -DCMAKE_BUILD_TYPE=Release`。De
 
 ## 配置与资源注意事项
 
-运行配置位于 `~/.config/trafficlight4ai/config.json`，socket 可用 `TL4AI_SOCKET` 覆盖。当前配置包含 `language`、`aiTool`、`timeoutSec`、`window.size`（`xsmall`/`small`/`medium`/`large`/`xlarge`）、`animation.mode`、`animation.periodMs`、`socket.path` 和 `sound.*`。不要提交个人配置、机器相关 socket 路径或本机音频路径。新增图片请放入 `resources/images/` 并在 Qt 资源配置中注册。
+运行配置位于 `~/.config/trafficlight4ai/config.json`，socket 路径或名称可用 `TL4AI_SOCKET` 覆盖。当前配置包含 `language`、`aiTool`、`timeoutSec`、`window.size`（`xsmall`/`small`/`medium`/`large`/`xlarge`）、`animation.mode`、`animation.periodMs`、`socket.path` 和 `sound.*`。不要提交个人配置、机器相关 socket 路径或本机音频路径。新增图片请放入 `resources/images/` 并在 Qt 资源配置中注册。
 
 ## 提交与 Pull Request 规范
 

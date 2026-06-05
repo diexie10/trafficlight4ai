@@ -7,8 +7,10 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Multimedia LinguistTools Test)
 
-enable_testing()
+include(CTest)
 
 add_subdirectory(src)
-add_subdirectory(tests)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 add_subdirectory(tools)

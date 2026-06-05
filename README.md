@@ -17,7 +17,7 @@ It displays as a small floating always-on-top window + system tray icon on your 
 ## How It Works
 
 ```
-AI Tool Hooks → tl4ai-ctl (CLI) → Unix Domain Socket → trafficlight4ai (GUI)
+AI Tool Hooks → tl4ai-ctl (CLI) → local IPC socket → trafficlight4ai (GUI)
 ```
 
 Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right moments. The GUI updates instantly.
@@ -56,7 +56,7 @@ The build produces two executables:
 | Executable | Path | Description |
 |---|---|---|
 | `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI main program — floating window + system tray icon, embeds IPC server to receive state commands |
-| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | Lightweight CLI — pure POSIX C++ (no Qt dependency), sends `RED`/`YELLOW`/`GREEN` commands to the GUI via Unix Domain Socket |
+| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | Lightweight Qt CLI, sends `RED`/`YELLOW`/`GREEN` commands to the GUI via `QLocalSocket` |
 
 ## Quick Start
 
@@ -156,7 +156,7 @@ tl4ai-ctl green    # Green light steady
 - **Strategy pattern** — Easy to add new AI tools (implement `AiToolStrategy`, register in `AiToolRegistry`)
 - **Sound notifications** — Plays sound on yellow (confirmation needed) and green (done), supports WAV/MP3/OGG with system beep fallback
 - **i18n** — English (default), Chinese, Japanese, switchable at runtime
-- **Lightweight CLI** — `tl4ai-ctl` is pure POSIX C++, no Qt dependency, <100ms execution
+- **Lightweight CLI** — `tl4ai-ctl` uses Qt Core/Network and `QLocalSocket` for cross-platform local IPC
 
 ## Configuration
 
@@ -188,7 +188,7 @@ Config file: `~/.config/trafficlight4ai/config.json`
 }
 ```
 
-Socket path can also be overridden via `TL4AI_SOCKET` environment variable.
+Socket path/name can also be overridden via `TL4AI_SOCKET` environment variable.
 
 ## Tests
 
