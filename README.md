@@ -25,14 +25,16 @@ Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right mo
 ## Requirements
 
 - Linux
-- Qt 6 (Core, Widgets, Network)
+- Qt 6 (Core, Widgets, Network, Multimedia)
 - CMake 3.20+
 - C++17 compiler
 
 ## Build
 
 ```bash
-sudo apt install qt6-base-dev    # Ubuntu/Debian
+# qt6-base-dev: provides Core, Widgets, Network, Test modules (GUI, IPC, testing)
+# qt6-multimedia-dev: provides Multimedia module (sound notification playback)
+sudo apt install qt6-base-dev qt6-multimedia-dev    # Ubuntu/Debian
 
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
