@@ -4,6 +4,7 @@
 #include "IpcServer.h"
 #include "StateManager.h"
 #include "AiToolStrategy.h"
+#include "SoundUtils.h"
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSlider>
@@ -17,6 +18,7 @@
 #include <QDialog>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QFile>
 #include <QFileDialog>
 #include <QApplication>
 
@@ -69,20 +71,26 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     m_yellowSoundCheck = new QCheckBox("启用");
     m_yellowSoundEdit = new QLineEdit();
     m_yellowSoundEdit->setPlaceholderText("留空使用系统提示音");
+    m_yellowPreviewBtn = new QPushButton("试听");
+    m_yellowPreviewBtn->setEnabled(false);
     auto *yellowBrowseBtn = new QPushButton("浏览");
     auto *yellowSoundLayout = new QHBoxLayout();
     yellowSoundLayout->addWidget(m_yellowSoundCheck);
     yellowSoundLayout->addWidget(m_yellowSoundEdit);
+    yellowSoundLayout->addWidget(m_yellowPreviewBtn);
     yellowSoundLayout->addWidget(yellowBrowseBtn);
 
     // Green sound
     m_greenSoundCheck = new QCheckBox("启用");
     m_greenSoundEdit = new QLineEdit();
     m_greenSoundEdit->setPlaceholderText("留空使用系统提示音");
+    m_greenPreviewBtn = new QPushButton("试听");
+    m_greenPreviewBtn->setEnabled(false);
     auto *greenBrowseBtn = new QPushButton("浏览");
     auto *greenSoundLayout = new QHBoxLayout();
     greenSoundLayout->addWidget(m_greenSoundCheck);
     greenSoundLayout->addWidget(m_greenSoundEdit);
+    greenSoundLayout->addWidget(m_greenPreviewBtn);
     greenSoundLayout->addWidget(greenBrowseBtn);
 
     // Form layout
@@ -129,6 +137,14 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
             this, &SettingsDialog::onYellowSoundToggled);
     connect(m_greenSoundCheck, &QCheckBox::toggled,
             this, &SettingsDialog::onGreenSoundToggled);
+    connect(m_yellowSoundEdit, &QLineEdit::textChanged,
+            this, [this]() { updatePreviewButtons(); });
+    connect(m_greenSoundEdit, &QLineEdit::textChanged,
+            this, [this]() { updatePreviewButtons(); });
+    connect(m_yellowPreviewBtn, &QPushButton::clicked,
+            this, &SettingsDialog::onPreviewYellowSound);
+    connect(m_greenPreviewBtn, &QPushButton::clicked,
+            this, &SettingsDialog::onPreviewGreenSound);
     connect(yellowBrowseBtn, &QPushButton::clicked,
             this, &SettingsDialog::onBrowseYellowSound);
     connect(greenBrowseBtn, &QPushButton::clicked,
@@ -298,6 +314,25 @@ void SettingsDialog::onYellowSoundToggled(bool checked)
 void SettingsDialog::onGreenSoundToggled(bool checked)
 {
     m_config->setGreenSoundEnabled(checked);
+}
+
+void SettingsDialog::onPreviewYellowSound()
+{
+    playSound(m_yellowSoundEdit->text().trimmed(), this);
+}
+
+void SettingsDialog::onPreviewGreenSound()
+{
+    playSound(m_greenSoundEdit->text().trimmed(), this);
+}
+
+void SettingsDialog::updatePreviewButtons()
+{
+    const QString yellowPath = m_yellowSoundEdit->text().trimmed();
+    m_yellowPreviewBtn->setEnabled(!yellowPath.isEmpty() && QFile::exists(yellowPath));
+
+    const QString greenPath = m_greenSoundEdit->text().trimmed();
+    m_greenPreviewBtn->setEnabled(!greenPath.isEmpty() && QFile::exists(greenPath));
 }
 
 void SettingsDialog::onBrowseYellowSound()

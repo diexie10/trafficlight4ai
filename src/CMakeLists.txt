@@ -14,6 +14,7 @@ add_executable(trafficlight4ai
     FloatingWindow.cpp
     TrayIcon.cpp
     SettingsDialog.cpp
+    SoundUtils.cpp
 )
 qt_add_resources(trafficlight4ai "images"
     PREFIX "/images"
