@@ -22,13 +22,6 @@ AI 工具 Hooks → tl4ai-ctl (CLI) → 本地 IPC socket → trafficlight4ai (G
 
 AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，GUI 即时更新。
 
-## 环境要求
-
-- Linux 或 Windows 11
-- Qt 6（Core, Widgets, Network, Multimedia）
-- CMake 3.20+
-- C++17 编译器
-
 ## 下载
 
 预编译包可从 GitHub Releases 下载：
@@ -39,36 +32,9 @@ AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，
 
 Windows 上运行 `bin/trafficlight4ai.exe`。它会作为 GUI 程序启动，不应弹出命令行窗口。可在 PowerShell、cmd 或 AI 工具 hooks 中调用 `bin/tl4ai-ctl.exe red/yellow/green` 来切换灯状态。如果 Windows 提示缺少 MSVC 运行时 DLL，请安装 Microsoft Visual C++ Redistributable 2022 x64。
 
-## 编译
+## 从源码编译
 
-```bash
-# qt6-base-dev: 提供 Core, Widgets, Network, Test 模块（GUI、IPC、测试）
-# qt6-multimedia-dev: 提供 Multimedia 模块（提示音播放）
-# qt6-tools-dev: 提供 LinguistTools 模块（国际化翻译编译）
-sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev    # Ubuntu/Debian
-
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j$(nproc)
-```
-
-需要查看 `qDebug()` 开发日志时，使用 Debug 构建：
-
-```bash
-cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-debug -j$(nproc)
-./build-debug/src/trafficlight4ai
-```
-
-Release 构建会定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，warning 和 critical 错误仍会正常输出。
-
-编译后生成两个可执行文件：
-
-| 可执行文件 | 路径 | 说明 |
-|---|---|---|
-| `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI 主程序 — 悬浮窗口 + 系统托盘图标，内嵌 IPC 服务端接收状态指令 |
-| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | 轻量 Qt CLI，通过 `QLocalSocket` 向 GUI 发送 `RED`/`YELLOW`/`GREEN` 指令 |
-
-Windows 构建由 `Windows Build` GitHub Actions workflow 生成。它使用 `-DBUILD_TESTING=OFF` 配置 CMake，通过 MSVC 编译，执行 `windeployqt`，并上传 `trafficlight4ai-windows-x86_64.zip` artifact。
+Linux 和 Windows 的编译前提、编译命令、打包注意事项和验证方式见 [docs/BUILD_zh.md](docs/BUILD_zh.md)。
 
 ## 快速开始
 
@@ -201,12 +167,6 @@ tl4ai-ctl green    # 绿灯常亮
 ```
 
 Socket 路径或名称也可通过 `TL4AI_SOCKET` 环境变量覆盖。
-
-## 测试
-
-```bash
-cd build && ctest --output-on-failure
-```
 
 ## 许可证
 

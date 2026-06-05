@@ -4,28 +4,9 @@
 
 本项目是 Qt 6 桌面工具，使用 CMake 和 C++17 构建。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供基于 Qt `QLocalSocket` 的 CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放交通灯 PNG，`translations/` 存放中文和日语 `.ts` 翻译，`docs/` 存放问题记录和设计说明。
 
-## 构建、测试与开发命令
+## 构建与验证文档
 
-Ubuntu/Debian 依赖：
-
-```bash
-sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev
-```
-
-常用命令：
-
-```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Debug      # 配置调试构建
-cmake --build build -j$(nproc)               # 编译 GUI、CLI、测试
-./build/src/trafficlight4ai                  # 启动 GUI
-./build/tools/tl4ai-ctl red                  # 手动发送状态指令
-cd build && ctest --output-on-failure        # 运行全部测试
-cd build && ctest -R test_state_manager --output-on-failure
-```
-
-Release 构建可使用 `cmake -B build-release -DCMAKE_BUILD_TYPE=Release`。Debug 构建保留 `qDebug()` 开发日志；Release 构建定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，但 warning 和 critical 错误仍会输出。
-
-Windows 构建由 `.github/workflows/windows-build.yml` 负责，使用 MSVC、`-DBUILD_TESTING=OFF` 和 `windeployqt` 生成 `trafficlight4ai-windows-x86_64.zip` artifact。Windows GUI 主程序必须保持 `WIN32_EXECUTABLE TRUE`，避免启动时弹出控制台窗口；`tl4ai-ctl` 仍作为 CLI 工具发布。
+Linux 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。
 
 ## 代码风格与命名约定
 
@@ -45,7 +26,7 @@ Windows 构建由 `.github/workflows/windows-build.yml` 负责，使用 MSVC、`
 
 ## 发布注意事项
 
-GitHub Release 应同时上传 Ubuntu tar.gz、Windows zip 和 `SHA256SUMS.txt`。Ubuntu 包来自本地 Release 构建并需通过 `ctest --test-dir build-release --output-on-failure`；Windows 包来自成功的 `Windows Build` artifact。`dist/` 是本地发布产物目录，已被 `.gitignore` 忽略，不要提交。
+GitHub Release 应同时上传 Ubuntu tar.gz、Windows zip 和 `SHA256SUMS.txt`。Ubuntu 包来自本地 Release 构建并需按构建文档完成验证；Windows 包来自成功的 `Windows Build` artifact。`dist/` 是本地发布产物目录，已被 `.gitignore` 忽略，不要提交。
 
 ## 提交与 Pull Request 规范
 

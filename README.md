@@ -22,13 +22,6 @@ AI Tool Hooks → tl4ai-ctl (CLI) → local IPC socket → trafficlight4ai (GUI)
 
 Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right moments. The GUI updates instantly.
 
-## Requirements
-
-- Linux or Windows 11
-- Qt 6 (Core, Widgets, Network, Multimedia)
-- CMake 3.20+
-- C++17 compiler
-
 ## Download
 
 Prebuilt archives are available from GitHub Releases:
@@ -39,36 +32,9 @@ Prebuilt archives are available from GitHub Releases:
 
 On Windows, run `bin/trafficlight4ai.exe`. It is built as a GUI application and should not open a console window. Use `bin/tl4ai-ctl.exe red/yellow/green` from PowerShell, cmd, or AI tool hooks to change the light state. If Windows reports missing MSVC runtime DLLs, install the Microsoft Visual C++ Redistributable 2022 x64.
 
-## Build
+## Build From Source
 
-```bash
-# qt6-base-dev: provides Core, Widgets, Network, Test modules (GUI, IPC, testing)
-# qt6-multimedia-dev: provides Multimedia module (sound notification playback)
-# qt6-tools-dev: provides LinguistTools module (i18n translation compilation)
-sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev    # Ubuntu/Debian
-
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j$(nproc)
-```
-
-Use a Debug build when you want development logs from `qDebug()`:
-
-```bash
-cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-debug -j$(nproc)
-./build-debug/src/trafficlight4ai
-```
-
-Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out while warnings and critical errors remain visible.
-
-The build produces two executables:
-
-| Executable | Path | Description |
-|---|---|---|
-| `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI main program — floating window + system tray icon, embeds IPC server to receive state commands |
-| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | Lightweight Qt CLI, sends `RED`/`YELLOW`/`GREEN` commands to the GUI via `QLocalSocket` |
-
-Windows builds are produced by the `Windows Build` GitHub Actions workflow. It configures CMake with `-DBUILD_TESTING=OFF`, builds with MSVC, runs `windeployqt`, and uploads `trafficlight4ai-windows-x86_64.zip` as an artifact.
+See [docs/BUILD.md](docs/BUILD.md) for Linux and Windows prerequisites, build commands, packaging notes, and verification steps.
 
 ## Quick Start
 
@@ -201,12 +167,6 @@ Config file: `~/.config/trafficlight4ai/config.json`
 ```
 
 Socket path/name can also be overridden via `TL4AI_SOCKET` environment variable.
-
-## Tests
-
-```bash
-cd build && ctest --output-on-failure
-```
 
 ## License
 

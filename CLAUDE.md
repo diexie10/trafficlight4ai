@@ -21,34 +21,9 @@ trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、C
 - **状态检测**：AI 工具 Hooks → tl4ai-ctl CLI → Qt local IPC socket
 - **国际化**：Qt Linguist（QTranslator + .ts/.qm），支持英语/中文/日语
 
-## 构建依赖（Ubuntu/Debian）
+## 构建与验证
 
-```bash
-sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev
-```
-
-## 构建命令
-
-```bash
-# 配置
-cmake -B build -DCMAKE_BUILD_TYPE=Debug
-
-# 编译
-cmake --build build -j$(nproc)
-
-# 运行 GUI
-./build/src/trafficlight4ai
-
-# 运行全部测试
-cd build && ctest --output-on-failure
-
-# 运行单个测试
-cd build && ctest -R test_state_manager --output-on-failure
-
-# Release 构建（定义 QT_NO_DEBUG_OUTPUT，qDebug 日志编译时移除，warning/critical 保留）
-cmake -B build-release -DCMAKE_BUILD_TYPE=Release
-cmake --build build-release -j$(nproc)
-```
+Linux 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在本文件中重复维护完整编译步骤。
 
 ## 项目目录结构
 
