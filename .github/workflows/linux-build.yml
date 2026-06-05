@@ -26,14 +26,15 @@ jobs:
           - name: Fedora
             image: fedora:41
             install: |
-              dnf install -y cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-linguist
+              dnf install -y cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttools-devel
           - name: Arch
             image: archlinux:latest
             install: |
-              pacman -Syu --noconfirm cmake gcc qt6-base qt6-multimedia qt6-tools
+              pacman -Syu --noconfirm base-devel cmake qt6-base qt6-multimedia qt6-tools
           - name: openSUSE
             image: opensuse/tumbleweed:latest
             install: |
+              zypper --non-interactive refresh || true
               zypper --non-interactive install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel
 
     name: ${{ matrix.name }}

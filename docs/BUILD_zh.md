@@ -28,7 +28,7 @@ Linux 依赖：
 sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev
 
 # Fedora
-sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-linguist
+sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttools-devel
 
 # Arch Linux/Manjaro
 sudo pacman -S cmake gcc qt6-base qt6-multimedia qt6-tools
