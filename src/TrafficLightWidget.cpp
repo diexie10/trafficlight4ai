@@ -102,7 +102,8 @@ void TrafficLightWidget::startAnimation()
 
     if (m_animationMode == "breathing") {
         m_animation->setStartValue(0.3);
-        m_animation->setKeyValueAt(0.5, 1.0);
+        m_animation->setKeyValueAt(0.35, 1.0);
+        m_animation->setKeyValueAt(0.65, 1.0);
         m_animation->setEndValue(0.3);
         m_animation->setEasingCurve(QEasingCurve::InOutSine);
     } else {
