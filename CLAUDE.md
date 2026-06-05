@@ -21,6 +21,12 @@ trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、C
 - **状态检测**：AI 工具 Hooks → tl4ai-ctl CLI → Unix Domain Socket
 - **国际化**：Qt Linguist（QTranslator + .ts/.qm），支持英语/中文/日语
 
+## 构建依赖（Ubuntu/Debian）
+
+```bash
+sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+```
+
 ## 构建命令
 
 ```bash
@@ -118,6 +124,8 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 
 指令为单行纯文本：`RED\n` / `YELLOW\n` / `GREEN\n`，大小写不敏感，无法识别的指令静默忽略。
 
+`tl4ai-ctl` 启动时会非阻塞 drain stdin（AI 工具 hooks 会往 stdin 写 JSON 数据）。
+
 ### AI 工具策略模式
 
 `AiToolStrategy` 接口封装不同 AI 工具的差异，通过 `AiToolRegistry` 注册和查找：
@@ -137,6 +145,34 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 | `test_ipc_server` | socket 收发、无效指令、旧 socket 清理、restart |
 | `test_ai_tool_strategy` | 事件名验证、hooks 模板内容、Registry 查找 |
 | `test_tl4ai_ctl` | CLI 集成测试，需要编译后的 tl4ai-ctl 二进制 |
+
+### 注意事项
+
+- 每个测试方法使用独立的临时文件路径（`init()` slot 生成唯一路径），避免测试间污染
+- 构造 stale Unix socket 需用 POSIX `socket()/bind()/close()`，`QLocalServer::close()` 会自动 unlink
+- IpcServer 测试中 `sendCommand` 后需 `QTest::qWait(100)` 等待事件循环处理
+
+### 配置文件
+
+路径：`~/.config/trafficlight4ai/config.json`
+
+| 字段 | 默认值 | 说明 |
+|------|--------|------|
+| `language` | `"en"` | 界面语言（en/zh/ja） |
+| `aiTool` | `"codex"` | AI 工具（codex/claude-code） |
+| `timeoutSec` | `300` | 超时回绿灯秒数，0 禁用 |
+| `window.size` | `"medium"` | 窗口大小（small/medium/large/xlarge） |
+| `window.posX/posY` | `20` | 窗口位置 |
+| `animation.mode` | `"breathing"` | 动画模式（breathing/classic） |
+| `animation.periodMs` | `1000` | 动画周期 200~5000ms |
+| `sound.yellowEnabled/greenEnabled` | `true` | 提示音开关 |
+| `sound.yellowFile/greenFile` | `""` | 自定义音效路径（WAV/MP3/OGG），空用系统 beep |
+
+## 已知平台问题
+
+- **Ubuntu SNI 托盘**：快速频繁 `setIcon` 后切换到静态图标可能不刷新，需 `QTimer::singleShot(150, ...)` 延迟重设
+- **QSystemTrayIcon 不是 QWidget**：`QMenu` 不能用 `setParent(this)`，需用 `destroyed` signal 管理生命周期
+- **FloatingWindow 尺寸切换**：需用 `QTimer::singleShot(0, ...)` 延迟 `move()` 以在布局重算后恢复位置
 
 ## 代码约定
 
