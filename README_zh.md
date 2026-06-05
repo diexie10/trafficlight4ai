@@ -24,10 +24,20 @@ AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，
 
 ## 环境要求
 
-- Linux
+- Linux 或 Windows 11
 - Qt 6（Core, Widgets, Network, Multimedia）
 - CMake 3.20+
 - C++17 编译器
+
+## 下载
+
+预编译包可从 GitHub Releases 下载：
+
+- `trafficlight4ai-v0.1.1-ubuntu-x86_64.tar.gz` — Ubuntu x86_64 构建。
+- `trafficlight4ai-v0.1.1-windows-x86_64.zip` — Windows x86_64 构建，已通过 `windeployqt` 打包 Qt 运行库。
+- `SHA256SUMS.txt` — 发布包校验和。
+
+Windows 上运行 `bin/trafficlight4ai.exe`。它会作为 GUI 程序启动，不应弹出命令行窗口。可在 PowerShell、cmd 或 AI 工具 hooks 中调用 `bin/tl4ai-ctl.exe red/yellow/green` 来切换灯状态。如果 Windows 提示缺少 MSVC 运行时 DLL，请安装 Microsoft Visual C++ Redistributable 2022 x64。
 
 ## 编译
 
@@ -57,6 +67,8 @@ Release 构建会定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移
 |---|---|---|
 | `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI 主程序 — 悬浮窗口 + 系统托盘图标，内嵌 IPC 服务端接收状态指令 |
 | `tl4ai-ctl` | `build/tools/tl4ai-ctl` | 轻量 Qt CLI，通过 `QLocalSocket` 向 GUI 发送 `RED`/`YELLOW`/`GREEN` 指令 |
+
+Windows 构建由 `Windows Build` GitHub Actions workflow 生成。它使用 `-DBUILD_TESTING=OFF` 配置 CMake，通过 MSVC 编译，执行 `windeployqt`，并上传 `trafficlight4ai-windows-x86_64.zip` artifact。
 
 ## 快速开始
 

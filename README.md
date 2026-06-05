@@ -24,10 +24,20 @@ Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right mo
 
 ## Requirements
 
-- Linux
+- Linux or Windows 11
 - Qt 6 (Core, Widgets, Network, Multimedia)
 - CMake 3.20+
 - C++17 compiler
+
+## Download
+
+Prebuilt archives are available from GitHub Releases:
+
+- `trafficlight4ai-v0.1.1-ubuntu-x86_64.tar.gz` — Ubuntu x86_64 build.
+- `trafficlight4ai-v0.1.1-windows-x86_64.zip` — Windows x86_64 build with Qt runtime files bundled by `windeployqt`.
+- `SHA256SUMS.txt` — checksums for release archives.
+
+On Windows, run `bin/trafficlight4ai.exe`. It is built as a GUI application and should not open a console window. Use `bin/tl4ai-ctl.exe red/yellow/green` from PowerShell, cmd, or AI tool hooks to change the light state. If Windows reports missing MSVC runtime DLLs, install the Microsoft Visual C++ Redistributable 2022 x64.
 
 ## Build
 
@@ -57,6 +67,8 @@ The build produces two executables:
 |---|---|---|
 | `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI main program — floating window + system tray icon, embeds IPC server to receive state commands |
 | `tl4ai-ctl` | `build/tools/tl4ai-ctl` | Lightweight Qt CLI, sends `RED`/`YELLOW`/`GREEN` commands to the GUI via `QLocalSocket` |
+
+Windows builds are produced by the `Windows Build` GitHub Actions workflow. It configures CMake with `-DBUILD_TESTING=OFF`, builds with MSVC, runs `windeployqt`, and uploads `trafficlight4ai-windows-x86_64.zip` as an artifact.
 
 ## Quick Start
 
