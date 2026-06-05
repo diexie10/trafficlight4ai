@@ -41,6 +41,16 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
 ```
 
+需要查看 `qDebug()` 开发日志时，使用 Debug 构建：
+
+```bash
+cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-debug -j$(nproc)
+./build-debug/src/trafficlight4ai
+```
+
+Release 构建会定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，warning 和 critical 错误仍会正常输出。
+
 ## 快速开始
 
 ### 1. 启动 GUI

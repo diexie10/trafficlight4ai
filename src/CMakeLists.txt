@@ -6,6 +6,9 @@ add_library(tl4ai_core STATIC
 )
 target_include_directories(tl4ai_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(tl4ai_core PUBLIC Qt6::Core Qt6::Network)
+target_compile_definitions(tl4ai_core PRIVATE
+    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+)
 
 # GUI executable
 add_executable(trafficlight4ai
@@ -39,3 +42,6 @@ qt_add_resources(trafficlight4ai "i18n"
     FILES ${QM_FILES}
 )
 target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets Qt6::Multimedia)
+target_compile_definitions(trafficlight4ai PRIVATE
+    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+)

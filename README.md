@@ -41,6 +41,16 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
 ```
 
+Use a Debug build when you want development logs from `qDebug()`:
+
+```bash
+cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-debug -j$(nproc)
+./build-debug/src/trafficlight4ai
+```
+
+Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out while warnings and critical errors remain visible.
+
 ## Quick Start
 
 ### 1. Run the GUI
