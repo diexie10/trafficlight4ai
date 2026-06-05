@@ -23,7 +23,7 @@ cd build && ctest --output-on-failure        # 运行全部测试
 cd build && ctest -R test_state_manager --output-on-failure
 ```
 
-Release 构建可使用 `cmake -B build-release -DCMAKE_BUILD_TYPE=Release`。
+Release 构建可使用 `cmake -B build-release -DCMAKE_BUILD_TYPE=Release`。Debug 构建保留 `qDebug()` 开发日志；Release 构建定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，但 warning 和 critical 错误仍会输出。
 
 ## 代码风格与命名约定
 
