@@ -10,18 +10,58 @@ Common requirements:
 - C++17 compiler
 - Qt 6 with Core, Widgets, Network, Multimedia, LinguistTools, and Test
 
-Linux packages on Ubuntu/Debian:
+Dependency roles:
+
+- CMake configures the project and generates native build files.
+- The C++17 compiler builds the GUI, core library, CLI, and tests.
+- Qt Core provides event loops, JSON/config utilities, timers, and base types.
+- Qt Widgets provides the floating window, settings dialog, and desktop UI.
+- Qt Network provides `QLocalServer`/`QLocalSocket` for local IPC.
+- Qt Multimedia provides sound notification playback.
+- Qt LinguistTools compiles `.ts` translations into `.qm` resources.
+- Qt Test builds and runs the unit and integration tests.
+
+Linux packages:
 
 ```bash
+# Ubuntu/Debian/Linux Mint
 sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+
+# Fedora
+sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-linguist
+
+# Arch Linux/Manjaro
+sudo pacman -S cmake gcc qt6-base qt6-multimedia qt6-tools
+
+# openSUSE
+sudo zypper install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel
 ```
 
 Windows requirements:
 
 - Windows 11
-- Visual Studio 2022 with the "Desktop development with C++" workload
+- Visual Studio Build Tools 2022 with MSVC v143, Windows 10/11 SDK, and CMake tools for Windows
 - Qt 6 for MSVC 2022 64-bit, including Multimedia and Linguist tools
 - PowerShell or Developer PowerShell for Visual Studio
+
+The full Visual Studio IDE is not required. A command-line setup is enough:
+
+```powershell
+winget install --id Microsoft.VisualStudio.2022.BuildTools
+winget install --id Kitware.CMake
+py -m pip install aqtinstall
+py -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 --outputdir C:\Qt --modules qtmultimedia
+```
+
+When installing Build Tools, select the C++ build tools workload and ensure MSVC v143, a Windows SDK, and CMake tools are included.
+
+Windows-specific tool roles:
+
+- MSVC v143 is the C++ compiler used for the Windows build.
+- Windows SDK provides the Windows headers and libraries required by Qt/MSVC applications.
+- CMake tools for Windows provide Visual Studio/CMake integration for command-line builds.
+- `aqtinstall` installs the matching Qt MSVC package without using the Qt GUI installer.
+- `windeployqt` copies Qt DLLs and plugins next to the executables so the package can run on another Windows machine.
 
 ## Linux Build
 
@@ -48,7 +88,7 @@ Run locally:
 
 ## Windows Build
 
-Run from Developer PowerShell so MSVC is on `PATH`.
+Run from Developer PowerShell so MSVC is on `PATH`. If you use plain PowerShell, initialize the MSVC environment first, or CMake will not find the compiler.
 
 ```powershell
 cmake -S . -B build-windows -G "Visual Studio 17 2022" -A x64 -DBUILD_TESTING=OFF -DCMAKE_PREFIX_PATH="C:\Qt\6.8.3\msvc2022_64"
@@ -77,6 +117,10 @@ Run locally:
 
 - Debug builds keep `qDebug()` output.
 - Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out while warning and critical logs remain.
+- Source builds should work on mainstream Linux distributions that provide Qt 6, but package names differ by distribution.
+- The Ubuntu release archive is dynamically linked and is only intended for compatible Ubuntu/Debian-like systems; it is not guaranteed to run unchanged on Fedora, Arch, or openSUSE.
+- System tray behavior depends on the desktop environment. KDE and Xfce are usually reliable; GNOME may require an AppIndicator or tray extension.
+- Sound playback uses Qt Multimedia and the system audio backend. Some distributions may require GStreamer, PulseAudio, or PipeWire plugins for custom audio files.
 - On Windows, `trafficlight4ai.exe` must be built with `WIN32_EXECUTABLE TRUE` so it does not open a console window.
 - `tl4ai-ctl` is intentionally a CLI executable and should remain callable from hooks, PowerShell, or cmd.
 - The Windows GitHub Actions workflow uses `-DBUILD_TESTING=OFF`, MSVC, and `windeployqt` to produce the release artifact.

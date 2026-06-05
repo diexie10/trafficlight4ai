@@ -30,6 +30,8 @@ Prebuilt archives are available from GitHub Releases:
 - `trafficlight4ai-v0.1.1-windows-x86_64.zip` — Windows x86_64 build with Qt runtime files bundled by `windeployqt`.
 - `SHA256SUMS.txt` — checksums for release archives.
 
+The Ubuntu archive is a dynamically linked build for Ubuntu/Debian-compatible systems, not a universal Linux package. For Fedora, Arch, openSUSE, and other distributions, build from source using [docs/BUILD.md](docs/BUILD.md).
+
 On Windows, run `bin/trafficlight4ai.exe`. It is built as a GUI application and should not open a console window. Use `bin/tl4ai-ctl.exe red/yellow/green` from PowerShell, cmd, or AI tool hooks to change the light state. If Windows reports missing MSVC runtime DLLs, install the Microsoft Visual C++ Redistributable 2022 x64.
 
 ## Build From Source
