@@ -303,7 +303,7 @@ void SettingsDialog::onGreenSoundToggled(bool checked)
 void SettingsDialog::onBrowseYellowSound()
 {
     QString file = QFileDialog::getOpenFileName(this, "选择黄灯提示音", QString(),
-                                                 "音频文件 (*.wav)");
+                                                 "音频文件 (*.wav *.mp3 *.ogg)");
     if (!file.isEmpty()) {
         m_yellowSoundEdit->setText(file);
         m_config->setYellowSoundFile(file);
@@ -313,7 +313,7 @@ void SettingsDialog::onBrowseYellowSound()
 void SettingsDialog::onBrowseGreenSound()
 {
     QString file = QFileDialog::getOpenFileName(this, "选择绿灯提示音", QString(),
-                                                 "音频文件 (*.wav)");
+                                                 "音频文件 (*.wav *.mp3 *.ogg)");
     if (!file.isEmpty()) {
         m_greenSoundEdit->setText(file);
         m_config->setGreenSoundFile(file);

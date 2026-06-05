@@ -2,7 +2,8 @@
 #include <QDir>
 #include <QFile>
 #include <QStandardPaths>
-#include <QSoundEffect>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include <QUrl>
 #include "StateManager.h"
 #include "ConfigManager.h"
@@ -22,13 +23,18 @@ static QString defaultConfigPath()
 static void playSound(const QString &filePath)
 {
     if (!filePath.isEmpty() && QFile::exists(filePath)) {
-        auto *effect = new QSoundEffect();
-        effect->setSource(QUrl::fromLocalFile(filePath));
-        effect->play();
-        QObject::connect(effect, &QSoundEffect::playingChanged, effect, [effect]() {
-            if (!effect->isPlaying())
-                effect->deleteLater();
+        auto *player = new QMediaPlayer();
+        auto *audioOutput = new QAudioOutput();
+        player->setAudioOutput(audioOutput);
+        player->setSource(QUrl::fromLocalFile(filePath));
+        QObject::connect(player, &QMediaPlayer::playbackStateChanged,
+                         player, [player, audioOutput](QMediaPlayer::PlaybackState state) {
+            if (state == QMediaPlayer::StoppedState) {
+                player->deleteLater();
+                audioOutput->deleteLater();
+            }
         });
+        player->play();
     } else {
         QApplication::beep();
     }

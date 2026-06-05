@@ -26,9 +26,9 @@ QSize TrafficLightWidget::sizeForPreset(SizePreset preset) const
 {
     int targetWidth = 80;
     switch (preset) {
-    case Small:  targetWidth = 80;  break;
-    case Medium: targetWidth = 100; break;
-    case Large:  targetWidth = 130; break;
+    case Small:  targetWidth = 56;  break;
+    case Medium: targetWidth = 70;  break;
+    case Large:  targetWidth = 91;  break;
     }
 
     if (m_imgOff.isNull() || m_imgOff.width() == 0)
