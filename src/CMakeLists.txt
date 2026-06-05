@@ -42,6 +42,9 @@ qt_add_resources(trafficlight4ai "i18n"
     FILES ${QM_FILES}
 )
 target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets Qt6::Multimedia)
+set_target_properties(trafficlight4ai PROPERTIES
+    WIN32_EXECUTABLE TRUE
+)
 target_compile_definitions(trafficlight4ai PRIVATE
     $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
 )
