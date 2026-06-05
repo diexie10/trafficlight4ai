@@ -95,15 +95,15 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
 
     // Form layout
     m_formLayout = new QFormLayout();
-    m_formLayout->addRow("", m_langCombo);
-    m_formLayout->addRow("", m_aiToolCombo);
-    m_formLayout->addRow("", m_timeoutSpin);
-    m_formLayout->addRow("", m_sizeCombo);
-    m_formLayout->addRow("", m_modeCombo);
-    m_formLayout->addRow("", periodLayout);
-    m_formLayout->addRow("", m_socketEdit);
-    m_formLayout->addRow("", yellowSoundLayout);
-    m_formLayout->addRow("", greenSoundLayout);
+    m_formLayout->addRow(tr("Language:"), m_langCombo);
+    m_formLayout->addRow(tr("AI Tool:"), m_aiToolCombo);
+    m_formLayout->addRow(tr("Timeout:"), m_timeoutSpin);
+    m_formLayout->addRow(tr("Window Size:"), m_sizeCombo);
+    m_formLayout->addRow(tr("Animation Mode:"), m_modeCombo);
+    m_formLayout->addRow(tr("Animation Period:"), periodLayout);
+    m_formLayout->addRow(tr("Socket Path:"), m_socketEdit);
+    m_formLayout->addRow(tr("Yellow Sound:"), yellowSoundLayout);
+    m_formLayout->addRow(tr("Green Sound:"), greenSoundLayout);
 
     // Buttons
     m_hooksBtn = new QPushButton();
