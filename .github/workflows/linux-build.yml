@@ -1,0 +1,58 @@
+name: Linux Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu
+            image: ubuntu:24.04
+            install: |
+              apt-get update
+              apt-get install -y cmake g++ qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+          - name: Fedora
+            image: fedora:41
+            install: |
+              dnf install -y cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-linguist
+          - name: Arch
+            image: archlinux:latest
+            install: |
+              pacman -Syu --noconfirm cmake gcc qt6-base qt6-multimedia qt6-tools
+          - name: openSUSE
+            image: opensuse/tumbleweed:latest
+            install: |
+              zypper --non-interactive install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel
+
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+
+    steps:
+      - name: Install dependencies
+        run: ${{ matrix.install }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build -j$(nproc)
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
