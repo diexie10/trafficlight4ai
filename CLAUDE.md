@@ -25,13 +25,24 @@ trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、C
 
 Linux 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在本文件中重复维护完整编译步骤。
 
+常用快速命令（Linux）：
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc)  # 编译
+cd build && ctest --output-on-failure                                       # 全部测试
+cd build && ctest -R test_state_manager --output-on-failure                 # 单个测试
+```
+
 ## 项目目录结构
 
 ```
 trafficlight4ai/
 ├── CMakeLists.txt                 # 根构建文件
 ├── CLAUDE.md                      # 项目指南
-├── docs/                          # 问题记录与设计说明
+├── .github/workflows/             # CI（Windows 构建）
+├── docs/
+│   ├── BUILD.md / BUILD_zh.md     # 跨平台构建指南（双语）
+│   └── ...                        # 问题记录与设计说明
 ├── src/
 │   ├── CMakeLists.txt             # tl4ai_core 静态库 + trafficlight4ai 可执行文件
 │   ├── StateManager.h/cpp         # 状态机（纯逻辑，含超时机制）
@@ -99,7 +110,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 
 指令为单行纯文本：`RED\n` / `YELLOW\n` / `GREEN\n`，大小写不敏感，无法识别的指令静默忽略。
 
-`tl4ai-ctl` 启动时会非阻塞 drain stdin（AI 工具 hooks 会往 stdin 写 JSON 数据）。
+`tl4ai-ctl` 在 Linux 上启动时会非阻塞 drain stdin（AI 工具 hooks 会往 stdin 写 JSON 数据），Windows 上跳过。
 
 ### AI 工具策略模式
 
@@ -127,7 +138,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 - 构造 stale Unix socket 需用 POSIX `socket()/bind()/close()`，`QLocalServer::close()` 会自动 unlink
 - IpcServer 测试中 `sendCommand` 后需 `QTest::qWait(100)` 等待事件循环处理
 
-### 配置文件
+## 配置文件
 
 路径：`~/.config/trafficlight4ai/config.json`
 
@@ -140,6 +151,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 | `window.posX/posY` | `20` | 窗口位置 |
 | `animation.mode` | `"breathing"` | 动画模式（breathing/classic） |
 | `animation.periodMs` | `1000` | 动画周期 200~5000ms |
+| `socket.path` | 平台相关 | Linux: `$XDG_RUNTIME_DIR/trafficlight4ai.sock`，Windows: `trafficlight4ai` |
 | `sound.yellowEnabled/greenEnabled` | `true` | 提示音开关 |
 | `sound.yellowFile/greenFile` | `""` | 自定义音效路径（WAV/MP3/OGG），空用系统 beep |
 
@@ -158,3 +170,4 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 - 所有 UI 文本使用 `tr()` 包裹（国际化），同步更新 `translations/` 下的 `.ts` 文件
 - 新增测试使用 `add_tl4ai_test(test_<component>)` 宏注册，测试槽函数按行为命名（如 `duplicateCommandRefreshesTimeout`）
 - Git 提交使用 conventional-style 前缀：`feat:` / `fix:` / `docs:` / `debug:`，标题用祈使语气
+- 更新 README.md 时必须同步更新 README_zh.md，保持双语内容一致
