@@ -45,7 +45,7 @@ cd build && ctest --output-on-failure
 # 运行单个测试
 cd build && ctest -R test_state_manager --output-on-failure
 
-# Release 构建
+# Release 构建（定义 QT_NO_DEBUG_OUTPUT，qDebug 日志编译时移除，warning/critical 保留）
 cmake -B build-release -DCMAKE_BUILD_TYPE=Release
 cmake --build build-release -j$(nproc)
 ```
@@ -56,7 +56,7 @@ cmake --build build-release -j$(nproc)
 trafficlight4ai/
 ├── CMakeLists.txt                 # 根构建文件
 ├── CLAUDE.md                      # 项目指南
-├── docs/superpowers/specs/        # 设计文档
+├── docs/                          # 问题记录与设计说明
 ├── src/
 │   ├── CMakeLists.txt             # tl4ai_core 静态库 + trafficlight4ai 可执行文件
 │   ├── StateManager.h/cpp         # 状态机（纯逻辑，含超时机制）
@@ -161,7 +161,7 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 | `language` | `"en"` | 界面语言（en/zh/ja） |
 | `aiTool` | `"codex"` | AI 工具（codex/claude-code） |
 | `timeoutSec` | `300` | 超时回绿灯秒数，0 禁用 |
-| `window.size` | `"medium"` | 窗口大小（small/medium/large/xlarge） |
+| `window.size` | `"medium"` | 窗口大小（xsmall/small/medium/large/xlarge） |
 | `window.posX/posY` | `20` | 窗口位置 |
 | `animation.mode` | `"breathing"` | 动画模式（breathing/classic） |
 | `animation.periodMs` | `1000` | 动画周期 200~5000ms |
@@ -180,4 +180,6 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 - Qt 信号槽使用新式语法（`&Class::signal`）
 - 头文件使用 `#pragma once`
 - 私有成员变量前缀 `m_`
-- 所有 UI 文本使用 `tr()` 包裹（国际化）
+- 所有 UI 文本使用 `tr()` 包裹（国际化），同步更新 `translations/` 下的 `.ts` 文件
+- 新增测试使用 `add_tl4ai_test(test_<component>)` 宏注册，测试槽函数按行为命名（如 `duplicateCommandRefreshesTimeout`）
+- Git 提交使用 conventional-style 前缀：`feat:` / `fix:` / `docs:` / `debug:`，标题用祈使语气

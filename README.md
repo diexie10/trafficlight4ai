@@ -59,13 +59,31 @@ Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out
 ./build/src/trafficlight4ai &
 ```
 
-### 2. Add tl4ai-ctl to your PATH
+### 2. Make tl4ai-ctl available to hooks
+
+Hooks need to find `tl4ai-ctl`. Choose one of the following:
+
+**Option A** — Use absolute path directly in hook commands (no installation needed):
+
+Replace `tl4ai-ctl` with the full path in step 3, e.g.:
+
+```
+/home/you/trafficlight4ai/build/tools/tl4ai-ctl red
+```
+
+**Option B** — Add to PATH (so hooks can use the short name `tl4ai-ctl`):
 
 ```bash
-sudo ln -s $(pwd)/build/tools/tl4ai-ctl /usr/local/bin/tl4ai-ctl
+# Symlink to a directory already in PATH
+sudo ln -s "$(pwd)/build/tools/tl4ai-ctl" /usr/local/bin/tl4ai-ctl
+
+# Or copy to ~/.local/bin (no sudo needed, make sure ~/.local/bin is in PATH)
+cp build/tools/tl4ai-ctl ~/.local/bin/
 ```
 
 ### 3. Configure hooks for your AI tool
+
+The examples below use the short name `tl4ai-ctl`. If you chose Option A, replace it with the full path.
 
 **Codex** — Create `~/.codex/hooks.json`:
 

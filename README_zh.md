@@ -59,13 +59,31 @@ Release 构建会定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移
 ./build/src/trafficlight4ai &
 ```
 
-### 2. 将 tl4ai-ctl 加入 PATH
+### 2. 让 hooks 能找到 tl4ai-ctl
+
+Hooks 需要能找到 `tl4ai-ctl`，以下两种方式任选其一：
+
+**方式 A** — 在 hook 命令中直接使用绝对路径（无需安装）：
+
+在第 3 步的配置中，将 `tl4ai-ctl` 替换为完整路径，例如：
+
+```
+/home/you/trafficlight4ai/build/tools/tl4ai-ctl red
+```
+
+**方式 B** — 加入 PATH（这样 hooks 可以直接用短名 `tl4ai-ctl`）：
 
 ```bash
-sudo ln -s $(pwd)/build/tools/tl4ai-ctl /usr/local/bin/tl4ai-ctl
+# 创建符号链接到 PATH 目录
+sudo ln -s "$(pwd)/build/tools/tl4ai-ctl" /usr/local/bin/tl4ai-ctl
+
+# 或复制到 ~/.local/bin（无需 sudo，确保 ~/.local/bin 已在 PATH 中）
+cp build/tools/tl4ai-ctl ~/.local/bin/
 ```
 
 ### 3. 配置 AI 工具的 hooks
+
+以下示例使用短名 `tl4ai-ctl`。如果你选择了方式 A，请替换为完整路径。
 
 **Codex** — 创建 `~/.codex/hooks.json`：
 
