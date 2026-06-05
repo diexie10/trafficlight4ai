@@ -32,9 +32,8 @@ jobs:
             install: |
               pacman -Syu --noconfirm base-devel cmake qt6-base qt6-multimedia qt6-tools
           - name: openSUSE
-            image: opensuse/tumbleweed:latest
+            image: opensuse/leap:15.6
             install: |
-              zypper --non-interactive refresh || true
               zypper --non-interactive install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel
 
     name: ${{ matrix.name }}
