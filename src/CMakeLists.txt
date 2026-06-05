@@ -24,4 +24,4 @@ qt_add_resources(trafficlight4ai "images"
         "${CMAKE_SOURCE_DIR}/resources/images/light_yellow.png"
         "${CMAKE_SOURCE_DIR}/resources/images/light_green.png"
 )
-target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets)
+target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets Qt6::Multimedia)

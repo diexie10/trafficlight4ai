@@ -44,9 +44,16 @@ void ConfigManager::applyDefaults()
     QJsonObject socket;
     socket["path"] = defaultSocketPath();
 
+    QJsonObject sound;
+    sound["yellowEnabled"] = true;
+    sound["greenEnabled"] = true;
+    sound["yellowFile"] = QString();
+    sound["greenFile"] = QString();
+
     m_root["window"] = window;
     m_root["animation"] = animation;
     m_root["socket"] = socket;
+    m_root["sound"] = sound;
     m_root["aiTool"] = "codex";
     m_root["timeoutSec"] = 300;
 }
@@ -195,6 +202,58 @@ void ConfigManager::setTimeoutSec(int sec)
     if (sec != 0)
         sec = std::clamp(sec, 30, 3600);
     m_root["timeoutSec"] = sec;
+    save();
+}
+
+bool ConfigManager::yellowSoundEnabled() const
+{
+    return m_root["sound"].toObject()["yellowEnabled"].toBool(true);
+}
+
+void ConfigManager::setYellowSoundEnabled(bool enabled)
+{
+    QJsonObject sound = m_root["sound"].toObject();
+    sound["yellowEnabled"] = enabled;
+    m_root["sound"] = sound;
+    save();
+}
+
+QString ConfigManager::yellowSoundFile() const
+{
+    return m_root["sound"].toObject()["yellowFile"].toString();
+}
+
+void ConfigManager::setYellowSoundFile(const QString &path)
+{
+    QJsonObject sound = m_root["sound"].toObject();
+    sound["yellowFile"] = path;
+    m_root["sound"] = sound;
+    save();
+}
+
+bool ConfigManager::greenSoundEnabled() const
+{
+    return m_root["sound"].toObject()["greenEnabled"].toBool(true);
+}
+
+void ConfigManager::setGreenSoundEnabled(bool enabled)
+{
+    QJsonObject sound = m_root["sound"].toObject();
+    sound["greenEnabled"] = enabled;
+    m_root["sound"] = sound;
+    save();
+}
+
+QString ConfigManager::greenSoundFile() const
+{
+    return m_root["sound"].toObject()["greenFile"].toString();
+}
+
+void ConfigManager::setGreenSoundFile(const QString &path)
+{
+    QJsonObject sound = m_root["sound"].toObject();
+    sound["greenFile"] = path;
+    m_root["sound"] = sound;
     save();
 }
 

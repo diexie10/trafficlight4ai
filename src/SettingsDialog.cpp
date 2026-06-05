@@ -4,6 +4,7 @@
 #include "IpcServer.h"
 #include "StateManager.h"
 #include "AiToolStrategy.h"
+#include <QCheckBox>
 #include <QComboBox>
 #include <QSlider>
 #include <QSpinBox>
@@ -16,6 +17,7 @@
 #include <QDialog>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QApplication>
 
 SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightWidget,
@@ -25,7 +27,7 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
       m_ipcServer(ipcServer), m_stateManager(stateManager)
 {
     setWindowTitle("设置 - Traffic Light for AI");
-    setMinimumSize(400, 320);
+    setMinimumSize(400, 420);
 
     // AI tool
     m_aiToolCombo = new QComboBox();
@@ -63,6 +65,26 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     // Socket path
     m_socketEdit = new QLineEdit();
 
+    // Yellow sound
+    m_yellowSoundCheck = new QCheckBox("启用");
+    m_yellowSoundEdit = new QLineEdit();
+    m_yellowSoundEdit->setPlaceholderText("留空使用系统提示音");
+    auto *yellowBrowseBtn = new QPushButton("浏览");
+    auto *yellowSoundLayout = new QHBoxLayout();
+    yellowSoundLayout->addWidget(m_yellowSoundCheck);
+    yellowSoundLayout->addWidget(m_yellowSoundEdit);
+    yellowSoundLayout->addWidget(yellowBrowseBtn);
+
+    // Green sound
+    m_greenSoundCheck = new QCheckBox("启用");
+    m_greenSoundEdit = new QLineEdit();
+    m_greenSoundEdit->setPlaceholderText("留空使用系统提示音");
+    auto *greenBrowseBtn = new QPushButton("浏览");
+    auto *greenSoundLayout = new QHBoxLayout();
+    greenSoundLayout->addWidget(m_greenSoundCheck);
+    greenSoundLayout->addWidget(m_greenSoundEdit);
+    greenSoundLayout->addWidget(greenBrowseBtn);
+
     // Form layout
     auto *form = new QFormLayout();
     form->addRow("AI 工具:", m_aiToolCombo);
@@ -71,6 +93,8 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     form->addRow("动画模式:", m_modeCombo);
     form->addRow("动画周期:", periodLayout);
     form->addRow("Socket 路径:", m_socketEdit);
+    form->addRow("黄灯提示音:", yellowSoundLayout);
+    form->addRow("绿灯提示音:", greenSoundLayout);
 
     // Hooks template button
     auto *hooksBtn = new QPushButton("查看推荐 Hooks 配置");
@@ -101,6 +125,14 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
             this, &SettingsDialog::onAnimationPeriodChanged);
     connect(m_periodSpin, &QSpinBox::valueChanged,
             this, &SettingsDialog::onAnimationPeriodChanged);
+    connect(m_yellowSoundCheck, &QCheckBox::toggled,
+            this, &SettingsDialog::onYellowSoundToggled);
+    connect(m_greenSoundCheck, &QCheckBox::toggled,
+            this, &SettingsDialog::onGreenSoundToggled);
+    connect(yellowBrowseBtn, &QPushButton::clicked,
+            this, &SettingsDialog::onBrowseYellowSound);
+    connect(greenBrowseBtn, &QPushButton::clicked,
+            this, &SettingsDialog::onBrowseGreenSound);
     connect(hooksBtn, &QPushButton::clicked,
             this, &SettingsDialog::onShowHooksTemplate);
     connect(okBtn, &QPushButton::clicked, this, &SettingsDialog::onAccept);
@@ -148,12 +180,23 @@ void SettingsDialog::showEvent(QShowEvent *event)
     m_periodSpin->setValue(m_config->animationPeriodMs());
     m_periodSpin->blockSignals(false);
 
-    // Socket path — disable editing when overridden by env var
+    // Socket path
     const bool envOverride = !qgetenv("TL4AI_SOCKET").isEmpty();
     m_socketEdit->setEnabled(!envOverride);
     m_socketEdit->setText(m_config->socketPath());
     if (envOverride)
         m_socketEdit->setPlaceholderText("由 TL4AI_SOCKET 环境变量控制");
+
+    // Sound settings
+    m_yellowSoundCheck->blockSignals(true);
+    m_yellowSoundCheck->setChecked(m_config->yellowSoundEnabled());
+    m_yellowSoundCheck->blockSignals(false);
+    m_yellowSoundEdit->setText(m_config->yellowSoundFile());
+
+    m_greenSoundCheck->blockSignals(true);
+    m_greenSoundCheck->setChecked(m_config->greenSoundEnabled());
+    m_greenSoundCheck->blockSignals(false);
+    m_greenSoundEdit->setText(m_config->greenSoundFile());
 }
 
 void SettingsDialog::takeSnapshot()
@@ -164,6 +207,10 @@ void SettingsDialog::takeSnapshot()
     m_snapMode = m_config->animationMode();
     m_snapPeriodMs = m_config->animationPeriodMs();
     m_snapSocketPath = m_config->socketPath();
+    m_snapYellowSoundEnabled = m_config->yellowSoundEnabled();
+    m_snapYellowSoundFile = m_config->yellowSoundFile();
+    m_snapGreenSoundEnabled = m_config->greenSoundEnabled();
+    m_snapGreenSoundFile = m_config->greenSoundFile();
 }
 
 void SettingsDialog::restoreSnapshot()
@@ -192,7 +239,11 @@ void SettingsDialog::restoreSnapshot()
     m_lightWidget->setAnimationPeriodMs(m_snapPeriodMs);
     m_config->setAnimationPeriodMs(m_snapPeriodMs);
 
-    // Socket path is not applied live — nothing to restore
+    // Restore sound settings
+    m_config->setYellowSoundEnabled(m_snapYellowSoundEnabled);
+    m_config->setYellowSoundFile(m_snapYellowSoundFile);
+    m_config->setGreenSoundEnabled(m_snapGreenSoundEnabled);
+    m_config->setGreenSoundFile(m_snapGreenSoundFile);
 }
 
 void SettingsDialog::onAiToolChanged(int index)
@@ -239,6 +290,36 @@ void SettingsDialog::onAnimationPeriodChanged(int value)
     m_lightWidget->setAnimationPeriodMs(value);
 }
 
+void SettingsDialog::onYellowSoundToggled(bool checked)
+{
+    m_config->setYellowSoundEnabled(checked);
+}
+
+void SettingsDialog::onGreenSoundToggled(bool checked)
+{
+    m_config->setGreenSoundEnabled(checked);
+}
+
+void SettingsDialog::onBrowseYellowSound()
+{
+    QString file = QFileDialog::getOpenFileName(this, "选择黄灯提示音", QString(),
+                                                 "音频文件 (*.wav)");
+    if (!file.isEmpty()) {
+        m_yellowSoundEdit->setText(file);
+        m_config->setYellowSoundFile(file);
+    }
+}
+
+void SettingsDialog::onBrowseGreenSound()
+{
+    QString file = QFileDialog::getOpenFileName(this, "选择绿灯提示音", QString(),
+                                                 "音频文件 (*.wav)");
+    if (!file.isEmpty()) {
+        m_greenSoundEdit->setText(file);
+        m_config->setGreenSoundFile(file);
+    }
+}
+
 void SettingsDialog::onAccept()
 {
     // Apply socket path change on OK (not live)
@@ -250,9 +331,14 @@ void SettingsDialog::onAccept()
             m_socketEdit->setText(m_config->socketPath());
             QMessageBox::warning(this, "Socket 错误",
                 "无法监听新路径: " + newPath + "\n已保留原路径。");
-            return; // don't close dialog
+            return;
         }
     }
+
+    // Save sound file paths from text edits (in case user typed manually)
+    m_config->setYellowSoundFile(m_yellowSoundEdit->text().trimmed());
+    m_config->setGreenSoundFile(m_greenSoundEdit->text().trimmed());
+
     accept();
 }
 

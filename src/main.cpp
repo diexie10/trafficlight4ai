@@ -1,6 +1,9 @@
 #include <QApplication>
 #include <QDir>
+#include <QFile>
 #include <QStandardPaths>
+#include <QSoundEffect>
+#include <QUrl>
 #include "StateManager.h"
 #include "ConfigManager.h"
 #include "IpcServer.h"
@@ -14,6 +17,21 @@ static QString defaultConfigPath()
 {
     return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
            + "/trafficlight4ai/config.json";
+}
+
+static void playSound(const QString &filePath)
+{
+    if (!filePath.isEmpty() && QFile::exists(filePath)) {
+        auto *effect = new QSoundEffect();
+        effect->setSource(QUrl::fromLocalFile(filePath));
+        effect->play();
+        QObject::connect(effect, &QSoundEffect::playingChanged, effect, [effect]() {
+            if (!effect->isPlaying())
+                effect->deleteLater();
+        });
+    } else {
+        QApplication::beep();
+    }
 }
 
 int main(int argc, char *argv[])
@@ -58,6 +76,15 @@ int main(int argc, char *argv[])
                      trayIcon, &TrayIcon::onStateChanged);
     QObject::connect(&stateManager, &StateManager::stateChanged,
                      lightWidget, &TrafficLightWidget::onStateChanged);
+
+    // Sound notifications on state change
+    QObject::connect(&stateManager, &StateManager::stateChanged,
+                     [&config](LightState state) {
+        if (state == LightState::WaitingConfirm && config.yellowSoundEnabled())
+            playSound(config.yellowSoundFile());
+        else if (state == LightState::Idle && config.greenSoundEnabled())
+            playSound(config.greenSoundFile());
+    });
 
     // Connect animation alpha to tray icon blinking
     QObject::connect(lightWidget, &TrafficLightWidget::activeAlphaChanged,

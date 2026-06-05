@@ -33,6 +33,16 @@ public:
     int timeoutSec() const;
     void setTimeoutSec(int sec);
 
+    bool yellowSoundEnabled() const;
+    void setYellowSoundEnabled(bool enabled);
+    QString yellowSoundFile() const;
+    void setYellowSoundFile(const QString &path);
+
+    bool greenSoundEnabled() const;
+    void setGreenSoundEnabled(bool enabled);
+    QString greenSoundFile() const;
+    void setGreenSoundFile(const QString &path);
+
 private:
     void load();
     void save();

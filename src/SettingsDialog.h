@@ -6,6 +6,7 @@ class QComboBox;
 class QSlider;
 class QSpinBox;
 class QLineEdit;
+class QCheckBox;
 class ConfigManager;
 class TrafficLightWidget;
 class IpcServer;
@@ -34,6 +35,10 @@ private slots:
     void onWindowSizeChanged(int index);
     void onAnimationModeChanged(int index);
     void onAnimationPeriodChanged(int value);
+    void onYellowSoundToggled(bool checked);
+    void onGreenSoundToggled(bool checked);
+    void onBrowseYellowSound();
+    void onBrowseGreenSound();
     void onShowHooksTemplate();
     void onAccept();
     void onCancel();
@@ -54,6 +59,10 @@ private:
     QSlider *m_periodSlider;
     QSpinBox *m_periodSpin;
     QLineEdit *m_socketEdit;
+    QCheckBox *m_yellowSoundCheck;
+    QLineEdit *m_yellowSoundEdit;
+    QCheckBox *m_greenSoundCheck;
+    QLineEdit *m_greenSoundEdit;
 
     // Snapshot for cancel
     QString m_snapAiTool;
@@ -62,4 +71,8 @@ private:
     QString m_snapMode;
     int m_snapPeriodMs;
     QString m_snapSocketPath;
+    bool m_snapYellowSoundEnabled;
+    QString m_snapYellowSoundFile;
+    bool m_snapGreenSoundEnabled;
+    QString m_snapGreenSoundFile;
 };
