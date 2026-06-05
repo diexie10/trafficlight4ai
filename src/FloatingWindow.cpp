@@ -57,14 +57,14 @@ void FloatingWindow::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu;
     if (m_settingsDialog) {
-        auto *settingsAction = menu.addAction("设置");
+        auto *settingsAction = menu.addAction(tr("Settings"));
         connect(settingsAction, &QAction::triggered, this, [this]() {
             m_settingsDialog->show();
             m_settingsDialog->raise();
             m_settingsDialog->activateWindow();
         });
     }
-    auto *quitAction = menu.addAction("退出");
+    auto *quitAction = menu.addAction(tr("Quit"));
     connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
     menu.exec(event->globalPos());
 }

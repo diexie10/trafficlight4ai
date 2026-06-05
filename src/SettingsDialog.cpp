@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QSlider>
 #include <QSpinBox>
+#include <QLabel>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QFormLayout>
@@ -28,8 +29,13 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     : QDialog(parent), m_config(config), m_lightWidget(lightWidget),
       m_ipcServer(ipcServer), m_stateManager(stateManager)
 {
-    setWindowTitle("设置 - Traffic Light for AI");
-    setMinimumSize(400, 420);
+    setMinimumSize(400, 460);
+
+    // Language
+    m_langCombo = new QComboBox();
+    m_langCombo->addItem("English", "en");
+    m_langCombo->addItem(QString::fromUtf8("中文"), "zh");
+    m_langCombo->addItem(QString::fromUtf8("日本語"), "ja");
 
     // AI tool
     m_aiToolCombo = new QComboBox();
@@ -40,16 +46,12 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     m_timeoutSpin = new QSpinBox();
     m_timeoutSpin->setRange(0, 3600);
     m_timeoutSpin->setSingleStep(30);
-    m_timeoutSpin->setSuffix(" 秒");
-    m_timeoutSpin->setSpecialValueText("禁用");
 
     // Window size
     m_sizeCombo = new QComboBox();
-    m_sizeCombo->addItems({"小", "中", "大"});
 
     // Animation mode
     m_modeCombo = new QComboBox();
-    m_modeCombo->addItems({"呼吸灯", "经典闪烁"});
 
     // Animation period
     m_periodSlider = new QSlider(Qt::Horizontal);
@@ -68,59 +70,61 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     m_socketEdit = new QLineEdit();
 
     // Yellow sound
-    m_yellowSoundCheck = new QCheckBox("启用");
+    m_yellowSoundCheck = new QCheckBox();
     m_yellowSoundEdit = new QLineEdit();
-    m_yellowSoundEdit->setPlaceholderText("留空使用系统提示音");
-    m_yellowPreviewBtn = new QPushButton("试听");
+    m_yellowPreviewBtn = new QPushButton();
     m_yellowPreviewBtn->setEnabled(false);
-    auto *yellowBrowseBtn = new QPushButton("浏览");
+    m_yellowBrowseBtn = new QPushButton();
     auto *yellowSoundLayout = new QHBoxLayout();
     yellowSoundLayout->addWidget(m_yellowSoundCheck);
     yellowSoundLayout->addWidget(m_yellowSoundEdit);
     yellowSoundLayout->addWidget(m_yellowPreviewBtn);
-    yellowSoundLayout->addWidget(yellowBrowseBtn);
+    yellowSoundLayout->addWidget(m_yellowBrowseBtn);
 
     // Green sound
-    m_greenSoundCheck = new QCheckBox("启用");
+    m_greenSoundCheck = new QCheckBox();
     m_greenSoundEdit = new QLineEdit();
-    m_greenSoundEdit->setPlaceholderText("留空使用系统提示音");
-    m_greenPreviewBtn = new QPushButton("试听");
+    m_greenPreviewBtn = new QPushButton();
     m_greenPreviewBtn->setEnabled(false);
-    auto *greenBrowseBtn = new QPushButton("浏览");
+    m_greenBrowseBtn = new QPushButton();
     auto *greenSoundLayout = new QHBoxLayout();
     greenSoundLayout->addWidget(m_greenSoundCheck);
     greenSoundLayout->addWidget(m_greenSoundEdit);
     greenSoundLayout->addWidget(m_greenPreviewBtn);
-    greenSoundLayout->addWidget(greenBrowseBtn);
+    greenSoundLayout->addWidget(m_greenBrowseBtn);
 
     // Form layout
-    auto *form = new QFormLayout();
-    form->addRow("AI 工具:", m_aiToolCombo);
-    form->addRow("超时时间:", m_timeoutSpin);
-    form->addRow("窗口大小:", m_sizeCombo);
-    form->addRow("动画模式:", m_modeCombo);
-    form->addRow("动画周期:", periodLayout);
-    form->addRow("Socket 路径:", m_socketEdit);
-    form->addRow("黄灯提示音:", yellowSoundLayout);
-    form->addRow("绿灯提示音:", greenSoundLayout);
-
-    // Hooks template button
-    auto *hooksBtn = new QPushButton("查看推荐 Hooks 配置");
+    m_formLayout = new QFormLayout();
+    m_formLayout->addRow("", m_langCombo);
+    m_formLayout->addRow("", m_aiToolCombo);
+    m_formLayout->addRow("", m_timeoutSpin);
+    m_formLayout->addRow("", m_sizeCombo);
+    m_formLayout->addRow("", m_modeCombo);
+    m_formLayout->addRow("", periodLayout);
+    m_formLayout->addRow("", m_socketEdit);
+    m_formLayout->addRow("", yellowSoundLayout);
+    m_formLayout->addRow("", greenSoundLayout);
 
     // Buttons
-    auto *okBtn = new QPushButton("确定");
-    auto *cancelBtn = new QPushButton("取消");
+    m_hooksBtn = new QPushButton();
+    m_okBtn = new QPushButton();
+    m_cancelBtn = new QPushButton();
     auto *btnLayout = new QHBoxLayout();
-    btnLayout->addWidget(hooksBtn);
+    btnLayout->addWidget(m_hooksBtn);
     btnLayout->addStretch();
-    btnLayout->addWidget(okBtn);
-    btnLayout->addWidget(cancelBtn);
+    btnLayout->addWidget(m_okBtn);
+    btnLayout->addWidget(m_cancelBtn);
 
     auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->addLayout(form);
+    mainLayout->addLayout(m_formLayout);
     mainLayout->addLayout(btnLayout);
 
+    // Set all translatable text
+    retranslateUi();
+
     // Connections
+    connect(m_langCombo, &QComboBox::currentIndexChanged,
+            this, &SettingsDialog::onLanguageChanged);
     connect(m_aiToolCombo, &QComboBox::currentIndexChanged,
             this, &SettingsDialog::onAiToolChanged);
     connect(m_timeoutSpin, &QSpinBox::valueChanged,
@@ -145,20 +149,100 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
             this, &SettingsDialog::onPreviewYellowSound);
     connect(m_greenPreviewBtn, &QPushButton::clicked,
             this, &SettingsDialog::onPreviewGreenSound);
-    connect(yellowBrowseBtn, &QPushButton::clicked,
+    connect(m_yellowBrowseBtn, &QPushButton::clicked,
             this, &SettingsDialog::onBrowseYellowSound);
-    connect(greenBrowseBtn, &QPushButton::clicked,
+    connect(m_greenBrowseBtn, &QPushButton::clicked,
             this, &SettingsDialog::onBrowseGreenSound);
-    connect(hooksBtn, &QPushButton::clicked,
+    connect(m_hooksBtn, &QPushButton::clicked,
             this, &SettingsDialog::onShowHooksTemplate);
-    connect(okBtn, &QPushButton::clicked, this, &SettingsDialog::onAccept);
-    connect(cancelBtn, &QPushButton::clicked, this, &SettingsDialog::onCancel);
+    connect(m_okBtn, &QPushButton::clicked, this, &SettingsDialog::onAccept);
+    connect(m_cancelBtn, &QPushButton::clicked, this, &SettingsDialog::onCancel);
+}
+
+void SettingsDialog::retranslateUi()
+{
+    setWindowTitle(tr("Settings - Traffic Light for AI"));
+
+    // Form labels
+    m_formLayout->labelForField(m_langCombo)->setProperty("text", tr("Language:"));
+    // Use itemAt to set row labels since labelForField may not work with layouts
+    int row = 0;
+    auto setLabel = [this](int r, const QString &text) {
+        QLabel *label = qobject_cast<QLabel *>(m_formLayout->itemAt(r, QFormLayout::LabelRole)->widget());
+        if (label) label->setText(text);
+    };
+    // Simpler approach: just re-set all row labels via the form layout
+    // QFormLayout doesn't have a direct setLabel API, so we access internals
+
+    // Actually, let's use a cleaner approach: store label pointers or use findChildren
+    // For simplicity, just iterate and set
+    const QStringList labels = {
+        tr("Language:"), tr("AI Tool:"), tr("Timeout:"), tr("Window Size:"),
+        tr("Animation Mode:"), tr("Animation Period:"), tr("Socket Path:"),
+        tr("Yellow Sound:"), tr("Green Sound:")
+    };
+    for (int i = 0; i < labels.size() && i < m_formLayout->rowCount(); ++i) {
+        auto *item = m_formLayout->itemAt(i, QFormLayout::LabelRole);
+        if (item && item->widget())
+            qobject_cast<QLabel *>(item->widget())->setText(labels[i]);
+    }
+
+    // Timeout suffix and special value
+    m_timeoutSpin->setSuffix(" " + tr("sec"));
+    m_timeoutSpin->setSpecialValueText(tr("Disabled"));
+
+    // Window size combo
+    const int sizeIdx = m_sizeCombo->currentIndex();
+    m_sizeCombo->blockSignals(true);
+    m_sizeCombo->clear();
+    m_sizeCombo->addItems({tr("Small"), tr("Medium"), tr("Large")});
+    if (sizeIdx >= 0) m_sizeCombo->setCurrentIndex(sizeIdx);
+    m_sizeCombo->blockSignals(false);
+
+    // Animation mode combo
+    const int modeIdx = m_modeCombo->currentIndex();
+    m_modeCombo->blockSignals(true);
+    m_modeCombo->clear();
+    m_modeCombo->addItems({tr("Breathing"), tr("Classic Blink")});
+    if (modeIdx >= 0) m_modeCombo->setCurrentIndex(modeIdx);
+    m_modeCombo->blockSignals(false);
+
+    // Sound controls
+    m_yellowSoundCheck->setText(tr("Enable"));
+    m_yellowSoundEdit->setPlaceholderText(tr("Leave empty for system beep"));
+    m_yellowPreviewBtn->setText(tr("Preview"));
+    m_yellowBrowseBtn->setText(tr("Browse"));
+
+    m_greenSoundCheck->setText(tr("Enable"));
+    m_greenSoundEdit->setPlaceholderText(tr("Leave empty for system beep"));
+    m_greenPreviewBtn->setText(tr("Preview"));
+    m_greenBrowseBtn->setText(tr("Browse"));
+
+    // Buttons
+    m_hooksBtn->setText(tr("View Recommended Hooks Config"));
+    m_okBtn->setText(tr("OK"));
+    m_cancelBtn->setText(tr("Cancel"));
+
+    // Env override placeholder
+    if (!qgetenv("TL4AI_SOCKET").isEmpty())
+        m_socketEdit->setPlaceholderText(tr("Controlled by TL4AI_SOCKET env var"));
 }
 
 void SettingsDialog::showEvent(QShowEvent *event)
 {
     QDialog::showEvent(event);
     takeSnapshot();
+
+    // Language
+    const QString lang = m_config->language();
+    for (int i = 0; i < m_langCombo->count(); ++i) {
+        if (m_langCombo->itemData(i).toString() == lang) {
+            m_langCombo->blockSignals(true);
+            m_langCombo->setCurrentIndex(i);
+            m_langCombo->blockSignals(false);
+            break;
+        }
+    }
 
     // AI tool
     const QString toolId = m_config->aiTool();
@@ -200,8 +284,6 @@ void SettingsDialog::showEvent(QShowEvent *event)
     const bool envOverride = !qgetenv("TL4AI_SOCKET").isEmpty();
     m_socketEdit->setEnabled(!envOverride);
     m_socketEdit->setText(m_config->socketPath());
-    if (envOverride)
-        m_socketEdit->setPlaceholderText("由 TL4AI_SOCKET 环境变量控制");
 
     // Sound settings
     m_yellowSoundCheck->blockSignals(true);
@@ -217,6 +299,7 @@ void SettingsDialog::showEvent(QShowEvent *event)
 
 void SettingsDialog::takeSnapshot()
 {
+    m_snapLang = m_config->language();
     m_snapAiTool = m_config->aiTool();
     m_snapTimeoutSec = m_config->timeoutSec();
     m_snapSize = m_config->windowSize();
@@ -231,6 +314,12 @@ void SettingsDialog::takeSnapshot()
 
 void SettingsDialog::restoreSnapshot()
 {
+    // Restore language
+    if (m_config->language() != m_snapLang) {
+        m_config->setLanguage(m_snapLang);
+        emit languageChanged(m_snapLang);
+    }
+
     // Restore AI tool
     m_config->setAiTool(m_snapAiTool);
     if (auto *strategy = AiToolRegistry::find(m_snapAiTool))
@@ -260,6 +349,13 @@ void SettingsDialog::restoreSnapshot()
     m_config->setYellowSoundFile(m_snapYellowSoundFile);
     m_config->setGreenSoundEnabled(m_snapGreenSoundEnabled);
     m_config->setGreenSoundFile(m_snapGreenSoundFile);
+}
+
+void SettingsDialog::onLanguageChanged(int index)
+{
+    const QString lang = m_langCombo->itemData(index).toString();
+    m_config->setLanguage(lang);
+    emit languageChanged(lang);
 }
 
 void SettingsDialog::onAiToolChanged(int index)
@@ -337,8 +433,8 @@ void SettingsDialog::updatePreviewButtons()
 
 void SettingsDialog::onBrowseYellowSound()
 {
-    QString file = QFileDialog::getOpenFileName(this, "选择黄灯提示音", QString(),
-                                                 "音频文件 (*.wav *.mp3 *.ogg)");
+    QString file = QFileDialog::getOpenFileName(this, tr("Select Yellow Sound"), QString(),
+                                                 tr("Audio Files (*.wav *.mp3 *.ogg)"));
     if (!file.isEmpty()) {
         m_yellowSoundEdit->setText(file);
         m_config->setYellowSoundFile(file);
@@ -347,8 +443,8 @@ void SettingsDialog::onBrowseYellowSound()
 
 void SettingsDialog::onBrowseGreenSound()
 {
-    QString file = QFileDialog::getOpenFileName(this, "选择绿灯提示音", QString(),
-                                                 "音频文件 (*.wav *.mp3 *.ogg)");
+    QString file = QFileDialog::getOpenFileName(this, tr("Select Green Sound"), QString(),
+                                                 tr("Audio Files (*.wav *.mp3 *.ogg)"));
     if (!file.isEmpty()) {
         m_greenSoundEdit->setText(file);
         m_config->setGreenSoundFile(file);
@@ -357,20 +453,18 @@ void SettingsDialog::onBrowseGreenSound()
 
 void SettingsDialog::onAccept()
 {
-    // Apply socket path change on OK (not live)
     const QString newPath = m_socketEdit->text().trimmed();
     if (!newPath.isEmpty() && newPath != m_config->socketPath()) {
         if (m_ipcServer->restart(newPath)) {
             m_config->setSocketPath(newPath);
         } else {
             m_socketEdit->setText(m_config->socketPath());
-            QMessageBox::warning(this, "Socket 错误",
-                "无法监听新路径: " + newPath + "\n已保留原路径。");
+            QMessageBox::warning(this, tr("Socket Error"),
+                tr("Cannot listen on: %1\nKept original path.").arg(newPath));
             return;
         }
     }
 
-    // Save sound file paths from text edits (in case user typed manually)
     m_config->setYellowSoundFile(m_yellowSoundEdit->text().trimmed());
     m_config->setGreenSoundFile(m_greenSoundEdit->text().trimmed());
 
@@ -385,15 +479,15 @@ void SettingsDialog::onShowHooksTemplate()
         return;
 
     auto *dlg = new QDialog(this);
-    dlg->setWindowTitle("推荐 Hooks 配置 - " + strategy->displayName());
+    dlg->setWindowTitle(tr("Recommended Hooks - %1").arg(strategy->displayName()));
     dlg->setMinimumSize(450, 350);
 
     auto *textEdit = new QTextEdit();
     textEdit->setReadOnly(true);
     textEdit->setPlainText(strategy->hooksTemplate());
 
-    auto *copyBtn = new QPushButton("复制");
-    auto *closeBtn = new QPushButton("关闭");
+    auto *copyBtn = new QPushButton(tr("Copy"));
+    auto *closeBtn = new QPushButton(tr("Close"));
 
     connect(copyBtn, &QPushButton::clicked, this, [textEdit]() {
         QApplication::clipboard()->setText(textEdit->toPlainText());

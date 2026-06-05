@@ -25,4 +25,17 @@ qt_add_resources(trafficlight4ai "images"
         "${CMAKE_SOURCE_DIR}/resources/images/light_yellow.png"
         "${CMAKE_SOURCE_DIR}/resources/images/light_green.png"
 )
+set(TS_FILES
+    "${CMAKE_SOURCE_DIR}/translations/trafficlight4ai_zh.ts"
+    "${CMAKE_SOURCE_DIR}/translations/trafficlight4ai_ja.ts"
+)
+qt_add_translations(trafficlight4ai
+    TS_FILES ${TS_FILES}
+    QM_FILES_OUTPUT_VARIABLE QM_FILES
+)
+qt_add_resources(trafficlight4ai "i18n"
+    PREFIX "/i18n"
+    BASE "${CMAKE_CURRENT_BINARY_DIR}"
+    FILES ${QM_FILES}
+)
 target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets Qt6::Multimedia)

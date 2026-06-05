@@ -33,6 +33,9 @@ public:
     int timeoutSec() const;
     void setTimeoutSec(int sec);
 
+    QString language() const;
+    void setLanguage(const QString &lang);
+
     bool yellowSoundEnabled() const;
     void setYellowSoundEnabled(bool enabled);
     QString yellowSoundFile() const;

@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QStandardPaths>
+#include <QTranslator>
 #include "StateManager.h"
 #include "ConfigManager.h"
 #include "IpcServer.h"
@@ -17,6 +18,27 @@ static QString defaultConfigPath()
            + "/trafficlight4ai/config.json";
 }
 
+static QTranslator *s_translator = nullptr;
+
+static void loadLanguage(QApplication &app, const QString &lang)
+{
+    if (s_translator) {
+        app.removeTranslator(s_translator);
+        delete s_translator;
+        s_translator = nullptr;
+    }
+
+    if (lang != "en") {
+        s_translator = new QTranslator(&app);
+        if (s_translator->load(":/i18n/trafficlight4ai_" + lang + ".qm")) {
+            app.installTranslator(s_translator);
+        } else {
+            delete s_translator;
+            s_translator = nullptr;
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -28,6 +50,9 @@ int main(int argc, char *argv[])
     StateManager stateManager;
     stateManager.setTimeoutSec(config.timeoutSec());
     IpcServer ipcServer(&stateManager, config.socketPath());
+
+    // Load initial language
+    loadLanguage(app, config.language());
 
     // GUI
     auto *lightWidget = new TrafficLightWidget();
@@ -50,7 +75,7 @@ int main(int argc, char *argv[])
     // Tray icon with dynamic tooltip
     auto *trayIcon = new TrayIcon(floatingWindow, settingsDialog);
     if (auto *strategy = AiToolRegistry::find(config.aiTool()))
-        trayIcon->setToolTip("Traffic Light for " + strategy->displayName());
+        trayIcon->onAiToolChanged(strategy->displayName());
     trayIcon->show();
 
     // Connect state changes to UI (trayIcon first so m_state is updated
@@ -76,6 +101,14 @@ int main(int argc, char *argv[])
     // Connect AI tool changes to tray tooltip
     QObject::connect(settingsDialog, &SettingsDialog::aiToolChanged,
                      trayIcon, &TrayIcon::onAiToolChanged);
+
+    // Language switching
+    QObject::connect(settingsDialog, &SettingsDialog::languageChanged,
+                     [&app, settingsDialog, trayIcon](const QString &lang) {
+        loadLanguage(app, lang);
+        settingsDialog->retranslateUi();
+        trayIcon->retranslateUi();
+    });
 
     return app.exec();
 }

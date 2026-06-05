@@ -56,6 +56,7 @@ void ConfigManager::applyDefaults()
     m_root["sound"] = sound;
     m_root["aiTool"] = "codex";
     m_root["timeoutSec"] = 300;
+    m_root["language"] = "en";
 }
 
 void ConfigManager::load()
@@ -202,6 +203,17 @@ void ConfigManager::setTimeoutSec(int sec)
     if (sec != 0)
         sec = std::clamp(sec, 30, 3600);
     m_root["timeoutSec"] = sec;
+    save();
+}
+
+QString ConfigManager::language() const
+{
+    return m_root["language"].toString("en");
+}
+
+void ConfigManager::setLanguage(const QString &lang)
+{
+    m_root["language"] = lang;
     save();
 }
 

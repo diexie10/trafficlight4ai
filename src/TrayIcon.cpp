@@ -12,17 +12,17 @@ TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObje
     : QSystemTrayIcon(parent), m_window(window)
 {
     setIcon(createIcon(QColor(40, 200, 40))); // default green
-    setToolTip("Traffic Light for AI");
 
     auto *menu = new QMenu(nullptr);
     connect(this, &QObject::destroyed, menu, &QObject::deleteLater);
-    auto *toggleAction = menu->addAction("显示/隐藏");
-    connect(toggleAction, &QAction::triggered, this, [this]() {
+
+    m_toggleAction = menu->addAction(tr("Show/Hide"));
+    connect(m_toggleAction, &QAction::triggered, this, [this]() {
         m_window->setVisible(!m_window->isVisible());
     });
 
-    auto *settingsAction = menu->addAction("设置");
-    connect(settingsAction, &QAction::triggered, settingsDialog, [settingsDialog]() {
+    m_settingsAction = menu->addAction(tr("Settings"));
+    connect(m_settingsAction, &QAction::triggered, settingsDialog, [settingsDialog]() {
         settingsDialog->show();
         settingsDialog->raise();
         settingsDialog->activateWindow();
@@ -30,12 +30,21 @@ TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObje
 
     menu->addSeparator();
 
-    auto *quitAction = menu->addAction("退出");
-    connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    m_quitAction = menu->addAction(tr("Quit"));
+    connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     setContextMenu(menu);
 
     connect(this, &QSystemTrayIcon::activated, this, &TrayIcon::onActivated);
+}
+
+void TrayIcon::retranslateUi()
+{
+    m_toggleAction->setText(tr("Show/Hide"));
+    m_settingsAction->setText(tr("Settings"));
+    m_quitAction->setText(tr("Quit"));
+    if (!m_aiToolName.isEmpty())
+        setToolTip(tr("Traffic Light for %1").arg(m_aiToolName));
 }
 
 void TrayIcon::onStateChanged(LightState newState)
@@ -57,8 +66,6 @@ void TrayIcon::onStateChanged(LightState newState)
            m_currentColor.red(), m_currentColor.green(), m_currentColor.blue());
     setIcon(createIcon(m_currentColor));
 
-    // Ubuntu SNI tray may not refresh after rapid icon updates from animation.
-    // Re-apply icon after a short delay to force tray refresh.
     if (newState == LightState::Idle) {
         QTimer::singleShot(150, this, [this]() {
             qDebug("[TrayIcon] delayed re-apply green icon");
@@ -69,9 +76,6 @@ void TrayIcon::onStateChanged(LightState newState)
 
 void TrayIcon::onActiveAlphaChanged(qreal alpha)
 {
-    qDebug("[TrayIcon] onActiveAlphaChanged: alpha=%.2f state=%d color=(%d,%d,%d)",
-           alpha, static_cast<int>(m_state),
-           m_currentColor.red(), m_currentColor.green(), m_currentColor.blue());
     if (m_state == LightState::Idle) {
         setIcon(createIcon(m_currentColor));
         return;
@@ -83,7 +87,8 @@ void TrayIcon::onActiveAlphaChanged(qreal alpha)
 
 void TrayIcon::onAiToolChanged(const QString &displayName)
 {
-    setToolTip("Traffic Light for " + displayName);
+    m_aiToolName = displayName;
+    setToolTip(tr("Traffic Light for %1").arg(displayName));
 }
 
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)

@@ -19,8 +19,9 @@ void playSound(const QString &filePath, QObject *errorContext)
                          (QMediaPlayer::Error, const QString &) {
             if (errorContext) {
                 auto *widget = qobject_cast<QWidget *>(errorContext);
-                QMessageBox::warning(widget, "音频错误",
-                    "无效的音频文件: " + filePath);
+                QMessageBox::warning(widget,
+                    QObject::tr("Audio Error"),
+                    QObject::tr("Invalid audio file: %1").arg(filePath));
             }
             player->deleteLater();
             audioOutput->deleteLater();

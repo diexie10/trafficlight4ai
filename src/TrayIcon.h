@@ -13,6 +13,8 @@ public:
     explicit TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog,
                       QObject *parent = nullptr);
 
+    void retranslateUi();
+
 public slots:
     void onStateChanged(LightState newState);
     void onAiToolChanged(const QString &displayName);
@@ -27,4 +29,8 @@ private:
     FloatingWindow *m_window;
     LightState m_state = LightState::Idle;
     QColor m_currentColor{40, 200, 40};
+    QAction *m_toggleAction;
+    QAction *m_settingsAction;
+    QAction *m_quitAction;
+    QString m_aiToolName;
 };
