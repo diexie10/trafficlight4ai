@@ -36,7 +36,7 @@ private slots:
     void defaultWindowSize()
     {
         ConfigManager cm(m_configPath);
-        QCOMPARE(cm.windowSize(), QString("small"));
+        QCOMPARE(cm.windowSize(), QString("medium"));
     }
 
     void defaultWindowPosition()
@@ -135,7 +135,7 @@ private slots:
         f.close();
 
         ConfigManager cm(m_configPath);
-        QCOMPARE(cm.windowSize(), QString("small"));
+        QCOMPARE(cm.windowSize(), QString("medium"));
         QCOMPARE(cm.animationMode(), QString("breathing"));
     }
 
@@ -152,7 +152,7 @@ private slots:
     {
         ConfigManager cm(m_configPath);
         cm.setWindowSize("huge"); // invalid
-        QCOMPARE(cm.windowSize(), QString("small")); // unchanged default
+        QCOMPARE(cm.windowSize(), QString("medium")); // unchanged default
     }
 
     void rejectsInvalidAnimationMode()
@@ -258,7 +258,7 @@ private slots:
         f.close();
 
         ConfigManager cm(m_configPath);
-        QCOMPARE(cm.windowSize(), QString("small")); // normalized to default
+        QCOMPARE(cm.windowSize(), QString("medium")); // normalized to default
     }
 
     void normalizeInvalidAnimationMode()
