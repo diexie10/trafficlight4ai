@@ -15,10 +15,11 @@ trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、C
 ## 技术栈
 
 - **语言**：C++17
-- **GUI 框架**：Qt 6（Core, Widgets, Network, Test）
+- **GUI 框架**：Qt 6（Core, Widgets, Network, Multimedia, Test）
 - **构建系统**：CMake（最低 3.20）
 - **目标平台**：Linux
 - **状态检测**：AI 工具 Hooks → tl4ai-ctl CLI → Unix Domain Socket
+- **国际化**：Qt Linguist（QTranslator + .ts/.qm），支持英语/中文/日语
 
 ## 构建命令
 
@@ -60,16 +61,24 @@ trafficlight4ai/
 │   ├── FloatingWindow.h/cpp       # 可拖动悬浮窗口
 │   ├── TrayIcon.h/cpp             # 系统托盘图标
 │   ├── SettingsDialog.h/cpp       # 设置对话框（实时预览+取消撤销）
+│   ├── SoundUtils.h/cpp           # 音效播放工具（QMediaPlayer + beep fallback）
 │   └── main.cpp                   # 入口
 ├── tests/
 │   ├── CMakeLists.txt
 │   ├── test_state_manager.cpp     # StateManager 单元测试
 │   ├── test_config_manager.cpp    # ConfigManager 单元测试
 │   ├── test_ipc_server.cpp        # IPC 协议集成测试
+│   ├── test_ai_tool_strategy.cpp  # AiToolStrategy 单元测试
 │   └── test_tl4ai_ctl.cpp         # CLI 集成测试
-└── tools/
-    ├── CMakeLists.txt
-    └── tl4ai_ctl.cpp              # 纯 POSIX CLI，不依赖 Qt
+├── tools/
+│   ├── CMakeLists.txt
+│   └── tl4ai_ctl.cpp              # 纯 POSIX CLI，不依赖 Qt
+├── translations/
+│   ├── trafficlight4ai_zh.ts      # 中文翻译
+│   └── trafficlight4ai_ja.ts      # 日语翻译
+└── resources/
+    ├── resources.qrc
+    └── images/                    # 红绿灯 PNG 图片
 ```
 
 ## 架构
@@ -91,6 +100,7 @@ trafficlight4ai/
 | `FloatingWindow` | 无边框置顶窗口，可拖动，记忆位置 | Qt Widgets |
 | `TrayIcon` | 系统托盘图标，颜色随状态变化，右键菜单 | Qt Widgets |
 | `SettingsDialog` | 设置对话框，实时预览配置变更，取消可撤销 | Qt Widgets |
+| `SoundUtils` | 音效播放（QMediaPlayer，支持 WAV/MP3/OGG，fallback 系统 beep） | Qt Multimedia |
 
 ### 数据流
 
@@ -125,6 +135,7 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 | `test_state_manager` | 状态切换、signal 发射、命令解析、超时机制 |
 | `test_config_manager` | 默认值、读写持久化、容错回退、参数校验、aiTool/timeoutSec |
 | `test_ipc_server` | socket 收发、无效指令、旧 socket 清理、restart |
+| `test_ai_tool_strategy` | 事件名验证、hooks 模板内容、Registry 查找 |
 | `test_tl4ai_ctl` | CLI 集成测试，需要编译后的 tl4ai-ctl 二进制 |
 
 ## 代码约定
@@ -133,3 +144,4 @@ AI Tool Hooks → tl4ai-ctl (POSIX CLI) → Unix Domain Socket → IpcServer →
 - Qt 信号槽使用新式语法（`&Class::signal`）
 - 头文件使用 `#pragma once`
 - 私有成员变量前缀 `m_`
+- 所有 UI 文本使用 `tr()` 包裹（国际化）
