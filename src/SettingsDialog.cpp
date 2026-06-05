@@ -163,19 +163,7 @@ void SettingsDialog::retranslateUi()
 {
     setWindowTitle(tr("Settings - Traffic Light for AI"));
 
-    // Form labels
-    m_formLayout->labelForField(m_langCombo)->setProperty("text", tr("Language:"));
-    // Use itemAt to set row labels since labelForField may not work with layouts
-    int row = 0;
-    auto setLabel = [this](int r, const QString &text) {
-        QLabel *label = qobject_cast<QLabel *>(m_formLayout->itemAt(r, QFormLayout::LabelRole)->widget());
-        if (label) label->setText(text);
-    };
-    // Simpler approach: just re-set all row labels via the form layout
-    // QFormLayout doesn't have a direct setLabel API, so we access internals
-
-    // Actually, let's use a cleaner approach: store label pointers or use findChildren
-    // For simplicity, just iterate and set
+    // Form labels — safely update each row's label
     const QStringList labels = {
         tr("Language:"), tr("AI Tool:"), tr("Timeout:"), tr("Window Size:"),
         tr("Animation Mode:"), tr("Animation Period:"), tr("Socket Path:"),
@@ -183,8 +171,9 @@ void SettingsDialog::retranslateUi()
     };
     for (int i = 0; i < labels.size() && i < m_formLayout->rowCount(); ++i) {
         auto *item = m_formLayout->itemAt(i, QFormLayout::LabelRole);
-        if (item && item->widget())
-            qobject_cast<QLabel *>(item->widget())->setText(labels[i]);
+        if (!item) continue;
+        auto *label = qobject_cast<QLabel *>(item->widget());
+        if (label) label->setText(labels[i]);
     }
 
     // Timeout suffix and special value
