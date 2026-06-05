@@ -17,6 +17,7 @@ FloatingWindow::FloatingWindow(TrafficLightWidget *lightWidget, ConfigManager *c
 
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->addWidget(lightWidget);
 
     move(m_config->windowPosX(), m_config->windowPosY());

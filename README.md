@@ -114,7 +114,7 @@ tl4ai-ctl green    # Green light steady
 - **Settings dialog** — Live preview, cancel to undo
   - AI tool selection (Codex / Claude Code)
   - Timeout auto-idle (default 5 min, 0 to disable)
-  - Window size (small / medium / large)
+  - Window size (extra small / small / medium / large / extra large)
   - Animation mode (breathing / classic blink)
   - Animation period (200–5000ms)
   - Socket path

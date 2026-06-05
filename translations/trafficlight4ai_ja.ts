@@ -10,6 +10,7 @@
     <message><source>sec</source><translation>秒</translation></message>
     <message><source>Disabled</source><translation>無効</translation></message>
     <message><source>Window Size:</source><translation>ウィンドウサイズ:</translation></message>
+    <message><source>Extra Small</source><translation>極小</translation></message>
     <message><source>Small</source><translation>小</translation></message>
     <message><source>Medium</source><translation>中</translation></message>
     <message><source>Large</source><translation>大</translation></message>

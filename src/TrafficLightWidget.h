@@ -10,7 +10,7 @@ class TrafficLightWidget : public QWidget {
     Q_PROPERTY(qreal activeAlpha READ activeAlpha WRITE setActiveAlpha)
 
 public:
-    enum SizePreset { Small, Medium, Large, ExtraLarge };
+    enum SizePreset { ExtraSmall, Small, Medium, Large, ExtraLarge };
 
     explicit TrafficLightWidget(QWidget *parent = nullptr);
 

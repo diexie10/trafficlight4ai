@@ -15,6 +15,7 @@
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QLayout>
 #include <QPushButton>
 #include <QDialog>
 #include <QClipboard>
@@ -185,7 +186,7 @@ void SettingsDialog::retranslateUi()
     const int sizeIdx = m_sizeCombo->currentIndex();
     m_sizeCombo->blockSignals(true);
     m_sizeCombo->clear();
-    m_sizeCombo->addItems({tr("Small"), tr("Medium"), tr("Large"), tr("Extra Large")});
+    m_sizeCombo->addItems({tr("Extra Small"), tr("Small"), tr("Medium"), tr("Large"), tr("Extra Large")});
     if (sizeIdx >= 0) m_sizeCombo->setCurrentIndex(sizeIdx);
     m_sizeCombo->blockSignals(false);
 
@@ -251,7 +252,7 @@ void SettingsDialog::showEvent(QShowEvent *event)
     m_timeoutSpin->blockSignals(false);
 
     // Window size
-    const QStringList sizes = {"small", "medium", "large", "xlarge"};
+    const QStringList sizes = {"xsmall", "small", "medium", "large", "xlarge"};
     m_sizeCombo->blockSignals(true);
     m_sizeCombo->setCurrentIndex(sizes.indexOf(m_config->windowSize()));
     m_sizeCombo->blockSignals(false);
@@ -323,16 +324,14 @@ void SettingsDialog::restoreSnapshot()
     QWidget *window = m_lightWidget->window();
     QPoint pos = window->pos();
     m_config->setWindowSize(m_snapSize);
-    const QStringList sizes = {"small", "medium", "large", "xlarge"};
+    const QStringList sizes = {"xsmall", "small", "medium", "large", "xlarge"};
     int idx = sizes.indexOf(m_snapSize);
     TrafficLightWidget::SizePreset presets[] = {
-        TrafficLightWidget::Small, TrafficLightWidget::Medium, TrafficLightWidget::Large, TrafficLightWidget::ExtraLarge
+        TrafficLightWidget::ExtraSmall, TrafficLightWidget::Small, TrafficLightWidget::Medium,
+        TrafficLightWidget::Large, TrafficLightWidget::ExtraLarge
     };
     m_lightWidget->setSizePreset(presets[idx >= 0 ? idx : 0]);
-    window->move(pos);
-    QTimer::singleShot(0, window, [window, pos]() {
-        window->move(pos);
-    });
+    resizeFloatingWindowAt(pos, false);
 
     // Restore animation
     m_lightWidget->setAnimationMode(m_snapMode);
@@ -370,9 +369,10 @@ void SettingsDialog::onTimeoutChanged(int value)
 
 void SettingsDialog::onWindowSizeChanged(int index)
 {
-    const QStringList sizes = {"small", "medium", "large", "xlarge"};
+    const QStringList sizes = {"xsmall", "small", "medium", "large", "xlarge"};
     TrafficLightWidget::SizePreset presets[] = {
-        TrafficLightWidget::Small, TrafficLightWidget::Medium, TrafficLightWidget::Large, TrafficLightWidget::ExtraLarge
+        TrafficLightWidget::ExtraSmall, TrafficLightWidget::Small, TrafficLightWidget::Medium,
+        TrafficLightWidget::Large, TrafficLightWidget::ExtraLarge
     };
 
     // Preserve window position across size change
@@ -382,11 +382,26 @@ void SettingsDialog::onWindowSizeChanged(int index)
     m_config->setWindowSize(sizes.at(index));
     m_lightWidget->setSizePreset(presets[index]);
 
-    // Defer move to after layout recalculation completes
+    resizeFloatingWindowAt(pos, true);
+}
+
+void SettingsDialog::resizeFloatingWindowAt(const QPoint &pos, bool savePosition)
+{
+    QWidget *window = m_lightWidget->window();
+
+    if (QLayout *layout = window->layout())
+        layout->activate();
+    window->adjustSize();
     window->move(pos);
-    QTimer::singleShot(0, window, [window, pos, this]() {
+
+    // Some window managers apply top-level geometry after the event loop turn.
+    QTimer::singleShot(0, window, [this, window, pos, savePosition]() {
+        if (QLayout *layout = window->layout())
+            layout->activate();
+        window->adjustSize();
         window->move(pos);
-        m_config->setWindowPos(pos.x(), pos.y());
+        if (savePosition)
+            m_config->setWindowPos(pos.x(), pos.y());
     });
 }
 

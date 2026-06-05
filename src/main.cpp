@@ -60,7 +60,9 @@ int main(int argc, char *argv[])
     lightWidget->setAnimationPeriodMs(config.animationPeriodMs());
 
     const QString size = config.windowSize();
-    if (size == "medium")
+    if (size == "xsmall")
+        lightWidget->setSizePreset(TrafficLightWidget::ExtraSmall);
+    else if (size == "medium")
         lightWidget->setSizePreset(TrafficLightWidget::Medium);
     else if (size == "large")
         lightWidget->setSizePreset(TrafficLightWidget::Large);

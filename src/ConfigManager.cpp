@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <algorithm>
 
-static const QStringList kValidSizes = {"small", "medium", "large", "xlarge"};
+static const QStringList kValidSizes = {"xsmall", "small", "medium", "large", "xlarge"};
 static const QStringList kValidModes = {"breathing", "classic"};
 static const QString kLegacyDefaultSocketPath = "/tmp/trafficlight4ai.sock";
 

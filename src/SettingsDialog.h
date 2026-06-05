@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QPoint>
 
 class QComboBox;
 class QSlider;
@@ -55,6 +56,7 @@ private slots:
 private:
     void takeSnapshot();
     void restoreSnapshot();
+    void resizeFloatingWindowAt(const QPoint &pos, bool savePosition);
 
     ConfigManager *m_config;
     TrafficLightWidget *m_lightWidget;
