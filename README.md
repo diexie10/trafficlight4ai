@@ -51,6 +51,13 @@ cmake --build build-debug -j$(nproc)
 
 Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out while warnings and critical errors remain visible.
 
+The build produces two executables:
+
+| Executable | Path | Description |
+|---|---|---|
+| `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI main program — floating window + system tray icon, embeds IPC server to receive state commands |
+| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | Lightweight CLI — pure POSIX C++ (no Qt dependency), sends `RED`/`YELLOW`/`GREEN` commands to the GUI via Unix Domain Socket |
+
 ## Quick Start
 
 ### 1. Run the GUI

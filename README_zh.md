@@ -51,6 +51,13 @@ cmake --build build-debug -j$(nproc)
 
 Release 构建会定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，warning 和 critical 错误仍会正常输出。
 
+编译后生成两个可执行文件：
+
+| 可执行文件 | 路径 | 说明 |
+|---|---|---|
+| `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI 主程序 — 悬浮窗口 + 系统托盘图标，内嵌 IPC 服务端接收状态指令 |
+| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | 轻量 CLI — 纯 POSIX C++ 实现（不依赖 Qt），通过 Unix Domain Socket 向 GUI 发送 `RED`/`YELLOW`/`GREEN` 指令 |
+
 ## 快速开始
 
 ### 1. 启动 GUI
