@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <QRegularExpression>
 #include "AiToolStrategy.h"
 
 class TestAiToolStrategy : public QObject {

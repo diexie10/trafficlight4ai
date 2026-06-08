@@ -1,5 +1,6 @@
 #include "TrafficLightWidget.h"
 #include <QPainter>
+#include <QEasingCurve>
 #include <QDebug>
 
 TrafficLightWidget::TrafficLightWidget(QWidget *parent)

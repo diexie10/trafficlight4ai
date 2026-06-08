@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QSystemTrayIcon>
+#include <QColor>
+#include <QIcon>
 #include "StateManager.h"
 
 class QAction;

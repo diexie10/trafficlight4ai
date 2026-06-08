@@ -1,5 +1,7 @@
 #include <QtTest>
 #include <QProcess>
+#include <QTemporaryDir>
+#include <QFile>
 #include <QCoreApplication>
 #include "IpcServer.h"
 #include "StateManager.h"
