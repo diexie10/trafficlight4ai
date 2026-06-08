@@ -50,6 +50,7 @@ private slots:
     void onBrowseGreenSound();
     void updatePreviewButtons();
     void onShowHooksTemplate();
+    void onEditHooksConfig();
     void onAccept();
     void onCancel();
 
@@ -81,6 +82,7 @@ private:
     QPushButton *m_greenPreviewBtn;
     QPushButton *m_greenBrowseBtn;
     QPushButton *m_hooksBtn;
+    QPushButton *m_editHooksBtn;
     QPushButton *m_okBtn;
     QPushButton *m_cancelBtn;
 

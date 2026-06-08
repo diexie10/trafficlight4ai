@@ -20,6 +20,11 @@
 #include <QDialog>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QDir>
+#include <QFileInfo>
+#include <QFont>
 #include <QFile>
 #include <QFileDialog>
 #include <QTimer>
@@ -109,10 +114,12 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
 
     // Buttons
     m_hooksBtn = new QPushButton();
+    m_editHooksBtn = new QPushButton();
     m_okBtn = new QPushButton();
     m_cancelBtn = new QPushButton();
     auto *btnLayout = new QHBoxLayout();
     btnLayout->addWidget(m_hooksBtn);
+    btnLayout->addWidget(m_editHooksBtn);
     btnLayout->addStretch();
     btnLayout->addWidget(m_okBtn);
     btnLayout->addWidget(m_cancelBtn);
@@ -157,6 +164,8 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
             this, &SettingsDialog::onBrowseGreenSound);
     connect(m_hooksBtn, &QPushButton::clicked,
             this, &SettingsDialog::onShowHooksTemplate);
+    connect(m_editHooksBtn, &QPushButton::clicked,
+            this, &SettingsDialog::onEditHooksConfig);
     connect(m_okBtn, &QPushButton::clicked, this, &SettingsDialog::onAccept);
     connect(m_cancelBtn, &QPushButton::clicked, this, &SettingsDialog::onCancel);
 }
@@ -211,6 +220,7 @@ void SettingsDialog::retranslateUi()
 
     // Buttons
     m_hooksBtn->setText(tr("View Recommended Hooks Config"));
+    m_editHooksBtn->setText(tr("Edit Hooks Config"));
     m_okBtn->setText(tr("OK"));
     m_cancelBtn->setText(tr("Cancel"));
 
@@ -524,6 +534,120 @@ void SettingsDialog::onShowHooksTemplate()
 
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->show();
+}
+
+void SettingsDialog::onEditHooksConfig()
+{
+    const QString toolId = m_aiToolCombo->currentData().toString();
+    auto *strategy = AiToolRegistry::find(toolId);
+    if (!strategy)
+        return;
+
+    const QString configPath = strategy->hooksConfigPath();
+    const bool entireFile = strategy->hooksIsEntireFile();
+
+    // Read current content
+    QString content;
+    QFile file(configPath);
+    if (file.exists() && file.open(QIODevice::ReadOnly)) {
+        QByteArray raw = file.readAll();
+        file.close();
+        if (entireFile) {
+            content = QString::fromUtf8(raw);
+        } else {
+            QJsonParseError err;
+            QJsonDocument doc = QJsonDocument::fromJson(raw, &err);
+            if (err.error == QJsonParseError::NoError && doc.isObject()) {
+                QJsonObject hooksObj;
+                hooksObj["hooks"] = doc.object()["hooks"];
+                content = QJsonDocument(hooksObj).toJson(QJsonDocument::Indented);
+            } else {
+                content = strategy->hooksTemplate();
+            }
+        }
+    } else {
+        content = strategy->hooksTemplate();
+    }
+
+    // Build editor dialog
+    auto *dlg = new QDialog(this);
+    dlg->setWindowTitle(tr("Edit Hooks Config - %1").arg(strategy->displayName()));
+    dlg->setMinimumSize(500, 400);
+
+    auto *textEdit = new QTextEdit();
+    textEdit->setPlainText(content);
+    QFont monoFont("monospace");
+    monoFont.setStyleHint(QFont::Monospace);
+    textEdit->setFont(monoFont);
+
+    auto *pathLabel = new QLabel(configPath);
+    pathLabel->setWordWrap(true);
+
+    auto *saveBtn = new QPushButton(tr("Save"));
+    auto *cancelBtn = new QPushButton(tr("Cancel"));
+
+    connect(saveBtn, &QPushButton::clicked, dlg, [this, dlg, textEdit, configPath, entireFile]() {
+        const QString text = textEdit->toPlainText().trimmed();
+        QJsonParseError err;
+        QJsonDocument editedDoc = QJsonDocument::fromJson(text.toUtf8(), &err);
+        if (err.error != QJsonParseError::NoError) {
+            QMessageBox::warning(dlg, tr("JSON Error"),
+                tr("Invalid JSON at offset %1:\n%2").arg(err.offset).arg(err.errorString()));
+            return;
+        }
+
+        // Prepare the final content to write
+        QByteArray output;
+        if (entireFile) {
+            output = editedDoc.toJson(QJsonDocument::Indented);
+        } else {
+            // Read existing file to preserve non-hooks fields
+            QJsonObject root;
+            QFile existing(configPath);
+            if (existing.exists() && existing.open(QIODevice::ReadOnly)) {
+                QJsonDocument existingDoc = QJsonDocument::fromJson(existing.readAll());
+                existing.close();
+                if (existingDoc.isObject())
+                    root = existingDoc.object();
+            }
+            // Merge hooks from edited content
+            QJsonObject editedObj = editedDoc.object();
+            if (editedObj.contains("hooks"))
+                root["hooks"] = editedObj["hooks"];
+            else
+                root["hooks"] = editedObj;
+            output = QJsonDocument(root).toJson(QJsonDocument::Indented);
+        }
+
+        // Create parent directory if needed
+        QDir dir = QFileInfo(configPath).absoluteDir();
+        if (!dir.exists())
+            dir.mkpath(".");
+
+        QFile outFile(configPath);
+        if (outFile.open(QIODevice::WriteOnly)) {
+            outFile.write(output);
+            outFile.close();
+            dlg->accept();
+        } else {
+            QMessageBox::warning(dlg, tr("Save Error"),
+                tr("Cannot write to: %1").arg(configPath));
+        }
+    });
+    connect(cancelBtn, &QPushButton::clicked, dlg, &QDialog::reject);
+
+    auto *btnLayout = new QHBoxLayout();
+    btnLayout->addStretch();
+    btnLayout->addWidget(saveBtn);
+    btnLayout->addWidget(cancelBtn);
+
+    auto *layout = new QVBoxLayout(dlg);
+    layout->addWidget(pathLabel);
+    layout->addWidget(textEdit);
+    layout->addLayout(btnLayout);
+
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 
 void SettingsDialog::reject()
