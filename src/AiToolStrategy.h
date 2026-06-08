@@ -63,13 +63,49 @@ public:
     }
 };
 
+class QoderCnStrategy : public AiToolStrategy {
+public:
+    QString id() const override { return "qoder-cn"; }
+    QString displayName() const override { return "Qoder CN"; }
+    int defaultTimeoutSec() const override { return 300; }
+    QString hooksTemplate() const override
+    {
+        return R"({
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "SubagentStart": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "Notification": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "PermissionRequest": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ]
+  }
+})";
+    }
+};
+
 class AiToolRegistry {
 public:
     static const QList<AiToolStrategy *> &strategies()
     {
         static CodexStrategy codex;
         static ClaudeCodeStrategy claude;
-        static QList<AiToolStrategy *> list = {&codex, &claude};
+        static QoderCnStrategy qoderCn;
+        static QList<AiToolStrategy *> list = {&codex, &claude, &qoderCn};
         return list;
     }
 
