@@ -36,7 +36,7 @@ jobs:
             image: opensuse/leap:15.6
             install: |
               zypper --non-interactive --gpg-auto-import-keys refresh
-              zypper --non-interactive install git cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-tools-linguist
+              zypper --non-interactive install git cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
 
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest

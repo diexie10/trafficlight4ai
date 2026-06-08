@@ -34,7 +34,7 @@ sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttoo
 sudo pacman -S cmake gcc qt6-base qt6-multimedia qt6-tools
 
 # openSUSE
-sudo zypper install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-tools-linguist
+sudo zypper install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
 ```
 
 Windows requirements:
