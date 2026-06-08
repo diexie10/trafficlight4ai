@@ -158,7 +158,7 @@ jobs:
 
   appimage:
     name: AppImage
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -167,7 +167,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ curl desktop-file-utils file libfuse2t64 patchelf qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+          sudo apt-get install -y cmake g++ curl desktop-file-utils file libfuse2 patchelf qt6-base-dev qt6-multimedia-dev qt6-tools-dev
 
       - name: Build package
         run: packaging/linux/build-appimage.sh "${{ inputs.version }}"

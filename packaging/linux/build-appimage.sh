@@ -27,6 +27,8 @@ curl -L -o "${linuxdeploy}" \
 curl -L -o "${qt_plugin}" \
     https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
 chmod +x "${linuxdeploy}" "${qt_plugin}"
+ln -sf "${qt_plugin}" "${tool_dir}/linuxdeploy-plugin-qt"
+export PATH="${tool_dir}:${PATH}"
 
 if command -v qmake6 >/dev/null 2>&1; then
     export QMAKE="$(command -v qmake6)"
@@ -38,6 +40,8 @@ export APPIMAGE_EXTRACT_AND_RUN=1
 export OUTPUT="${output_dir}/${package}-${version}-linux-amd64.AppImage"
 "${linuxdeploy}" \
     --appdir "${app_dir}" \
+    --executable "${app_dir}/usr/bin/${package}" \
+    --executable "${app_dir}/usr/bin/tl4ai-ctl" \
     --desktop-file "${app_dir}/usr/share/applications/${package}.desktop" \
     --icon-file "${app_dir}/usr/share/pixmaps/${package}.png" \
     --plugin qt \
