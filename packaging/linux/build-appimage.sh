@@ -27,15 +27,36 @@ QT_PLUGIN_VER="1-alpha-20250213-1"
 LINUXDEPLOY_SHA256="c20cd71e3a4e3b80c3483cef793cda3f4e990aca14014d23c544ca3ce1270b4d"
 QT_PLUGIN_SHA256="bef140a1a96994029153dca8c00b1750b9a5a764fb9db2dc68d7bb40e8a29e8a"
 
+# Download a tool from pinned release, falling back to continuous on failure.
+download_tool() {
+    local output="$1" pinned_url="$2" continuous_url="$3" expected_sha="$4"
+
+    if curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 -o "${output}" "${pinned_url}"; then
+        if echo "${expected_sha}  ${output}" | sha256sum -c --strict 2>/dev/null; then
+            echo "Downloaded pinned release: ${pinned_url##*/}"
+            return 0
+        fi
+        echo "WARNING: SHA256 mismatch for pinned release, falling back to continuous"
+    else
+        echo "WARNING: Pinned release download failed, falling back to continuous"
+    fi
+
+    curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 -o "${output}" "${continuous_url}"
+    echo "Downloaded continuous release: ${continuous_url##*/}"
+}
+
 linuxdeploy="${tool_dir}/linuxdeploy-x86_64.AppImage"
 qt_plugin="${tool_dir}/linuxdeploy-plugin-qt-x86_64.AppImage"
-curl --fail --location --retry 5 --retry-all-errors --connect-timeout 20 -o "${linuxdeploy}" \
-    "https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VER}/linuxdeploy-x86_64.AppImage"
-curl --fail --location --retry 5 --retry-all-errors --connect-timeout 20 -o "${qt_plugin}" \
-    "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${QT_PLUGIN_VER}/linuxdeploy-plugin-qt-x86_64.AppImage"
 
-echo "${LINUXDEPLOY_SHA256}  ${linuxdeploy}" | sha256sum -c --strict
-echo "${QT_PLUGIN_SHA256}  ${qt_plugin}" | sha256sum -c --strict
+download_tool "${linuxdeploy}" \
+    "https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VER}/linuxdeploy-x86_64.AppImage" \
+    "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" \
+    "${LINUXDEPLOY_SHA256}"
+
+download_tool "${qt_plugin}" \
+    "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${QT_PLUGIN_VER}/linuxdeploy-plugin-qt-x86_64.AppImage" \
+    "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage" \
+    "${QT_PLUGIN_SHA256}"
 
 chmod +x "${linuxdeploy}" "${qt_plugin}"
 ln -sf "${qt_plugin}" "${tool_dir}/linuxdeploy-plugin-qt"
