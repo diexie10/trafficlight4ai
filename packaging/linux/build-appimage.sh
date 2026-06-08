@@ -29,9 +29,9 @@ QT_PLUGIN_SHA256="bef140a1a96994029153dca8c00b1750b9a5a764fb9db2dc68d7bb40e8a29e
 
 linuxdeploy="${tool_dir}/linuxdeploy-x86_64.AppImage"
 qt_plugin="${tool_dir}/linuxdeploy-plugin-qt-x86_64.AppImage"
-curl -L -o "${linuxdeploy}" \
+curl --fail --location --retry 5 --retry-all-errors --connect-timeout 20 -o "${linuxdeploy}" \
     "https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VER}/linuxdeploy-x86_64.AppImage"
-curl -L -o "${qt_plugin}" \
+curl --fail --location --retry 5 --retry-all-errors --connect-timeout 20 -o "${qt_plugin}" \
     "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${QT_PLUGIN_VER}/linuxdeploy-plugin-qt-x86_64.AppImage"
 
 echo "${LINUXDEPLOY_SHA256}  ${linuxdeploy}" | sha256sum -c --strict
