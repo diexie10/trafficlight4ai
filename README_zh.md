@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code 等）。
+AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code、Copilot 等）。
 
 [English](README.md)
 
@@ -125,6 +125,37 @@ cp build/tools/tl4ai-ctl ~/.local/bin/
 }
 ```
 
+**Copilot** — 保存为 `~/.copilot/hooks/trafficlight4ai.json`：
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "preToolUse": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "subagentStart": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "notification": [
+      { "type": "command", "command": "tl4ai-ctl yellow" }
+    ],
+    "permissionRequest": [
+      { "type": "command", "command": "tl4ai-ctl yellow" }
+    ],
+    "agentStop": [
+      { "type": "command", "command": "tl4ai-ctl green" }
+    ],
+    "sessionEnd": [
+      { "type": "command", "command": "tl4ai-ctl green" }
+    ]
+  }
+}
+```
+
 也可以在设置对话框中点击"查看推荐 Hooks 配置"按钮获取模板。
 
 ### 4. 手动测试
@@ -140,7 +171,7 @@ tl4ai-ctl green    # 绿灯常亮
 - **悬浮窗口** — 可拖动、始终置顶、记忆位置
 - **系统托盘图标** — 颜色随状态变化，右键菜单
 - **设置对话框** — 实时预览，取消可撤销
-  - AI 工具选择（Codex / Claude Code）
+  - AI 工具选择（Codex / Claude Code / Copilot）
   - 超时自动回绿灯（默认 5 分钟，0 禁用）
   - 窗口大小（超小 / 小 / 中 / 大 / 超大）
   - 动画模式（呼吸灯 / 经典闪烁）

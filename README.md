@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-A visual traffic light status indicator for AI coding tools (Codex, Claude Code, and more).
+A visual traffic light status indicator for AI coding tools (Codex, Claude Code, Copilot, and more).
 
 [中文文档](README_zh.md)
 
@@ -125,6 +125,37 @@ The examples below use the short name `tl4ai-ctl`. If you chose Option A, replac
 }
 ```
 
+**Copilot** — Save as `~/.copilot/hooks/trafficlight4ai.json`:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "preToolUse": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "subagentStart": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "notification": [
+      { "type": "command", "command": "tl4ai-ctl yellow" }
+    ],
+    "permissionRequest": [
+      { "type": "command", "command": "tl4ai-ctl yellow" }
+    ],
+    "agentStop": [
+      { "type": "command", "command": "tl4ai-ctl green" }
+    ],
+    "sessionEnd": [
+      { "type": "command", "command": "tl4ai-ctl green" }
+    ]
+  }
+}
+```
+
 You can also view these templates in the Settings dialog ("View Recommended Hooks Config" button).
 
 ### 4. Test manually
@@ -140,7 +171,7 @@ tl4ai-ctl green    # Green light steady
 - **Floating window** — Draggable, always-on-top, remembers position
 - **System tray icon** — Color changes with state, right-click menu
 - **Settings dialog** — Live preview, cancel to undo
-  - AI tool selection (Codex / Claude Code)
+  - AI tool selection (Codex / Claude Code / Copilot)
   - Timeout auto-idle (default 5 min, 0 to disable)
   - Window size (extra small / small / medium / large / extra large)
   - Animation mode (breathing / classic blink)

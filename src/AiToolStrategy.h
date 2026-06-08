@@ -63,13 +63,50 @@ public:
     }
 };
 
+class CopilotStrategy : public AiToolStrategy {
+public:
+    QString id() const override { return "copilot"; }
+    QString displayName() const override { return "Copilot"; }
+    int defaultTimeoutSec() const override { return 300; }
+    QString hooksTemplate() const override
+    {
+        return R"({
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "preToolUse": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "subagentStart": [
+      { "type": "command", "command": "tl4ai-ctl red" }
+    ],
+    "notification": [
+      { "type": "command", "command": "tl4ai-ctl yellow" }
+    ],
+    "permissionRequest": [
+      { "type": "command", "command": "tl4ai-ctl yellow" }
+    ],
+    "agentStop": [
+      { "type": "command", "command": "tl4ai-ctl green" }
+    ],
+    "sessionEnd": [
+      { "type": "command", "command": "tl4ai-ctl green" }
+    ]
+  }
+})";
+    }
+};
+
 class AiToolRegistry {
 public:
     static const QList<AiToolStrategy *> &strategies()
     {
         static CodexStrategy codex;
         static ClaudeCodeStrategy claude;
-        static QList<AiToolStrategy *> list = {&codex, &claude};
+        static CopilotStrategy copilot;
+        static QList<AiToolStrategy *> list = {&codex, &claude, &copilot};
         return list;
     }
 

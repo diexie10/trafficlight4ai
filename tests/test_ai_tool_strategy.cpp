@@ -89,6 +89,58 @@ private slots:
         }
     }
 
+    void copilotTemplateContainsUserPromptSubmitted()
+    {
+        CopilotStrategy copilot;
+        QVERIFY(copilot.hooksTemplate().contains("userPromptSubmitted"));
+    }
+
+    void copilotTemplateHasRedYellowGreen()
+    {
+        CopilotStrategy copilot;
+        const QString tmpl = copilot.hooksTemplate();
+        QVERIFY(tmpl.contains("tl4ai-ctl red"));
+        QVERIFY(tmpl.contains("tl4ai-ctl yellow"));
+        QVERIFY(tmpl.contains("tl4ai-ctl green"));
+    }
+
+    void copilotTemplateOnlyUsesValidEvents()
+    {
+        const QStringList copilotEvents = {
+            "sessionStart", "sessionEnd", "userPromptSubmitted",
+            "preToolUse", "postToolUse", "postToolUseFailure",
+            "preCompact", "agentStop", "subagentStart",
+            "subagentStop", "errorOccurred", "notification",
+            "permissionRequest"
+        };
+
+        CopilotStrategy copilot;
+        const QString tmpl = copilot.hooksTemplate();
+        QRegularExpression re(R"RE("(\w+)":\s*\[)RE");
+        auto it = re.globalMatch(tmpl);
+        while (it.hasNext()) {
+            auto match = it.next();
+            QString event = match.captured(1);
+            if (event == "hooks" || event == "version")
+                continue;
+            QVERIFY2(copilotEvents.contains(event),
+                      qPrintable("Invalid Copilot event: " + event));
+        }
+    }
+
+    void copilotTemplateHasVersion()
+    {
+        CopilotStrategy copilot;
+        QVERIFY(copilot.hooksTemplate().contains("\"version\": 1"));
+    }
+
+    void registryFindsCopilot()
+    {
+        auto *s = AiToolRegistry::find("copilot");
+        QVERIFY(s != nullptr);
+        QCOMPARE(s->id(), QString("copilot"));
+    }
+
     void registryFindsCodex()
     {
         auto *s = AiToolRegistry::find("codex");
