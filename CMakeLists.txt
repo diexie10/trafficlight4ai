@@ -26,7 +26,7 @@ install(FILES README.md README_zh.md LICENSE
 install(FILES packaging/linux/trafficlight4ai.desktop
     DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
 )
-install(FILES resources/images/light_green.png
+install(FILES resources/images/app-icon.png
     DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps
     RENAME trafficlight4ai.png
 )
