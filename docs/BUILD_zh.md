@@ -124,13 +124,13 @@ windeployqt --release --dir windows-package\bin windows-package\bin\tl4ai-ctl.ex
 
 `Release Packages` GitHub Actions workflow 会按输入版本构建并发布 Release 资产。`0.2.0` 的预期文件为：
 
-- `trafficlight4ai-0.2.0-windows-amd64.zip`
-- `trafficlight4ai-0.2.0-linux-amd64.deb`
-- `trafficlight4ai-0.2.0-fedora-amd64.rpm`
-- `trafficlight4ai-0.2.0-opensuse-amd64.rpm`
-- `trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst`
-- `trafficlight4ai-0.2.0-linux-amd64.AppImage`
-- `SHA256SUMS.txt`
+- [`trafficlight4ai-0.2.0-windows-amd64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-windows-amd64.zip)
+- [`trafficlight4ai-0.2.0-linux-amd64.deb`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-linux-amd64.deb)
+- [`trafficlight4ai-0.2.0-fedora-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-fedora-amd64.rpm)
+- [`trafficlight4ai-0.2.0-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-opensuse-amd64.rpm)
+- [`trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst)
+- [`trafficlight4ai-0.2.0-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-linux-amd64.AppImage)
+- [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/SHA256SUMS.txt)
 
 Linux 打包脚本位于 `packaging/linux/`。脚本通过 CMake install 规则先暂存 `/usr/bin`、desktop 元数据、应用图标、README 和许可证，再生成对应发行版安装包。
 
