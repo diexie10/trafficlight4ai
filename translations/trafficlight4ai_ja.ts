@@ -27,6 +27,15 @@
     <message><source>Preview</source><translation>試聴</translation></message>
     <message><source>Browse</source><translation>参照</translation></message>
     <message><source>View Recommended Hooks Config</source><translation>推奨Hooks設定を表示</translation></message>
+    <message><source>Edit Hooks Config</source><translation>Hooks設定を編集</translation></message>
+    <message><source>Edit Hooks Config - %1</source><translation>Hooks設定を編集 - %1</translation></message>
+    <message><source>JSON Error</source><translation>JSONエラー</translation></message>
+    <message><source>Invalid JSON at offset %1:
+%2</source><translation>オフセット %1 で無効なJSON：
+%2</translation></message>
+    <message><source>Save Error</source><translation>保存エラー</translation></message>
+    <message><source>Cannot write to: %1</source><translation>書き込みできません：%1</translation></message>
+    <message><source>Save</source><translation>保存</translation></message>
     <message><source>OK</source><translation>OK</translation></message>
     <message><source>Cancel</source><translation>キャンセル</translation></message>
     <message><source>Recommended Hooks - %1</source><translation>推奨Hooks設定 - %1</translation></message>
