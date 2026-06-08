@@ -47,6 +47,16 @@ static void removeStaleSocket(const QString &path)
 #endif
 }
 
+static bool pathBlockedByNonSocket(const QString &path)
+{
+#ifdef Q_OS_UNIX
+    return QFile::exists(path) && !isUnixSocket(path);
+#else
+    Q_UNUSED(path)
+    return false;
+#endif
+}
+
 static void removeOwnedServer(const QString &path)
 {
 #ifdef Q_OS_UNIX
@@ -61,6 +71,12 @@ IpcServer::IpcServer(StateManager *stateManager, const QString &socketPath, QObj
       m_stateManager(stateManager), m_socketPath(socketPath)
 {
     removeStaleSocket(m_socketPath);
+
+    if (pathBlockedByNonSocket(m_socketPath)) {
+        qWarning("IpcServer: path is occupied by a non-socket file: %s",
+                 qPrintable(m_socketPath));
+        return;
+    }
 
     m_server->setSocketOptions(QLocalServer::UserAccessOption);
     connectServer();
@@ -91,6 +107,11 @@ bool IpcServer::restart(const QString &newPath)
     newServer->setSocketOptions(QLocalServer::UserAccessOption);
 
     removeStaleSocket(newPath);
+    if (pathBlockedByNonSocket(newPath)) {
+        qWarning("IpcServer: path is occupied by a non-socket file: %s",
+                 qPrintable(newPath));
+        return false;
+    }
     if (!newServer->listen(newPath)) {
         qWarning("IpcServer: failed to listen on %s: %s",
                  qPrintable(newPath), qPrintable(newServer->errorString()));
