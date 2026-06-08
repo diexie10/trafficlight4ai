@@ -127,6 +127,42 @@ private slots:
         }
     }
 
+    void codexHooksConfigPath()
+    {
+        CodexStrategy codex;
+        QVERIFY(codex.hooksConfigPath().endsWith("/.codex/hooks.json"));
+    }
+
+    void codexHooksIsEntireFile()
+    {
+        CodexStrategy codex;
+        QCOMPARE(codex.hooksIsEntireFile(), true);
+    }
+
+    void claudeHooksConfigPath()
+    {
+        ClaudeCodeStrategy claude;
+        QVERIFY(claude.hooksConfigPath().endsWith("/.claude/settings.json"));
+    }
+
+    void claudeHooksIsNotEntireFile()
+    {
+        ClaudeCodeStrategy claude;
+        QCOMPARE(claude.hooksIsEntireFile(), false);
+    }
+
+    void qoderCnHooksConfigPath()
+    {
+        QoderCnStrategy qoderCn;
+        QVERIFY(qoderCn.hooksConfigPath().endsWith("/.qoder-cn/settings.json"));
+    }
+
+    void qoderCnHooksIsNotEntireFile()
+    {
+        QoderCnStrategy qoderCn;
+        QCOMPARE(qoderCn.hooksIsEntireFile(), false);
+    }
+
     void registryFindsQoderCn()
     {
         auto *s = AiToolRegistry::find("qoder-cn");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QString>
+#include <QDir>
 #include <QList>
 #include <memory>
 
@@ -11,6 +12,8 @@ public:
     virtual QString displayName() const = 0;
     virtual int defaultTimeoutSec() const = 0;
     virtual QString hooksTemplate() const = 0;
+    virtual QString hooksConfigPath() const = 0;
+    virtual bool hooksIsEntireFile() const = 0;
 };
 
 class CodexStrategy : public AiToolStrategy {
@@ -40,6 +43,8 @@ public:
   }
 })";
     }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.codex/hooks.json"; }
+    bool hooksIsEntireFile() const override { return true; }
 };
 
 class ClaudeCodeStrategy : public AiToolStrategy {
@@ -61,6 +66,8 @@ public:
   }
 })";
     }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.claude/settings.json"; }
+    bool hooksIsEntireFile() const override { return false; }
 };
 
 class QoderCnStrategy : public AiToolStrategy {
@@ -96,6 +103,8 @@ public:
   }
 })";
     }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.qoder-cn/settings.json"; }
+    bool hooksIsEntireFile() const override { return false; }
 };
 
 class AiToolRegistry {
