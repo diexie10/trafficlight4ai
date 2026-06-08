@@ -120,6 +120,20 @@ windeployqt --release --dir windows-package\bin windows-package\bin\tl4ai-ctl.ex
 .\windows-package\bin\tl4ai-ctl.exe red
 ```
 
+## 发布打包
+
+`Release Packages` GitHub Actions workflow 会按输入版本构建并发布 Release 资产。`0.2.0` 的预期文件为：
+
+- `trafficlight4ai-0.2.0-windows-amd64.zip`
+- `trafficlight4ai-0.2.0-linux-amd64.deb`
+- `trafficlight4ai-0.2.0-fedora-amd64.rpm`
+- `trafficlight4ai-0.2.0-opensuse-amd64.rpm`
+- `trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst`
+- `trafficlight4ai-0.2.0-linux-amd64.AppImage`
+- `SHA256SUMS.txt`
+
+Linux 打包脚本位于 `packaging/linux/`。脚本通过 CMake install 规则先暂存 `/usr/bin`、desktop 元数据、应用图标、README 和许可证，再生成对应发行版安装包。
+
 ## 编译注意事项
 
 - Debug 构建保留 `qDebug()` 输出。
@@ -127,7 +141,7 @@ windeployqt --release --dir windows-package\bin windows-package\bin\tl4ai-ctl.ex
 - 只要发行版提供 Qt 6，源码编译通常适用于主流 Linux 发行版，但包名会因发行版而不同。
 - Linux GitHub Actions workflow 会在 Ubuntu 24.04、Fedora 41、Arch Linux latest 和 openSUSE Leap 15.6 上验证 Release 构建、可执行文件存在性和 CTest。
 - 在 openSUSE Leap 15.6 上需要使用 GCC 13（`CC=gcc-13 CXX=g++-13`），因为默认 GCC 7 工具链不提供 Qt 6 所需的 C++17 `<filesystem>` 头文件。
-- Ubuntu 发布包是动态链接二进制，主要面向兼容的 Ubuntu/Debian 系统；不保证能直接在 Fedora、Arch 或 openSUSE 上运行。
+- 发行版安装包是动态链接构建，应在匹配的发行版家族中使用；其它发行版建议使用 AppImage 或从源码编译。
 - 系统托盘行为取决于桌面环境。KDE 和 Xfce 通常较稳定；GNOME 可能需要 AppIndicator 或托盘扩展。
 - 提示音播放使用 Qt Multimedia 和系统音频后端。部分发行版可能需要额外安装 GStreamer、PulseAudio 或 PipeWire 插件才能播放自定义音频文件。
 - Windows 下 `trafficlight4ai.exe` 必须保持 `WIN32_EXECUTABLE TRUE`，避免启动 GUI 时弹出命令行窗口。

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=trafficlight4ai
+Comment=Visual traffic light status indicator for AI coding tools
+Exec=trafficlight4ai
+Icon=trafficlight4ai
+Terminal=false
+Categories=Utility;Development;

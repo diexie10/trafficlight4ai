@@ -26,11 +26,15 @@ Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right mo
 
 Prebuilt archives are available from GitHub Releases:
 
-- `trafficlight4ai-v0.1.1-ubuntu-x86_64.tar.gz` — Ubuntu x86_64 build.
-- `trafficlight4ai-v0.1.1-windows-x86_64.zip` — Windows x86_64 build with Qt runtime files bundled by `windeployqt`.
+- `trafficlight4ai-0.2.0-windows-amd64.zip` — Windows build with Qt runtime files bundled by `windeployqt`.
+- `trafficlight4ai-0.2.0-linux-amd64.deb` — Ubuntu/Debian package.
+- `trafficlight4ai-0.2.0-fedora-amd64.rpm` — Fedora package.
+- `trafficlight4ai-0.2.0-opensuse-amd64.rpm` — openSUSE Leap package.
+- `trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst` — Arch Linux package.
+- `trafficlight4ai-0.2.0-linux-amd64.AppImage` — generic Linux AppImage.
 - `SHA256SUMS.txt` — checksums for release archives.
 
-The Ubuntu archive is a dynamically linked build for Ubuntu/Debian-compatible systems, not a universal Linux package. For Fedora, Arch, openSUSE, and other distributions, build from source using [docs/BUILD.md](docs/BUILD.md).
+Linux distro packages are dynamically linked and target the named distribution family. For other distributions, use the AppImage or build from source using [docs/BUILD.md](docs/BUILD.md).
 
 On Windows, run `bin/trafficlight4ai.exe`. It is built as a GUI application and should not open a console window. Use `bin/tl4ai-ctl.exe red/yellow/green` from PowerShell, cmd, or AI tool hooks to change the light state. If Windows reports missing MSVC runtime DLLs, install the Microsoft Visual C++ Redistributable 2022 x64.
 

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - fix/linux-ci-build
   pull_request:
     branches:
       - main

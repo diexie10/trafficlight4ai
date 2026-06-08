@@ -120,6 +120,20 @@ Run locally:
 .\windows-package\bin\tl4ai-ctl.exe red
 ```
 
+## Release Packaging
+
+The `Release Packages` GitHub Actions workflow builds and publishes the release assets for a requested version. For `0.2.0`, the expected assets are:
+
+- `trafficlight4ai-0.2.0-windows-amd64.zip`
+- `trafficlight4ai-0.2.0-linux-amd64.deb`
+- `trafficlight4ai-0.2.0-fedora-amd64.rpm`
+- `trafficlight4ai-0.2.0-opensuse-amd64.rpm`
+- `trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst`
+- `trafficlight4ai-0.2.0-linux-amd64.AppImage`
+- `SHA256SUMS.txt`
+
+The Linux package scripts live in `packaging/linux/`. They use CMake install rules to stage `/usr/bin`, desktop metadata, the application icon, README files, and the license before producing the distro-specific package.
+
 ## Build Notes
 
 - Debug builds keep `qDebug()` output.
@@ -127,7 +141,7 @@ Run locally:
 - Source builds should work on mainstream Linux distributions that provide Qt 6, but package names differ by distribution.
 - The Linux GitHub Actions workflow verifies Release builds, executable presence, and CTest on Ubuntu 24.04, Fedora 41, Arch Linux latest, and openSUSE Leap 15.6.
 - On openSUSE Leap 15.6, use GCC 13 (`CC=gcc-13 CXX=g++-13`) because the default GCC 7 toolchain does not provide the C++17 `<filesystem>` header required by Qt 6.
-- The Ubuntu release archive is dynamically linked and is only intended for compatible Ubuntu/Debian-like systems; it is not guaranteed to run unchanged on Fedora, Arch, or openSUSE.
+- Distro release packages are dynamically linked and should be used on their matching distribution family; use the AppImage or build from source elsewhere.
 - System tray behavior depends on the desktop environment. KDE and Xfce are usually reliable; GNOME may require an AppIndicator or tray extension.
 - Sound playback uses Qt Multimedia and the system audio backend. Some distributions may require GStreamer, PulseAudio, or PipeWire plugins for custom audio files.
 - On Windows, `trafficlight4ai.exe` must be built with `WIN32_EXECUTABLE TRUE` so it does not open a console window.

@@ -26,11 +26,15 @@ AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，
 
 预编译包可从 GitHub Releases 下载：
 
-- `trafficlight4ai-v0.1.1-ubuntu-x86_64.tar.gz` — Ubuntu x86_64 构建。
-- `trafficlight4ai-v0.1.1-windows-x86_64.zip` — Windows x86_64 构建，已通过 `windeployqt` 打包 Qt 运行库。
+- `trafficlight4ai-0.2.0-windows-amd64.zip` — Windows 构建，已通过 `windeployqt` 打包 Qt 运行库。
+- `trafficlight4ai-0.2.0-linux-amd64.deb` — Ubuntu/Debian 安装包。
+- `trafficlight4ai-0.2.0-fedora-amd64.rpm` — Fedora 安装包。
+- `trafficlight4ai-0.2.0-opensuse-amd64.rpm` — openSUSE Leap 安装包。
+- `trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst` — Arch Linux 安装包。
+- `trafficlight4ai-0.2.0-linux-amd64.AppImage` — 通用 Linux AppImage。
 - `SHA256SUMS.txt` — 发布包校验和。
 
-Ubuntu 压缩包是面向 Ubuntu/Debian 兼容系统的动态链接构建，不是通用 Linux 包。Fedora、Arch、openSUSE 和其它发行版建议按 [docs/BUILD_zh.md](docs/BUILD_zh.md) 从源码编译。
+Linux 发行版安装包是动态链接构建，主要面向对应发行版家族。其它发行版可优先使用 AppImage，或按 [docs/BUILD_zh.md](docs/BUILD_zh.md) 从源码编译。
 
 Windows 上运行 `bin/trafficlight4ai.exe`。它会作为 GUI 程序启动，不应弹出命令行窗口。可在 PowerShell、cmd 或 AI 工具 hooks 中调用 `bin/tl4ai-ctl.exe red/yellow/green` 来切换灯状态。如果 Windows 提示缺少 MSVC 运行时 DLL，请安装 Microsoft Visual C++ Redistributable 2022 x64。
 
