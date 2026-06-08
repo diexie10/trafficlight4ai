@@ -62,6 +62,7 @@ IpcServer::IpcServer(StateManager *stateManager, const QString &socketPath, QObj
 {
     removeStaleSocket(m_socketPath);
 
+    m_server->setSocketOptions(QLocalServer::UserAccessOption);
     connectServer();
     m_ownsSocket = m_server->listen(m_socketPath);
     if (!m_ownsSocket)
@@ -87,6 +88,7 @@ bool IpcServer::restart(const QString &newPath)
         return isListening();
 
     auto newServer = std::make_unique<QLocalServer>();
+    newServer->setSocketOptions(QLocalServer::UserAccessOption);
 
     removeStaleSocket(newPath);
     if (!newServer->listen(newPath)) {
@@ -118,20 +120,17 @@ void IpcServer::onNewConnection()
 {
     while (QLocalSocket *client = m_server->nextPendingConnection()) {
         auto processData = [this, client]() {
-            QByteArray data = client->readAll();
+            QByteArray data = client->read(64);
             if (!data.isEmpty())
                 m_stateManager->handleCommand(QString::fromUtf8(data));
             client->disconnectFromServer();
             client->deleteLater();
         };
 
-        connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
-
-        // Data may arrive before readyRead is connected (fast CLI sender).
-        // Check immediately; otherwise wait for the signal. Mutually exclusive.
         if (client->bytesAvailable()) {
             processData();
         } else {
+            connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
             connect(client, &QLocalSocket::readyRead, this, processData);
         }
     }

@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
     const QString size = config.windowSize();
     if (size == "xsmall")
         lightWidget->setSizePreset(TrafficLightWidget::ExtraSmall);
+    else if (size == "small")
+        lightWidget->setSizePreset(TrafficLightWidget::Small);
     else if (size == "medium")
         lightWidget->setSizePreset(TrafficLightWidget::Medium);
     else if (size == "large")
