@@ -26,13 +26,13 @@ Your AI tool's hook system triggers `tl4ai-ctl red/yellow/green` at the right mo
 
 Prebuilt archives are available from GitHub Releases:
 
-- [`trafficlight4ai-0.2.0-windows-amd64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-windows-amd64.zip) — Windows build with Qt runtime files bundled by `windeployqt`.
-- [`trafficlight4ai-0.2.0-linux-amd64.deb`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-linux-amd64.deb) — Ubuntu/Debian package.
-- [`trafficlight4ai-0.2.0-fedora-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-fedora-amd64.rpm) — Fedora package.
-- [`trafficlight4ai-0.2.0-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-opensuse-amd64.rpm) — openSUSE Leap package.
-- [`trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-arch-amd64.pkg.tar.zst) — Arch Linux package.
-- [`trafficlight4ai-0.2.0-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/trafficlight4ai-0.2.0-linux-amd64.AppImage) — generic Linux AppImage.
-- [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.0/SHA256SUMS.txt) — checksums for release archives.
+- [`trafficlight4ai-0.2.1-windows-amd64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-windows-amd64.zip) — Windows build with Qt runtime files bundled by `windeployqt`.
+- [`trafficlight4ai-0.2.1-linux-amd64.deb`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-linux-amd64.deb) — Ubuntu/Debian package.
+- [`trafficlight4ai-0.2.1-fedora-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-fedora-amd64.rpm) — Fedora package.
+- [`trafficlight4ai-0.2.1-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-opensuse-amd64.rpm) — openSUSE Leap package.
+- [`trafficlight4ai-0.2.1-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-arch-amd64.pkg.tar.zst) — Arch Linux package.
+- [`trafficlight4ai-0.2.1-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-linux-amd64.AppImage) — generic Linux AppImage.
+- [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/SHA256SUMS.txt) — checksums for release archives.
 
 Linux distro packages are dynamically linked and target the named distribution family. For other distributions, use the AppImage or build from source using [docs/BUILD.md](docs/BUILD.md).
 
