@@ -79,6 +79,13 @@ cmake -B build-release -DCMAKE_BUILD_TYPE=Release
 cmake --build build-release -j$(nproc)
 ```
 
+在 openSUSE Leap 15.6 上需要显式使用 GCC 13 配置：
+
+```bash
+CC=gcc-13 CXX=g++-13 cmake -B build-release -DCMAKE_BUILD_TYPE=Release
+cmake --build build-release -j$(nproc)
+```
+
 本地运行：
 
 ```bash
@@ -118,6 +125,7 @@ windeployqt --release --dir windows-package\bin windows-package\bin\tl4ai-ctl.ex
 - Debug 构建保留 `qDebug()` 输出。
 - Release 构建定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，warning 和 critical 日志仍会保留。
 - 只要发行版提供 Qt 6，源码编译通常适用于主流 Linux 发行版，但包名会因发行版而不同。
+- Linux GitHub Actions workflow 会在 Ubuntu 24.04、Fedora 41、Arch Linux latest 和 openSUSE Leap 15.6 上验证 Release 构建、可执行文件存在性和 CTest。
 - 在 openSUSE Leap 15.6 上需要使用 GCC 13（`CC=gcc-13 CXX=g++-13`），因为默认 GCC 7 工具链不提供 Qt 6 所需的 C++17 `<filesystem>` 头文件。
 - Ubuntu 发布包是动态链接二进制，主要面向兼容的 Ubuntu/Debian 系统；不保证能直接在 Fedora、Arch 或 openSUSE 上运行。
 - 系统托盘行为取决于桌面环境。KDE 和 Xfce 通常较稳定；GNOME 可能需要 AppIndicator 或托盘扩展。

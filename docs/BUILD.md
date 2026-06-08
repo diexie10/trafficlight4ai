@@ -79,6 +79,13 @@ cmake -B build-release -DCMAKE_BUILD_TYPE=Release
 cmake --build build-release -j$(nproc)
 ```
 
+On openSUSE Leap 15.6, configure with GCC 13 explicitly:
+
+```bash
+CC=gcc-13 CXX=g++-13 cmake -B build-release -DCMAKE_BUILD_TYPE=Release
+cmake --build build-release -j$(nproc)
+```
+
 Run locally:
 
 ```bash
@@ -118,6 +125,7 @@ Run locally:
 - Debug builds keep `qDebug()` output.
 - Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out while warning and critical logs remain.
 - Source builds should work on mainstream Linux distributions that provide Qt 6, but package names differ by distribution.
+- The Linux GitHub Actions workflow verifies Release builds, executable presence, and CTest on Ubuntu 24.04, Fedora 41, Arch Linux latest, and openSUSE Leap 15.6.
 - On openSUSE Leap 15.6, use GCC 13 (`CC=gcc-13 CXX=g++-13`) because the default GCC 7 toolchain does not provide the C++17 `<filesystem>` header required by Qt 6.
 - The Ubuntu release archive is dynamically linked and is only intended for compatible Ubuntu/Debian-like systems; it is not guaranteed to run unchanged on Fedora, Arch, or openSUSE.
 - System tray behavior depends on the desktop environment. KDE and Xfce are usually reliable; GNOME may require an AppIndicator or tray extension.

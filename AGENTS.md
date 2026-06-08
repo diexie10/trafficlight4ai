@@ -6,7 +6,7 @@
 
 ## 构建与验证文档
 
-Linux 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。
+Linux 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。Linux Build workflow 当前验证 Ubuntu 24.04、Fedora 41、Arch Linux latest 和 openSUSE Leap 15.6；openSUSE Leap 15.6 必须使用 `gcc13/gcc13-c++` 并以 `CC=gcc-13 CXX=g++-13` 配置 CMake。
 
 ## 代码风格与命名约定
 
