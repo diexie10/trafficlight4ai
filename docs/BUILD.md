@@ -34,7 +34,7 @@ sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttoo
 sudo pacman -S cmake gcc qt6-base qt6-multimedia qt6-tools
 
 # openSUSE
-sudo zypper install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
+sudo zypper install cmake gcc13 gcc13-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
 ```
 
 Windows requirements:
@@ -118,6 +118,7 @@ Run locally:
 - Debug builds keep `qDebug()` output.
 - Release builds define `QT_NO_DEBUG_OUTPUT`, so debug-level logs are compiled out while warning and critical logs remain.
 - Source builds should work on mainstream Linux distributions that provide Qt 6, but package names differ by distribution.
+- On openSUSE Leap 15.6, use GCC 13 (`CC=gcc-13 CXX=g++-13`) because the default GCC 7 toolchain does not provide the C++17 `<filesystem>` header required by Qt 6.
 - The Ubuntu release archive is dynamically linked and is only intended for compatible Ubuntu/Debian-like systems; it is not guaranteed to run unchanged on Fedora, Arch, or openSUSE.
 - System tray behavior depends on the desktop environment. KDE and Xfce are usually reliable; GNOME may require an AppIndicator or tray extension.
 - Sound playback uses Qt Multimedia and the system audio backend. Some distributions may require GStreamer, PulseAudio, or PipeWire plugins for custom audio files.

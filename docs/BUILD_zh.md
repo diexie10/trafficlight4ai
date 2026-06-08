@@ -34,7 +34,7 @@ sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttoo
 sudo pacman -S cmake gcc qt6-base qt6-multimedia qt6-tools
 
 # openSUSE
-sudo zypper install cmake gcc-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
+sudo zypper install cmake gcc13 gcc13-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
 ```
 
 Windows 要求：
@@ -118,6 +118,7 @@ windeployqt --release --dir windows-package\bin windows-package\bin\tl4ai-ctl.ex
 - Debug 构建保留 `qDebug()` 输出。
 - Release 构建定义 `QT_NO_DEBUG_OUTPUT`，调试级日志会在编译时移除，warning 和 critical 日志仍会保留。
 - 只要发行版提供 Qt 6，源码编译通常适用于主流 Linux 发行版，但包名会因发行版而不同。
+- 在 openSUSE Leap 15.6 上需要使用 GCC 13（`CC=gcc-13 CXX=g++-13`），因为默认 GCC 7 工具链不提供 Qt 6 所需的 C++17 `<filesystem>` 头文件。
 - Ubuntu 发布包是动态链接二进制，主要面向兼容的 Ubuntu/Debian 系统；不保证能直接在 Fedora、Arch 或 openSUSE 上运行。
 - 系统托盘行为取决于桌面环境。KDE 和 Xfce 通常较稳定；GNOME 可能需要 AppIndicator 或托盘扩展。
 - 提示音播放使用 Qt Multimedia 和系统音频后端。部分发行版可能需要额外安装 GStreamer、PulseAudio 或 PipeWire 插件才能播放自定义音频文件。
