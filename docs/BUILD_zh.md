@@ -25,7 +25,7 @@ Linux 依赖：
 
 ```bash
 # Ubuntu/Debian/Linux Mint
-sudo apt install qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+sudo apt install cmake g++ libgl1-mesa-dev qt6-base-dev qt6-l10n-tools qt6-multimedia-dev qt6-tools-dev
 
 # Fedora
 sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttools-devel
