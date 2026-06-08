@@ -26,6 +26,8 @@ LINUXDEPLOY_VER="1-alpha-20251107-1"
 QT_PLUGIN_VER="1-alpha-20250213-1"
 LINUXDEPLOY_SHA256="c20cd71e3a4e3b80c3483cef793cda3f4e990aca14014d23c544ca3ce1270b4d"
 QT_PLUGIN_SHA256="bef140a1a96994029153dca8c00b1750b9a5a764fb9db2dc68d7bb40e8a29e8a"
+RUNTIME_VER="20251108"
+RUNTIME_SHA256="2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d"
 
 # Download a tool from pinned release, falling back to continuous on failure.
 download_tool() {
@@ -58,9 +60,17 @@ download_tool "${qt_plugin}" \
     "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage" \
     "${QT_PLUGIN_SHA256}"
 
+# Pre-download AppImage runtime so appimagetool doesn't fetch it at build time.
+runtime="${tool_dir}/runtime-x86_64"
+download_tool "${runtime}" \
+    "https://github.com/AppImage/type2-runtime/releases/download/${RUNTIME_VER}/runtime-x86_64" \
+    "https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64" \
+    "${RUNTIME_SHA256}"
+
 chmod +x "${linuxdeploy}" "${qt_plugin}"
 ln -sf "${qt_plugin}" "${tool_dir}/linuxdeploy-plugin-qt"
 export PATH="${tool_dir}:${PATH}"
+export LDAI_RUNTIME_FILE="${runtime}"
 
 if command -v qmake6 >/dev/null 2>&1; then
     export QMAKE="$(command -v qmake6)"
