@@ -189,6 +189,22 @@ Socket 路径或名称也可通过 `TL4AI_SOCKET` 环境变量覆盖。
 cd build && ctest --output-on-failure
 ```
 
+## 添加新 AI 工具
+
+trafficlight4ai 使用策略模式支持多种 AI 工具。添加新工具只需：
+
+1. **创建策略类** — 在 `src/AiToolStrategy.h` 中继承 `AiToolStrategy` 并实现：
+   - `id()` — 唯一标识符（如 `"my-tool"`）
+   - `displayName()` — 设置对话框中显示的名称（如 `"My Tool"`）
+   - `defaultTimeoutSec()` — 自动回绿灯的超时秒数
+   - `hooksTemplate()` — 该工具推荐的 hooks 配置 JSON
+
+2. **注册** — 在同文件的 `AiToolRegistry::strategies()` 中添加静态实例并追加到列表。
+
+3. **重新编译** — 新工具会自动出现在设置对话框的 AI 工具下拉列表中，其 hooks 模板可通过"查看推荐 Hooks 配置"按钮查看。
+
+无需修改 IPC、状态机或 GUI 代码，策略模式会处理一切。
+
 ## 许可证
 
 MIT

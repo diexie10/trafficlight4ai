@@ -189,6 +189,22 @@ Socket path/name can also be overridden via `TL4AI_SOCKET` environment variable.
 cd build && ctest --output-on-failure
 ```
 
+## Adding a New AI Tool
+
+trafficlight4ai uses a strategy pattern to support multiple AI tools. To add a new one:
+
+1. **Create a strategy class** in `src/AiToolStrategy.h` — inherit from `AiToolStrategy` and implement:
+   - `id()` — unique identifier (e.g. `"my-tool"`)
+   - `displayName()` — name shown in the Settings dialog (e.g. `"My Tool"`)
+   - `defaultTimeoutSec()` — auto-idle timeout in seconds
+   - `hooksTemplate()` — recommended hooks config JSON for this tool
+
+2. **Register it** in `AiToolRegistry::strategies()` (same file) — add a static instance and append its pointer to the list.
+
+3. **Rebuild** — the new tool will appear in the Settings dialog's AI tool dropdown and its hooks template will be available via "View Recommended Hooks Config".
+
+No changes are needed to IPC, state machine, or GUI code — the strategy pattern handles everything.
+
 ## License
 
 MIT
