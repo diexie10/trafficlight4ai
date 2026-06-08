@@ -20,12 +20,21 @@ cmake -S "${repo_root}" -B "${build_dir}" \
 cmake --build "${build_dir}" -j"$(nproc)"
 DESTDIR="${app_dir}" cmake --install "${build_dir}" --strip
 
+# Pinned SHA256 checksums for reproducible builds.
+# Update these when upgrading linuxdeploy versions.
+LINUXDEPLOY_SHA256="514d4ffe2a2f757369b41863a4f63fbbb222c429652803ebc081cb16ba21ac25"
+QT_PLUGIN_SHA256="be1b7e166bf9975cfb694ebe6759ba40502ffc6196440d3e64aa90c4dbd67e9f"
+
 linuxdeploy="${tool_dir}/linuxdeploy-x86_64.AppImage"
 qt_plugin="${tool_dir}/linuxdeploy-plugin-qt-x86_64.AppImage"
 curl -L -o "${linuxdeploy}" \
     https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
 curl -L -o "${qt_plugin}" \
     https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+
+echo "${LINUXDEPLOY_SHA256}  ${linuxdeploy}" | sha256sum -c --strict
+echo "${QT_PLUGIN_SHA256}  ${qt_plugin}" | sha256sum -c --strict
+
 chmod +x "${linuxdeploy}" "${qt_plugin}"
 ln -sf "${qt_plugin}" "${tool_dir}/linuxdeploy-plugin-qt"
 export PATH="${tool_dir}:${PATH}"

@@ -119,19 +119,39 @@ void IpcServer::connectServer()
 void IpcServer::onNewConnection()
 {
     while (QLocalSocket *client = m_server->nextPendingConnection()) {
-        auto processData = [this, client]() {
-            QByteArray data = client->read(64);
-            if (!data.isEmpty())
-                m_stateManager->handleCommand(QString::fromUtf8(data));
-            client->disconnectFromServer();
+        auto *buf = new QByteArray();
+
+        auto tryProcess = [this, client, buf]() {
+            buf->append(client->read(64 - buf->size()));
+            if (buf->contains('\n') || buf->size() >= 64) {
+                m_stateManager->handleCommand(QString::fromUtf8(*buf));
+                delete buf;
+                client->disconnectFromServer();
+                client->deleteLater();
+            }
+        };
+
+        auto onDisconnected = [this, client, buf]() {
+            if (!buf->isEmpty())
+                m_stateManager->handleCommand(QString::fromUtf8(*buf));
+            delete buf;
             client->deleteLater();
         };
 
         if (client->bytesAvailable()) {
-            processData();
+            buf->append(client->read(64));
+            if (buf->contains('\n') || buf->size() >= 64) {
+                m_stateManager->handleCommand(QString::fromUtf8(*buf));
+                delete buf;
+                client->disconnectFromServer();
+                client->deleteLater();
+            } else {
+                connect(client, &QLocalSocket::readyRead, this, tryProcess);
+                connect(client, &QLocalSocket::disconnected, this, onDisconnected);
+            }
         } else {
-            connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
-            connect(client, &QLocalSocket::readyRead, this, processData);
+            connect(client, &QLocalSocket::readyRead, this, tryProcess);
+            connect(client, &QLocalSocket::disconnected, this, onDisconnected);
         }
     }
 }
