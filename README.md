@@ -44,6 +44,13 @@ See [docs/BUILD.md](docs/BUILD.md) for Linux and Windows prerequisites, build co
 
 Linux source builds are verified in GitHub Actions on Ubuntu 24.04, Fedora 41, Arch Linux latest, and openSUSE Leap 15.6. The build guide lists distribution-specific packages and the openSUSE GCC 13 requirement.
 
+The build produces two executables:
+
+| Executable | Path | Description |
+|---|---|---|
+| `trafficlight4ai` | `build/src/trafficlight4ai` | Qt GUI main program — floating window + system tray icon, embeds IPC server to receive state commands |
+| `tl4ai-ctl` | `build/tools/tl4ai-ctl` | Lightweight CLI — sends `RED`/`YELLOW`/`GREEN` commands to the GUI via local IPC socket |
+
 ## Quick Start
 
 ### 1. Run the GUI
@@ -175,6 +182,12 @@ Config file: `~/.config/trafficlight4ai/config.json`
 ```
 
 Socket path/name can also be overridden via `TL4AI_SOCKET` environment variable.
+
+## Tests
+
+```bash
+cd build && ctest --output-on-failure
+```
 
 ## License
 
