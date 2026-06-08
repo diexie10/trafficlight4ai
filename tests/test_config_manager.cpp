@@ -313,6 +313,97 @@ private slots:
         else
             qunsetenv("TL4AI_SOCKET");
     }
+
+    void defaultLanguage()
+    {
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.language(), QString("en"));
+    }
+
+    void setAndGetLanguage()
+    {
+        ConfigManager cm(m_configPath);
+        cm.setLanguage("zh");
+        QCOMPARE(cm.language(), QString("zh"));
+    }
+
+    void languagePersists()
+    {
+        {
+            ConfigManager cm(m_configPath);
+            cm.setLanguage("ja");
+        }
+        ConfigManager cm2(m_configPath);
+        QCOMPARE(cm2.language(), QString("ja"));
+    }
+
+    void defaultYellowSoundEnabled()
+    {
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.yellowSoundEnabled(), true);
+    }
+
+    void setAndGetYellowSoundEnabled()
+    {
+        ConfigManager cm(m_configPath);
+        cm.setYellowSoundEnabled(false);
+        QCOMPARE(cm.yellowSoundEnabled(), false);
+    }
+
+    void defaultGreenSoundEnabled()
+    {
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.greenSoundEnabled(), true);
+    }
+
+    void setAndGetGreenSoundEnabled()
+    {
+        ConfigManager cm(m_configPath);
+        cm.setGreenSoundEnabled(false);
+        QCOMPARE(cm.greenSoundEnabled(), false);
+    }
+
+    void defaultYellowSoundFile()
+    {
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.yellowSoundFile(), QString());
+    }
+
+    void setAndGetYellowSoundFile()
+    {
+        ConfigManager cm(m_configPath);
+        cm.setYellowSoundFile("/tmp/alert.wav");
+        QCOMPARE(cm.yellowSoundFile(), QString("/tmp/alert.wav"));
+    }
+
+    void defaultGreenSoundFile()
+    {
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.greenSoundFile(), QString());
+    }
+
+    void setAndGetGreenSoundFile()
+    {
+        ConfigManager cm(m_configPath);
+        cm.setGreenSoundFile("/tmp/done.ogg");
+        QCOMPARE(cm.greenSoundFile(), QString("/tmp/done.ogg"));
+    }
+
+    void soundSettingsPersist()
+    {
+        {
+            ConfigManager cm(m_configPath);
+            cm.setYellowSoundEnabled(false);
+            cm.setYellowSoundFile("/tmp/y.wav");
+            cm.setGreenSoundEnabled(false);
+            cm.setGreenSoundFile("/tmp/g.mp3");
+        }
+        ConfigManager cm2(m_configPath);
+        QCOMPARE(cm2.yellowSoundEnabled(), false);
+        QCOMPARE(cm2.yellowSoundFile(), QString("/tmp/y.wav"));
+        QCOMPARE(cm2.greenSoundEnabled(), false);
+        QCOMPARE(cm2.greenSoundFile(), QString("/tmp/g.mp3"));
+    }
 };
 
 QTEST_MAIN(TestConfigManager)

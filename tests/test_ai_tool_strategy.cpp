@@ -67,6 +67,28 @@ private slots:
         QVERIFY(tmpl.contains("tl4ai-ctl green"));
     }
 
+    void claudeTemplateOnlyUsesValidEvents()
+    {
+        const QStringList claudeEvents = {
+            "PreToolUse", "PostToolUse", "Notification", "Stop",
+            "SubagentStart", "SubagentStop", "UserPromptSubmit",
+            "PermissionRequest", "SessionEnd"
+        };
+
+        ClaudeCodeStrategy claude;
+        const QString tmpl = claude.hooksTemplate();
+        QRegularExpression re(R"RE("(\w+)":\s*[\[{])RE");
+        auto it = re.globalMatch(tmpl);
+        while (it.hasNext()) {
+            auto match = it.next();
+            QString event = match.captured(1);
+            if (event == "hooks" || event == "command")
+                continue;
+            QVERIFY2(claudeEvents.contains(event),
+                      qPrintable("Invalid Claude Code event: " + event));
+        }
+    }
+
     void registryFindsCodex()
     {
         auto *s = AiToolRegistry::find("codex");

@@ -189,6 +189,17 @@ private slots:
         sm.setState(LightState::Working); // duplicate
         QCOMPARE(spy.count(), 0); // no signal for same state
     }
+
+    void setTimeoutZeroWhileWorkingCancelsTimer()
+    {
+        StateManager sm;
+        sm.setTimeoutSec(1);
+        sm.setState(LightState::Working);
+        // Disable timeout while working
+        sm.setTimeoutSec(0);
+        QTest::qWait(1500);
+        QCOMPARE(sm.state(), LightState::Working); // timer was cancelled
+    }
 };
 
 QTEST_MAIN(TestStateManager)
