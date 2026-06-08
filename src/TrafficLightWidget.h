@@ -14,6 +14,7 @@ public:
 
     explicit TrafficLightWidget(QWidget *parent = nullptr);
 
+    static SizePreset sizePresetFromString(const QString &size);
     void setSizePreset(SizePreset preset);
     void setAnimationMode(const QString &mode);
     void setAnimationPeriodMs(int ms);

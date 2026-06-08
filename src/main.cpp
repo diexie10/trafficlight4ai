@@ -59,17 +59,7 @@ int main(int argc, char *argv[])
     lightWidget->setAnimationMode(config.animationMode());
     lightWidget->setAnimationPeriodMs(config.animationPeriodMs());
 
-    const QString size = config.windowSize();
-    if (size == "xsmall")
-        lightWidget->setSizePreset(TrafficLightWidget::ExtraSmall);
-    else if (size == "small")
-        lightWidget->setSizePreset(TrafficLightWidget::Small);
-    else if (size == "medium")
-        lightWidget->setSizePreset(TrafficLightWidget::Medium);
-    else if (size == "large")
-        lightWidget->setSizePreset(TrafficLightWidget::Large);
-    else if (size == "xlarge")
-        lightWidget->setSizePreset(TrafficLightWidget::ExtraLarge);
+    lightWidget->setSizePreset(TrafficLightWidget::sizePresetFromString(config.windowSize()));
 
     auto *floatingWindow = new FloatingWindow(lightWidget, &config);
     floatingWindow->show();

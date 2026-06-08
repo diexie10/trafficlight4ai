@@ -15,6 +15,16 @@ TrafficLightWidget::TrafficLightWidget(QWidget *parent)
     setSizePreset(Small);
 }
 
+TrafficLightWidget::SizePreset TrafficLightWidget::sizePresetFromString(const QString &size)
+{
+    if (size == "xsmall") return ExtraSmall;
+    if (size == "small")  return Small;
+    if (size == "medium") return Medium;
+    if (size == "large")  return Large;
+    if (size == "xlarge") return ExtraLarge;
+    return Small;
+}
+
 void TrafficLightWidget::setSizePreset(SizePreset preset)
 {
     m_sizePreset = preset;
