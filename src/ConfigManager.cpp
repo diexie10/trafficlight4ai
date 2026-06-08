@@ -97,6 +97,9 @@ void ConfigManager::load()
 
 void ConfigManager::save()
 {
+    if (m_batchSave)
+        return;
+
     QDir dir = QFileInfo(m_configPath).absoluteDir();
     if (!dir.exists())
         dir.mkpath(".");
@@ -273,6 +276,17 @@ void ConfigManager::setGreenSoundFile(const QString &path)
     QJsonObject sound = m_root["sound"].toObject();
     sound["greenFile"] = path;
     m_root["sound"] = sound;
+    save();
+}
+
+void ConfigManager::beginBatchSave()
+{
+    m_batchSave = true;
+}
+
+void ConfigManager::endBatchSave()
+{
+    m_batchSave = false;
     save();
 }
 

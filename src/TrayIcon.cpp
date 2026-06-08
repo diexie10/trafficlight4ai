@@ -100,15 +100,13 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 
 QIcon TrayIcon::createIcon(const QColor &color) const
 {
-    const int size = 64;
-    QPixmap pixmap(size, size);
-    pixmap.fill(Qt::transparent);
+    m_iconPixmap.fill(Qt::transparent);
 
-    QPainter painter(&pixmap);
+    QPainter painter(&m_iconPixmap);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setBrush(color);
     painter.setPen(Qt::NoPen);
-    painter.drawEllipse(4, 4, size - 8, size - 8);
+    painter.drawEllipse(4, 4, 64 - 8, 64 - 8);
 
-    return QIcon(pixmap);
+    return QIcon(m_iconPixmap);
 }

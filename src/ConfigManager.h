@@ -46,6 +46,9 @@ public:
     QString greenSoundFile() const;
     void setGreenSoundFile(const QString &path);
 
+    void beginBatchSave();
+    void endBatchSave();
+
 private:
     void load();
     void save();
@@ -54,4 +57,5 @@ private:
 
     QString m_configPath;
     QJsonObject m_root;
+    bool m_batchSave = false;
 };

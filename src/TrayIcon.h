@@ -3,6 +3,7 @@
 #include <QSystemTrayIcon>
 #include <QColor>
 #include <QIcon>
+#include <QPixmap>
 #include "StateManager.h"
 
 class QAction;
@@ -36,4 +37,5 @@ private:
     QAction *m_settingsAction;
     QAction *m_quitAction;
     QString m_aiToolName;
+    mutable QPixmap m_iconPixmap{64, 64};
 };

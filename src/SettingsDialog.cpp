@@ -305,6 +305,8 @@ void SettingsDialog::takeSnapshot()
 
 void SettingsDialog::restoreSnapshot()
 {
+    m_config->beginBatchSave();
+
     // Restore language
     if (m_config->language() != m_snapLang) {
         m_config->setLanguage(m_snapLang);
@@ -344,6 +346,8 @@ void SettingsDialog::restoreSnapshot()
     m_config->setYellowSoundFile(m_snapYellowSoundFile);
     m_config->setGreenSoundEnabled(m_snapGreenSoundEnabled);
     m_config->setGreenSoundFile(m_snapGreenSoundFile);
+
+    m_config->endBatchSave();
 }
 
 void SettingsDialog::onLanguageChanged(int index)
