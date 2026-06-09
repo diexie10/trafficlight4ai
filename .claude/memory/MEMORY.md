@@ -1,0 +1,3 @@
+- [中文交流偏好](user_language.md) — 用户偏好使用中文对话
+- [README 双语同步](feedback_readme_bilingual.md) — 更新 README.md 时必须同步更新 README_zh.md
+- [Release 时更新文档链接](feedback_release_update_docs.md) — 发布新版本后同步更新 README 中的版本号及下载链接
