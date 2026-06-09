@@ -173,11 +173,9 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 
 ## 代码约定
 
-- 类名 PascalCase，方法和变量 camelCase
 - Qt 信号槽使用新式语法（`&Class::signal`）
 - 头文件使用 `#pragma once`
 - 头文件中使用的 Qt 类型必须显式 `#include`，不要依赖间接包含（CI 容器环境下隐式包含可能不存在）
-- 私有成员变量前缀 `m_`
 - 所有 UI 文本使用 `tr()` 包裹（国际化），同步更新 `translations/` 下的 `.ts` 文件
 - 新增测试使用 `add_tl4ai_test(test_<component>)` 宏注册，测试槽函数按行为命名（如 `duplicateCommandRefreshesTimeout`）
 - Git 提交使用 conventional-style 前缀：`feat:` / `fix:` / `docs:` / `debug:`，标题用祈使语气
