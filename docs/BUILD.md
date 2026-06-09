@@ -160,15 +160,18 @@ The package contains `trafficlight4ai.app`, `docs/`, and a `bin/tl4ai-ctl` wrapp
 
 ## Release Packaging
 
-The `Release Packages` GitHub Actions workflow builds and publishes the release assets for a requested version. For `0.3.0`, the expected assets are:
+The `Release Packages` GitHub Actions workflow produces the following assets for each version:
 
-- [`trafficlight4ai-0.3.0-windows-amd64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-windows-amd64.zip)
-- [`trafficlight4ai-0.3.0-linux-amd64.deb`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-linux-amd64.deb)
-- [`trafficlight4ai-0.3.0-fedora-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-fedora-amd64.rpm)
-- [`trafficlight4ai-0.3.0-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-opensuse-amd64.rpm)
-- [`trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst)
-- [`trafficlight4ai-0.3.0-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-linux-amd64.AppImage)
-- [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/SHA256SUMS.txt)
+- `trafficlight4ai-<version>-windows-amd64.zip` — Windows
+- `trafficlight4ai-<version>-linux-amd64.deb` — Ubuntu/Debian
+- `trafficlight4ai-<version>-fedora-amd64.rpm` — Fedora
+- `trafficlight4ai-<version>-opensuse-amd64.rpm` — openSUSE Leap
+- `trafficlight4ai-<version>-arch-amd64.pkg.tar.zst` — Arch Linux
+- `trafficlight4ai-<version>-linux-amd64.AppImage` — generic Linux
+- `trafficlight4ai-<version>-macos-arm64.zip` — macOS arm64
+- `SHA256SUMS.txt` — checksums
+
+Download links are available on the [GitHub Releases](https://github.com/yhz61010/trafficlight4ai/releases) page.
 
 The Linux package scripts live in `packaging/linux/`. They use CMake install rules to stage `/usr/bin`, desktop metadata, the application icon, README files, and the license before producing the distro-specific package.
 

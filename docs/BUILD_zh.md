@@ -160,15 +160,18 @@ packaging/macos/build-zip.sh 0.2.2 arm64
 
 ## 发布打包
 
-`Release Packages` GitHub Actions workflow 会按输入版本构建并发布 Release 资产。`0.3.0` 的预期文件为：
+`Release Packages` GitHub Actions workflow 会按输入版本构建并发布以下 Release 资产：
 
-- [`trafficlight4ai-0.3.0-windows-amd64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-windows-amd64.zip)
-- [`trafficlight4ai-0.3.0-linux-amd64.deb`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-linux-amd64.deb)
-- [`trafficlight4ai-0.3.0-fedora-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-fedora-amd64.rpm)
-- [`trafficlight4ai-0.3.0-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-opensuse-amd64.rpm)
-- [`trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst)
-- [`trafficlight4ai-0.3.0-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-linux-amd64.AppImage)
-- [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/SHA256SUMS.txt)
+- `trafficlight4ai-<version>-windows-amd64.zip` — Windows
+- `trafficlight4ai-<version>-linux-amd64.deb` — Ubuntu/Debian
+- `trafficlight4ai-<version>-fedora-amd64.rpm` — Fedora
+- `trafficlight4ai-<version>-opensuse-amd64.rpm` — openSUSE Leap
+- `trafficlight4ai-<version>-arch-amd64.pkg.tar.zst` — Arch Linux
+- `trafficlight4ai-<version>-linux-amd64.AppImage` — 通用 Linux
+- `trafficlight4ai-<version>-macos-arm64.zip` — macOS arm64
+- `SHA256SUMS.txt` — 校验和
+
+下载链接见 [GitHub Releases](https://github.com/yhz61010/trafficlight4ai/releases) 页面。
 
 Linux 打包脚本位于 `packaging/linux/`。脚本通过 CMake install 规则先暂存 `/usr/bin`、desktop 元数据、应用图标、README 和许可证，再生成对应发行版安装包。
 
