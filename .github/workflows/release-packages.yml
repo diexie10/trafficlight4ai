@@ -7,6 +7,10 @@ on:
         description: Release version without leading v
         required: true
         default: "0.2.1"
+      notes:
+        description: Release notes (leave empty to auto-generate from commits)
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -219,8 +223,17 @@ jobs:
               echo "Tag ${tag} already exists" >&2
               exit 1
           fi
-          gh release create "${tag}" release-assets/* \
-              --repo "${{ github.repository }}" \
-              --target "${{ github.sha }}" \
-              --title "trafficlight4ai ${version}" \
-              --notes "Release ${version} packages Windows zip, Ubuntu deb, Fedora rpm, openSUSE rpm, Arch pkg.tar.zst, and a generic Linux AppImage."
+          notes="${{ inputs.notes }}"
+          if [ -z "${notes}" ]; then
+              gh release create "${tag}" release-assets/* \
+                  --repo "${{ github.repository }}" \
+                  --target "${{ github.sha }}" \
+                  --title "trafficlight4ai ${version}" \
+                  --generate-notes
+          else
+              gh release create "${tag}" release-assets/* \
+                  --repo "${{ github.repository }}" \
+                  --target "${{ github.sha }}" \
+                  --title "trafficlight4ai ${version}" \
+                  --notes "${notes}"
+          fi
