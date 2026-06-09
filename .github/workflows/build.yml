@@ -39,7 +39,7 @@ jobs:
           apt-get update
           apt-get install -y git cmake g++ qt6-base-dev qt6-multimedia-dev qt6-tools-dev
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
@@ -63,7 +63,7 @@ jobs:
       - name: Install dependencies
         run: dnf install -y git cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttools-devel
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
@@ -87,7 +87,7 @@ jobs:
       - name: Install dependencies
         run: pacman -Syu --noconfirm git base-devel cmake qt6-base qt6-multimedia qt6-tools
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
@@ -113,7 +113,7 @@ jobs:
           zypper --non-interactive --gpg-auto-import-keys refresh
           zypper --non-interactive install git cmake gcc13 gcc13-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Configure
         run: CC=gcc-13 CXX=g++-13 cmake -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
@@ -133,7 +133,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -157,7 +157,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -188,7 +188,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install dependencies
         run: |
           brew install cmake qt
