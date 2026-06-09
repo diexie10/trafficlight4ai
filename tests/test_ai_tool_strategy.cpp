@@ -220,6 +220,54 @@ private slots:
         QCOMPARE(copilot.hooksIsEntireFile(), true);
     }
 
+    void codexDisplayName()
+    {
+        CodexStrategy codex;
+        QCOMPARE(codex.displayName(), QString("Codex"));
+    }
+
+    void codexDefaultTimeout()
+    {
+        CodexStrategy codex;
+        QCOMPARE(codex.defaultTimeoutSec(), 300);
+    }
+
+    void claudeDisplayName()
+    {
+        ClaudeCodeStrategy claude;
+        QCOMPARE(claude.displayName(), QString("Claude Code"));
+    }
+
+    void claudeDefaultTimeout()
+    {
+        ClaudeCodeStrategy claude;
+        QCOMPARE(claude.defaultTimeoutSec(), 300);
+    }
+
+    void qoderCnDisplayName()
+    {
+        QoderCnStrategy qoderCn;
+        QCOMPARE(qoderCn.displayName(), QString("Qoder CN"));
+    }
+
+    void qoderCnDefaultTimeout()
+    {
+        QoderCnStrategy qoderCn;
+        QCOMPARE(qoderCn.defaultTimeoutSec(), 300);
+    }
+
+    void copilotDisplayName()
+    {
+        CopilotStrategy copilot;
+        QCOMPARE(copilot.displayName(), QString("Copilot"));
+    }
+
+    void copilotDefaultTimeout()
+    {
+        CopilotStrategy copilot;
+        QCOMPARE(copilot.defaultTimeoutSec(), 300);
+    }
+
     void registryFindsQoderCn()
     {
         auto *s = AiToolRegistry::find("qoder-cn");

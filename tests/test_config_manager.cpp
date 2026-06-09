@@ -404,6 +404,34 @@ private slots:
         QCOMPARE(cm2.greenSoundEnabled(), false);
         QCOMPARE(cm2.greenSoundFile(), QString("/tmp/g.mp3"));
     }
+    void batchSaveSuppressesWrites()
+    {
+        ConfigManager cm(m_configPath);
+        cm.beginBatchSave();
+        cm.setWindowSize("large");
+        cm.setAnimationMode("classic");
+        cm.endBatchSave();
+
+        // Reload and verify changes persisted (endBatchSave triggers save)
+        ConfigManager cm2(m_configPath);
+        QCOMPARE(cm2.windowSize(), QString("large"));
+        QCOMPARE(cm2.animationMode(), QString("classic"));
+    }
+
+    void batchSaveWritesOnEnd()
+    {
+        {
+            ConfigManager cm(m_configPath);
+            cm.beginBatchSave();
+            cm.setLanguage("ja");
+            cm.setTimeoutSec(120);
+            // Destroy without endBatchSave — save() is suppressed by m_batchSave
+        }
+        // Changes should NOT persist because batch was never committed
+        ConfigManager cm2(m_configPath);
+        QCOMPARE(cm2.language(), QString("en"));   // unchanged
+        QCOMPARE(cm2.timeoutSec(), 300);           // unchanged
+    }
 };
 
 QTEST_MAIN(TestConfigManager)

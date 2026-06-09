@@ -206,6 +206,23 @@ private slots:
         sendCommand("RED\n");
         QCOMPARE(sm.state(), LightState::Working);
     }
+    void emptyCommandIgnored()
+    {
+        StateManager sm;
+        IpcServer server(&sm, m_socketPath);
+
+        sendCommand("\n");
+        QCOMPARE(sm.state(), LightState::Idle);
+    }
+
+    void commandCaseInsensitive()
+    {
+        StateManager sm;
+        IpcServer server(&sm, m_socketPath);
+
+        sendCommand("red\n");
+        QCOMPARE(sm.state(), LightState::Working);
+    }
 };
 
 QTEST_MAIN(TestIpcServer)
