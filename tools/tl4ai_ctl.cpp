@@ -16,10 +16,13 @@ static QByteArray computeDefaultSocketPath()
 #ifdef _WIN32
     return QByteArrayLiteral("trafficlight4ai");
 #else
-    // Priority: $XDG_RUNTIME_DIR/trafficlight4ai.sock, fallback /tmp/trafficlight4ai-$UID.sock
+    // Priority: $XDG_RUNTIME_DIR, then $TMPDIR (macOS per-user), then /tmp
     const char *xdg = std::getenv("XDG_RUNTIME_DIR");
     if (xdg && xdg[0] != '\0')
         return QByteArray(xdg) + "/trafficlight4ai.sock";
+    const char *tmpDir = std::getenv("TMPDIR");
+    if (tmpDir && tmpDir[0] != '\0')
+        return QByteArray(tmpDir) + "trafficlight4ai.sock";
     return QByteArray("/tmp/trafficlight4ai-") + QByteArray::number(getuid()) + ".sock";
 #endif
 }

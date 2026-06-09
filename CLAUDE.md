@@ -17,7 +17,7 @@ trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、C
 - **语言**：C++17
 - **GUI 框架**：Qt 6（Core, Widgets, Network, Multimedia, LinguistTools, Test）
 - **构建系统**：CMake（最低 3.20）
-- **目标平台**：Linux，Windows（最低 Windows 10）
+- **目标平台**：Linux，Windows（最低 Windows 10），macOS（最低 macOS 12）
 - **状态检测**：AI 工具 Hooks → tl4ai-ctl CLI → Qt local IPC socket
 - **国际化**：Qt Linguist（QTranslator + .ts/.qm），支持英语/中文/日语
 
@@ -108,7 +108,7 @@ AI Tool Hooks → tl4ai-ctl (Qt CLI) → local IPC socket → IpcServer → Stat
 
 ### Socket 协议
 
-Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`）。Windows 默认名称：`trafficlight4ai`。可通过 config.json 或 `TL4AI_SOCKET` 环境变量覆盖。
+Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`）。macOS 默认路径：`$TMPDIR/trafficlight4ai.sock`（per-user 临时目录）。Windows 默认名称：`trafficlight4ai`。可通过 config.json 或 `TL4AI_SOCKET` 环境变量覆盖。
 
 指令为单行纯文本：`RED\n` / `YELLOW\n` / `GREEN\n`，大小写不敏感，无法识别的指令静默忽略。
 
@@ -157,7 +157,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 | `window.posX/posY` | `20` | 窗口位置 |
 | `animation.mode` | `"breathing"` | 动画模式（breathing/classic） |
 | `animation.periodMs` | `1000` | 动画周期 200~5000ms |
-| `socket.path` | 平台相关 | Linux: `$XDG_RUNTIME_DIR/trafficlight4ai.sock`，Windows: `trafficlight4ai` |
+| `socket.path` | 平台相关 | Linux: `$XDG_RUNTIME_DIR/trafficlight4ai.sock`，macOS: `$TMPDIR/trafficlight4ai.sock`，Windows: `trafficlight4ai` |
 | `sound.yellowEnabled/greenEnabled` | `true` | 提示音开关 |
 | `sound.yellowFile/greenFile` | `""` | 自定义音效路径（WAV/MP3/OGG），空用系统 beep |
 

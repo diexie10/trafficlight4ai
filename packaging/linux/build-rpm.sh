@@ -55,7 +55,7 @@ cp -a %{_sourcedir}/package-root/. %{buildroot}/
 /usr/share/pixmaps/trafficlight4ai.png
 
 %changelog
-* Mon Jun 08 2026 Michael Leo <noreply@example.com> - ${version}-1
+* Mon Jun 08 2026 Michael Leo <yhzemail61010@aliyun.com> - ${version}-1
 - Release ${version}
 EOF
 

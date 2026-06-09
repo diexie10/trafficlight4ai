@@ -26,7 +26,7 @@ cat > "${work_dir}/debian/control" <<EOF
 Source: ${package}
 Section: utils
 Priority: optional
-Maintainer: Michael Leo <noreply@example.com>
+Maintainer: Michael Leo <yhzemail61010@aliyun.com>
 Standards-Version: 4.7.0
 Package: ${package}
 Architecture: ${arch}
@@ -47,7 +47,7 @@ Version: ${version}
 Section: utils
 Priority: optional
 Architecture: ${arch}
-Maintainer: Michael Leo <noreply@example.com>
+Maintainer: Michael Leo <yhzemail61010@aliyun.com>
 Installed-Size: ${installed_size}
 Depends: ${deps}
 Homepage: https://github.com/yhz61010/trafficlight4ai
