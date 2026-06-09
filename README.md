@@ -111,35 +111,7 @@ tl4ai-ctl green    # Green light steady
 
 ## Configuration
 
-Config file: `~/.config/trafficlight4ai/config.json`
-
-```json
-{
-  "language": "en",
-  "aiTool": "codex",
-  "timeoutSec": 300,
-  "window": {
-    "size": "medium",
-    "posX": 20,
-    "posY": 20
-  },
-  "animation": {
-    "mode": "breathing",
-    "periodMs": 1000
-  },
-  "socket": {
-    "path": "$XDG_RUNTIME_DIR/trafficlight4ai.sock"
-  },
-  "sound": {
-    "yellowEnabled": true,
-    "greenEnabled": true,
-    "yellowFile": "",
-    "greenFile": ""
-  }
-}
-```
-
-The default socket path is platform-specific: Linux uses `$XDG_RUNTIME_DIR/trafficlight4ai.sock` (fallback `/tmp/trafficlight4ai-$UID.sock`), macOS uses `$TMPDIR/trafficlight4ai.sock`, and Windows uses the named pipe `trafficlight4ai`. It can also be overridden via `TL4AI_SOCKET` environment variable.
+See [docs/HOOKS.md](docs/HOOKS.md#configuration) for the config file format and platform-specific socket path defaults.
 
 ## Tests
 

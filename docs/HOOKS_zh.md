@@ -112,3 +112,35 @@
   }
 }
 ```
+
+## 配置文件
+
+路径：`~/.config/trafficlight4ai/config.json`
+
+```json
+{
+  "language": "en",
+  "aiTool": "codex",
+  "timeoutSec": 300,
+  "window": {
+    "size": "medium",
+    "posX": 20,
+    "posY": 20
+  },
+  "animation": {
+    "mode": "breathing",
+    "periodMs": 1000
+  },
+  "socket": {
+    "path": "$XDG_RUNTIME_DIR/trafficlight4ai.sock"
+  },
+  "sound": {
+    "yellowEnabled": true,
+    "greenEnabled": true,
+    "yellowFile": "",
+    "greenFile": ""
+  }
+}
+```
+
+默认 socket 路径因平台而异：Linux 使用 `$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`），macOS 使用 `$TMPDIR/trafficlight4ai.sock`，Windows 使用命名管道 `trafficlight4ai`。也可通过 `TL4AI_SOCKET` 环境变量覆盖。
