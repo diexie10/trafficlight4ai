@@ -19,6 +19,15 @@ private:
         const QByteArray runtimeDir = qgetenv("XDG_RUNTIME_DIR");
         if (!runtimeDir.isEmpty())
             return QString::fromLocal8Bit(runtimeDir) + "/trafficlight4ai.sock";
+#ifdef Q_OS_MACOS
+        const QByteArray tmpDir = qgetenv("TMPDIR");
+        if (!tmpDir.isEmpty()) {
+            QString dir = QString::fromLocal8Bit(tmpDir);
+            if (!dir.endsWith('/'))
+                dir += '/';
+            return dir + "trafficlight4ai.sock";
+        }
+#endif
         return QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
     }
 
@@ -71,7 +80,8 @@ private slots:
         qunsetenv("XDG_RUNTIME_DIR");
 
         ConfigManager cm(m_configPath);
-        QCOMPARE(cm.socketPath(), QString("/tmp/trafficlight4ai-%1.sock").arg(getuid()));
+        // On macOS, $TMPDIR takes over; on Linux, falls back to /tmp
+        QCOMPARE(cm.socketPath(), expectedDefaultSocketPath());
 
         if (hadRuntimeEnv)
             qputenv("XDG_RUNTIME_DIR", originalRuntimeEnv);
