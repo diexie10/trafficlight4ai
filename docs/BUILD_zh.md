@@ -65,7 +65,7 @@ Windows 专用工具作用：
 
 macOS 要求：
 
-- macOS 14 或更高版本，用于匹配当前 GitHub-hosted arm64 构建 runner
+- macOS 12 或更高版本（部署目标）；macOS 14 或更高版本用于 GitHub-hosted arm64 构建 runner
 - Xcode Command Line Tools
 - CMake 3.20+
 - Qt 6 for macOS，包含 Multimedia 和 Linguist 工具

@@ -65,7 +65,7 @@ Windows-specific tool roles:
 
 macOS requirements:
 
-- macOS 14 or later for the current GitHub-hosted arm64 build runner
+- macOS 12 or later (deployment target); macOS 14 or later for the GitHub-hosted arm64 build runner
 - Xcode Command Line Tools
 - CMake 3.20+
 - Qt 6 for macOS, including Multimedia and Linguist tools
