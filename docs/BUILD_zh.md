@@ -39,7 +39,7 @@ sudo zypper install cmake gcc13 gcc13-c++ qt6-base-devel qt6-multimedia-devel qt
 
 Windows 要求：
 
-- Windows 11
+- Windows 10 或更高版本
 - Visual Studio Build Tools 2022，包含 MSVC v143、Windows 10/11 SDK、CMake tools for Windows
 - Qt 6 for MSVC 2022 64-bit，包含 Multimedia 和 Linguist 工具
 - PowerShell 或 Visual Studio Developer PowerShell
