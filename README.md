@@ -42,7 +42,7 @@ On Windows, run `bin/trafficlight4ai.exe`. It is built as a GUI application and 
 
 See [docs/BUILD.md](docs/BUILD.md) for Linux and Windows prerequisites, build commands, packaging notes, and verification steps.
 
-Linux source builds are verified in GitHub Actions on Ubuntu 24.04, Fedora 41, Arch Linux latest, and openSUSE Leap 15.6. The build guide lists distribution-specific packages and the openSUSE GCC 13 requirement.
+Source builds are verified in GitHub Actions (`build.yml`) on Ubuntu 24.04, Fedora 41, Arch Linux latest, openSUSE Leap 15.6, AppImage (Ubuntu 22.04), and Windows. The workflow runs automatically on pull requests to main, and can be triggered manually to build a single platform or all platforms. The build guide lists distribution-specific packages and the openSUSE GCC 13 requirement.
 
 The build produces two executables:
 
