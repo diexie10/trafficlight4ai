@@ -24,8 +24,12 @@ static QString defaultSocketPath()
         return QString::fromLocal8Bit(runtimeDir) + "/trafficlight4ai.sock";
     // macOS sets $TMPDIR to a per-user directory; fall back to /tmp on Linux
     const QByteArray tmpDir = qgetenv("TMPDIR");
-    if (!tmpDir.isEmpty())
-        return QString::fromLocal8Bit(tmpDir) + "trafficlight4ai.sock";
+    if (!tmpDir.isEmpty()) {
+        QString dir = QString::fromLocal8Bit(tmpDir);
+        if (!dir.endsWith('/'))
+            dir += '/';
+        return dir + "trafficlight4ai.sock";
+    }
     return QString("/tmp/trafficlight4ai-%1.sock").arg(getuid());
 #endif
 }

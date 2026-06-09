@@ -21,8 +21,12 @@ static QByteArray computeDefaultSocketPath()
     if (xdg && xdg[0] != '\0')
         return QByteArray(xdg) + "/trafficlight4ai.sock";
     const char *tmpDir = std::getenv("TMPDIR");
-    if (tmpDir && tmpDir[0] != '\0')
-        return QByteArray(tmpDir) + "trafficlight4ai.sock";
+    if (tmpDir && tmpDir[0] != '\0') {
+        QByteArray dir(tmpDir);
+        if (!dir.endsWith('/'))
+            dir += '/';
+        return dir + "trafficlight4ai.sock";
+    }
     return QByteArray("/tmp/trafficlight4ai-") + QByteArray::number(getuid()) + ".sock";
 #endif
 }

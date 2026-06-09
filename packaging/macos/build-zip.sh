@@ -22,7 +22,7 @@ cmake -S . -B "${build_dir}" \
     -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-}" \
     -DCMAKE_OSX_ARCHITECTURES="${CMAKE_OSX_ARCHITECTURES:-${arch}}" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="${CMAKE_OSX_DEPLOYMENT_TARGET:-12.0}"
-cmake --build "${build_dir}" --config Release --parallel "$(sysctl -n hw.ncpu)"
+cmake --build "${build_dir}" --config Release --parallel "$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)"
 
 rm -rf "${stage_dir}" "${archive}"
 mkdir -p "${stage_dir}/bin" "${stage_dir}/docs" "${dist_dir}"
