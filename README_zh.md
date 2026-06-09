@@ -144,6 +144,10 @@ Socket 路径或名称也可通过 `TL4AI_SOCKET` 环境变量覆盖。
 ## 测试
 
 ```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc) && cd build && ctest --output-on-failure
+or
+cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j$(nproc)
 cd build && ctest --output-on-failure
 ```
 
