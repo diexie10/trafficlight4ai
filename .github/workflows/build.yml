@@ -1,0 +1,180 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to build
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - ubuntu
+          - fedora
+          - arch
+          - opensuse
+          - appimage
+          - windows
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu:
+    name: Ubuntu
+    if: >-
+      github.event_name == 'pull_request' ||
+      contains(fromJSON('["all","ubuntu"]'), inputs.platform)
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake g++ qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Verify executables
+        run: |
+          test -x build/src/trafficlight4ai
+          test -x build/tools/tl4ai-ctl
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  fedora:
+    name: Fedora
+    if: >-
+      github.event_name == 'pull_request' ||
+      contains(fromJSON('["all","fedora"]'), inputs.platform)
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:41
+    steps:
+      - name: Install dependencies
+        run: dnf install -y git cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttools-devel
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Verify executables
+        run: |
+          test -x build/src/trafficlight4ai
+          test -x build/tools/tl4ai-ctl
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  arch:
+    name: Arch
+    if: >-
+      github.event_name == 'pull_request' ||
+      contains(fromJSON('["all","arch"]'), inputs.platform)
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: pacman -Syu --noconfirm git base-devel cmake qt6-base qt6-multimedia qt6-tools
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Verify executables
+        run: |
+          test -x build/src/trafficlight4ai
+          test -x build/tools/tl4ai-ctl
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  opensuse:
+    name: openSUSE
+    if: >-
+      github.event_name == 'pull_request' ||
+      contains(fromJSON('["all","opensuse"]'), inputs.platform)
+    runs-on: ubuntu-latest
+    container:
+      image: opensuse/leap:15.6
+    steps:
+      - name: Install dependencies
+        run: |
+          zypper --non-interactive --gpg-auto-import-keys refresh
+          zypper --non-interactive install git cmake gcc13 gcc13-c++ qt6-base-devel qt6-multimedia-devel qt6-tools-devel qt6-linguist-devel
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: CC=gcc-13 CXX=g++-13 cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Verify executables
+        run: |
+          test -x build/src/trafficlight4ai
+          test -x build/tools/tl4ai-ctl
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  appimage:
+    name: AppImage
+    if: >-
+      github.event_name == 'pull_request' ||
+      contains(fromJSON('["all","appimage"]'), inputs.platform)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ curl desktop-file-utils file libfuse2 libgl1-mesa-dev patchelf qt6-base-dev qt6-l10n-tools qt6-multimedia-dev qt6-tools-dev qt6-tools-dev-tools
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Verify executables
+        run: |
+          test -x build/src/trafficlight4ai
+          test -x build/tools/tl4ai-ctl
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  windows:
+    name: Windows
+    if: >-
+      github.event_name == 'pull_request' ||
+      contains(fromJSON('["all","windows"]'), inputs.platform)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.3"
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          modules: "qtmultimedia"
+          cache: true
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTING=OFF
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Verify executables
+        run: |
+          Test-Path build/src/Release/trafficlight4ai.exe
+          Test-Path build/tools/Release/tl4ai-ctl.exe
