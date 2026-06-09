@@ -6,7 +6,7 @@ on:
       version:
         description: Release version without leading v
         required: true
-        default: "0.2.1"
+        default: "0.3.0"
       notes:
         description: Release notes (leave empty to auto-generate from commits)
         required: false
