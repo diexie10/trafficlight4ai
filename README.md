@@ -144,6 +144,10 @@ Socket path/name can also be overridden via `TL4AI_SOCKET` environment variable.
 ## Tests
 
 ```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j$(nproc) && cd build && ctest --output-on-failure
+or
+cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j$(nproc)
 cd build && ctest --output-on-failure
 ```
 
