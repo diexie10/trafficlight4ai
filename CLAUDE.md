@@ -61,6 +61,7 @@ trafficlight4ai/
 │   ├── test_config_manager.cpp    # ConfigManager 单元测试
 │   ├── test_ipc_server.cpp        # IPC 协议集成测试
 │   ├── test_ai_tool_strategy.cpp  # AiToolStrategy 单元测试
+│   ├── test_traffic_light_widget.cpp  # TrafficLightWidget 单元测试（offscreen）
 │   └── test_tl4ai_ctl.cpp         # CLI 集成测试
 ├── tools/
 │   ├── CMakeLists.txt
@@ -69,7 +70,8 @@ trafficlight4ai/
 │   ├── trafficlight4ai_zh.ts      # 中文翻译
 │   └── trafficlight4ai_ja.ts      # 日语翻译
 ├── packaging/
-│   └── linux/                     # deb/rpm/AppImage/Arch 打包脚本 + .desktop
+│   ├── linux/                     # deb/rpm/AppImage/Arch 打包脚本 + .desktop
+│   └── macos/                     # macOS zip 打包脚本
 └── resources/
     ├── resources.qrc
     └── images/                    # 红绿灯 PNG + 应用图标
@@ -136,6 +138,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 | `test_config_manager` | 默认值、读写持久化、容错回退、参数校验、aiTool/timeoutSec |
 | `test_ipc_server` | socket 收发、无效指令、旧 socket 清理、restart |
 | `test_ai_tool_strategy` | 事件名验证、hooks 模板内容、Registry 查找、hooksConfigPath/hooksIsEntireFile |
+| `test_traffic_light_widget` | sizePresetFromString 字符串到枚举转换（需 offscreen 平台） |
 | `test_tl4ai_ctl` | CLI 集成测试，需要编译后的 tl4ai-ctl 二进制 |
 
 ### 注意事项
@@ -143,6 +146,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 - 每个测试方法使用独立的临时文件路径（`init()` slot 生成唯一路径），避免测试间污染
 - 构造 stale Unix socket 需用 POSIX `socket()/bind()/close()`，`QLocalServer::close()` 会自动 unlink
 - IpcServer 测试中 `sendCommand` 后需 `QTest::qWait(100)` 等待事件循环处理
+- Qt Widgets 相关测试需在 CMake 中设置 `QT_QPA_PLATFORM=offscreen`，否则在 CI 无显示器环境下会 abort
 
 ## 配置文件
 
@@ -170,6 +174,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 - **FloatingWindow 尺寸切换**：需用 `QTimer::singleShot(0, ...)` 延迟 `move()` 以在布局重算后恢复位置
 - **AppImage 构建 CDN 超时**：linuxdeploy/type2-runtime 下载可能因 GitHub CDN 504 失败，`build-appimage.sh` 已实现固定版本+continuous fallback 机制和 SHA256 校验
 - **QLocalServer::listen() 与普通文件**：Qt 可能在路径被普通文件占用时仍允许 listen 成功，需在调用前用 `pathBlockedByNonSocket()` 显式拒绝
+- **macOS socket 路径 $TMPDIR**：`$TMPDIR` fallback 必须限制在 `Q_OS_MACOS` / `__APPLE__` 下，不可在 Linux 上生效（Linux 的 TMPDIR 会导致 GUI 和 CLI socket 路径不一致）
 
 ## 代码约定
 

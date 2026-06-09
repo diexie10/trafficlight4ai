@@ -139,7 +139,7 @@ Config file: `~/.config/trafficlight4ai/config.json`
 }
 ```
 
-Socket path/name can also be overridden via `TL4AI_SOCKET` environment variable.
+The default socket path is platform-specific: Linux uses `$XDG_RUNTIME_DIR/trafficlight4ai.sock` (fallback `/tmp/trafficlight4ai-$UID.sock`), macOS uses `$TMPDIR/trafficlight4ai.sock`, and Windows uses the named pipe `trafficlight4ai`. It can also be overridden via `TL4AI_SOCKET` environment variable.
 
 ## Tests
 

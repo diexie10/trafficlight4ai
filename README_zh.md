@@ -139,7 +139,7 @@ tl4ai-ctl green    # 绿灯常亮
 }
 ```
 
-Socket 路径或名称也可通过 `TL4AI_SOCKET` 环境变量覆盖。
+默认 socket 路径因平台而异：Linux 使用 `$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`），macOS 使用 `$TMPDIR/trafficlight4ai.sock`，Windows 使用命名管道 `trafficlight4ai`。也可通过 `TL4AI_SOCKET` 环境变量覆盖。
 
 ## 测试
 
