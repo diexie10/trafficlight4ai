@@ -32,6 +32,7 @@ AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，
 - [`trafficlight4ai-0.3.0-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-opensuse-amd64.rpm) — openSUSE Leap 安装包。
 - [`trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst) — Arch Linux 安装包。
 - [`trafficlight4ai-0.3.0-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-linux-amd64.AppImage) — 通用 Linux AppImage。
+- [`trafficlight4ai-0.3.0-macos-arm64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-macos-arm64.zip) — macOS arm64 应用包，含 Qt frameworks。
 - [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/SHA256SUMS.txt) — 发布包校验和。
 
 Linux 发行版安装包是动态链接构建，主要面向对应发行版家族。其它发行版可优先使用 AppImage，或按 [docs/BUILD_zh.md](docs/BUILD_zh.md) 从源码编译。macOS（最低 macOS 12）发布包已在 Release workflow 中支持，会从 macOS 支持合入后的新版本开始生成。

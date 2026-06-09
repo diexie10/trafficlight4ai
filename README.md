@@ -32,6 +32,7 @@ Prebuilt archives are available from GitHub Releases:
 - [`trafficlight4ai-0.3.0-opensuse-amd64.rpm`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-opensuse-amd64.rpm) — openSUSE Leap package.
 - [`trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-arch-amd64.pkg.tar.zst) — Arch Linux package.
 - [`trafficlight4ai-0.3.0-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-linux-amd64.AppImage) — generic Linux AppImage.
+- [`trafficlight4ai-0.3.0-macos-arm64.zip`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/trafficlight4ai-0.3.0-macos-arm64.zip) — macOS arm64 app bundle with Qt frameworks.
 - [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.3.0/SHA256SUMS.txt) — checksums for release archives.
 
 Linux distro packages are dynamically linked and target the named distribution family. For other distributions, use the AppImage or build from source using [docs/BUILD.md](docs/BUILD.md). macOS (12 or later) release packages are supported by the release workflow for new releases after macOS support lands.
