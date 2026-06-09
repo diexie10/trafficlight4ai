@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QString>
+#include <QDir>
 #include <QList>
 #include <memory>
 
@@ -11,6 +12,8 @@ public:
     virtual QString displayName() const = 0;
     virtual int defaultTimeoutSec() const = 0;
     virtual QString hooksTemplate() const = 0;
+    virtual QString hooksConfigPath() const = 0;
+    virtual bool hooksIsEntireFile() const = 0;
 };
 
 class CodexStrategy : public AiToolStrategy {
@@ -40,6 +43,8 @@ public:
   }
 })";
     }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.codex/hooks.json"; }
+    bool hooksIsEntireFile() const override { return true; }
 };
 
 class ClaudeCodeStrategy : public AiToolStrategy {
@@ -61,6 +66,45 @@ public:
   }
 })";
     }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.claude/settings.json"; }
+    bool hooksIsEntireFile() const override { return false; }
+};
+
+class QoderCnStrategy : public AiToolStrategy {
+public:
+    QString id() const override { return "qoder-cn"; }
+    QString displayName() const override { return "Qoder CN"; }
+    int defaultTimeoutSec() const override { return 300; }
+    QString hooksTemplate() const override
+    {
+        return R"({
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "SubagentStart": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "Notification": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "PermissionRequest": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ]
+  }
+})";
+    }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.qoder-cn/settings.json"; }
+    bool hooksIsEntireFile() const override { return false; }
 };
 
 class CopilotStrategy : public AiToolStrategy {
@@ -97,6 +141,8 @@ public:
   }
 })";
     }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.copilot/hooks/trafficlight4ai.json"; }
+    bool hooksIsEntireFile() const override { return true; }
 };
 
 class AiToolRegistry {
@@ -105,8 +151,9 @@ public:
     {
         static CodexStrategy codex;
         static ClaudeCodeStrategy claude;
+        static QoderCnStrategy qoderCn;
         static CopilotStrategy copilot;
-        static QList<AiToolStrategy *> list = {&codex, &claude, &copilot};
+        static QList<AiToolStrategy *> list = {&codex, &claude, &qoderCn, &copilot};
         return list;
     }
 

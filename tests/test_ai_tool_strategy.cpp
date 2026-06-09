@@ -89,6 +89,44 @@ private slots:
         }
     }
 
+    void qoderCnTemplateContainsUserPromptSubmit()
+    {
+        QoderCnStrategy qoderCn;
+        QVERIFY(qoderCn.hooksTemplate().contains("UserPromptSubmit"));
+    }
+
+    void qoderCnTemplateHasRedYellowGreen()
+    {
+        QoderCnStrategy qoderCn;
+        const QString tmpl = qoderCn.hooksTemplate();
+        QVERIFY(tmpl.contains("tl4ai-ctl red"));
+        QVERIFY(tmpl.contains("tl4ai-ctl yellow"));
+        QVERIFY(tmpl.contains("tl4ai-ctl green"));
+    }
+
+    void qoderCnTemplateOnlyUsesValidEvents()
+    {
+        const QStringList qoderCnEvents = {
+            "SessionStart", "SessionEnd", "UserPromptSubmit",
+            "PreToolUse", "PostToolUse", "PostToolUseFailure",
+            "Stop", "SubagentStart", "SubagentStop",
+            "PreCompact", "Notification", "PermissionRequest"
+        };
+
+        QoderCnStrategy qoderCn;
+        const QString tmpl = qoderCn.hooksTemplate();
+        QRegularExpression re(R"RE("(\w+)":\s*\[)RE");
+        auto it = re.globalMatch(tmpl);
+        while (it.hasNext()) {
+            auto match = it.next();
+            QString event = match.captured(1);
+            if (event == "hooks")
+                continue;
+            QVERIFY2(qoderCnEvents.contains(event),
+                      qPrintable("Invalid Qoder CN event: " + event));
+        }
+    }
+
     void copilotTemplateContainsUserPromptSubmitted()
     {
         CopilotStrategy copilot;
@@ -132,6 +170,61 @@ private slots:
     {
         CopilotStrategy copilot;
         QVERIFY(copilot.hooksTemplate().contains("\"version\": 1"));
+    }
+
+    void codexHooksConfigPath()
+    {
+        CodexStrategy codex;
+        QVERIFY(codex.hooksConfigPath().endsWith("/.codex/hooks.json"));
+    }
+
+    void codexHooksIsEntireFile()
+    {
+        CodexStrategy codex;
+        QCOMPARE(codex.hooksIsEntireFile(), true);
+    }
+
+    void claudeHooksConfigPath()
+    {
+        ClaudeCodeStrategy claude;
+        QVERIFY(claude.hooksConfigPath().endsWith("/.claude/settings.json"));
+    }
+
+    void claudeHooksIsNotEntireFile()
+    {
+        ClaudeCodeStrategy claude;
+        QCOMPARE(claude.hooksIsEntireFile(), false);
+    }
+
+    void qoderCnHooksConfigPath()
+    {
+        QoderCnStrategy qoderCn;
+        QVERIFY(qoderCn.hooksConfigPath().endsWith("/.qoder-cn/settings.json"));
+    }
+
+    void qoderCnHooksIsNotEntireFile()
+    {
+        QoderCnStrategy qoderCn;
+        QCOMPARE(qoderCn.hooksIsEntireFile(), false);
+    }
+
+    void copilotHooksConfigPath()
+    {
+        CopilotStrategy copilot;
+        QVERIFY(copilot.hooksConfigPath().endsWith("/.copilot/hooks/trafficlight4ai.json"));
+    }
+
+    void copilotHooksIsEntireFile()
+    {
+        CopilotStrategy copilot;
+        QCOMPARE(copilot.hooksIsEntireFile(), true);
+    }
+
+    void registryFindsQoderCn()
+    {
+        auto *s = AiToolRegistry::find("qoder-cn");
+        QVERIFY(s != nullptr);
+        QCOMPARE(s->id(), QString("qoder-cn"));
     }
 
     void registryFindsCopilot()

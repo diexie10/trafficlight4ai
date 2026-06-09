@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-A visual traffic light status indicator for AI coding tools (Codex, Claude Code, Copilot, and more).
+A visual traffic light status indicator for AI coding tools (Codex, Claude Code, Qoder CN, Copilot, and more).
 
 [中文文档](README_zh.md)
 
@@ -125,6 +125,36 @@ The examples below use the short name `tl4ai-ctl`. If you chose Option A, replac
 }
 ```
 
+**Qoder CN** — Add to `~/.qoder/settings.json` (or project-level `.qoder/settings.json`):
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "SubagentStart": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "Notification": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "PermissionRequest": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ]
+  }
+}
+```
+
 **Copilot** — Save as `~/.copilot/hooks/trafficlight4ai.json`:
 
 ```json
@@ -171,7 +201,7 @@ tl4ai-ctl green    # Green light steady
 - **Floating window** — Draggable, always-on-top, remembers position
 - **System tray icon** — Color changes with state, right-click menu
 - **Settings dialog** — Live preview, cancel to undo
-  - AI tool selection (Codex / Claude Code / Copilot)
+  - AI tool selection (Codex / Claude Code / Qoder CN / Copilot)
   - Timeout auto-idle (default 5 min, 0 to disable)
   - Window size (extra small / small / medium / large / extra large)
   - Animation mode (breathing / classic blink)

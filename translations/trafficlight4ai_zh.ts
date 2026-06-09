@@ -27,6 +27,15 @@
     <message><source>Preview</source><translation>试听</translation></message>
     <message><source>Browse</source><translation>浏览</translation></message>
     <message><source>View Recommended Hooks Config</source><translation>查看推荐 Hooks 配置</translation></message>
+    <message><source>Edit Hooks Config</source><translation>编辑 Hooks 配置</translation></message>
+    <message><source>Edit Hooks Config - %1</source><translation>编辑 Hooks 配置 - %1</translation></message>
+    <message><source>JSON Error</source><translation>JSON 错误</translation></message>
+    <message><source>Invalid JSON at offset %1:
+%2</source><translation>偏移 %1 处 JSON 无效：
+%2</translation></message>
+    <message><source>Save Error</source><translation>保存错误</translation></message>
+    <message><source>Cannot write to: %1</source><translation>无法写入：%1</translation></message>
+    <message><source>Save</source><translation>保存</translation></message>
     <message><source>OK</source><translation>确定</translation></message>
     <message><source>Cancel</source><translation>取消</translation></message>
     <message><source>Recommended Hooks - %1</source><translation>推荐 Hooks 配置 - %1</translation></message>

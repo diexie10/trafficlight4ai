@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code、Copilot 等）。
+AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code、Qoder CN、Copilot 等）。
 
 [English](README.md)
 
@@ -125,6 +125,36 @@ cp build/tools/tl4ai-ctl ~/.local/bin/
 }
 ```
 
+**Qoder CN** — 添加到 `~/.qoder/settings.json`（或项目级 `.qoder/settings.json`）：
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "SubagentStart": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }] }
+    ],
+    "Notification": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "PermissionRequest": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }] }
+    ]
+  }
+}
+```
+
 **Copilot** — 保存为 `~/.copilot/hooks/trafficlight4ai.json`：
 
 ```json
@@ -171,7 +201,7 @@ tl4ai-ctl green    # 绿灯常亮
 - **悬浮窗口** — 可拖动、始终置顶、记忆位置
 - **系统托盘图标** — 颜色随状态变化，右键菜单
 - **设置对话框** — 实时预览，取消可撤销
-  - AI 工具选择（Codex / Claude Code / Copilot）
+  - AI 工具选择（Codex / Claude Code / Qoder CN / Copilot）
   - 超时自动回绿灯（默认 5 分钟，0 禁用）
   - 窗口大小（超小 / 小 / 中 / 大 / 超大）
   - 动画模式（呼吸灯 / 经典闪烁）
