@@ -125,7 +125,7 @@ The examples below use the short name `tl4ai-ctl`. If you chose Option A, replac
 }
 ```
 
-**Qoder CN** — Add to `~/.qoder/settings.json` (or project-level `.qoder/settings.json`):
+**Qoder CN** — Add to `~/.qoder-cn/settings.json` (or project-level `.qoder/settings.json`):
 
 ```json
 {

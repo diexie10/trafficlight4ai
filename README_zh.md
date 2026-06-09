@@ -125,7 +125,7 @@ cp build/tools/tl4ai-ctl ~/.local/bin/
 }
 ```
 
-**Qoder CN** — 添加到 `~/.qoder/settings.json`（或项目级 `.qoder/settings.json`）：
+**Qoder CN** — 添加到 `~/.qoder-cn/settings.json`（或项目级 `.qoder/settings.json`）：
 
 ```json
 {
