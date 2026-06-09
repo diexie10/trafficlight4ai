@@ -2,11 +2,11 @@
 
 ## 项目结构与模块组织
 
-本项目是 Qt 6 桌面工具，使用 CMake 和 C++17 构建，目标平台为 Linux、macOS 和 Windows 10+。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`AiToolStrategy` 封装 Codex、Claude Code、Qoder CN、Copilot 的 hooks 差异，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供基于 Qt `QLocalSocket` 的 CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放 PNG 图标，`translations/` 存放中文和日语 `.ts` 翻译，`packaging/linux/` 存放 deb/rpm/AppImage/Arch 打包脚本，`packaging/macos/` 存放 macOS zip 打包脚本，`docs/` 存放构建、hooks、问题记录和设计说明，`.claude/rules/` 存放 Claude 专用协作规则。
+本项目是 Qt 6 桌面工具，使用 CMake 和 C++17 构建，目标平台为 Linux、macOS 12+ 和 Windows 10+。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`AiToolStrategy` 封装 Codex、Claude Code、Qoder CN、Copilot 的 hooks 差异，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供基于 Qt `QLocalSocket` 的 CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放 PNG 图标，`translations/` 存放中文和日语 `.ts` 翻译，`packaging/linux/` 存放 deb/rpm/AppImage/Arch 打包脚本，`packaging/macos/` 存放 macOS zip 打包脚本，`docs/` 存放构建、hooks、问题记录和设计说明，`.claude/rules/` 与 `.claude/commands/` 存放 Claude 专用协作规则和命令。
 
 ## 构建与验证文档
 
-Linux、macOS 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。`Build` workflow 验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage、macOS arm64 和 Windows；openSUSE Leap 15.6 必须使用 `gcc13/gcc13-c++` 并以 `CC=gcc-13 CXX=g++-13` 配置 CMake。
+Linux、macOS 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。`Build` workflow 验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage、macOS arm64 和 Windows；openSUSE Leap 15.6 必须使用 `gcc13/gcc13-c++` 并以 `CC=gcc-13 CXX=g++-13` 配置 CMake。GitHub Actions 中优先使用 Node 24 兼容的官方 actions 版本，例如 `actions/checkout@v6`、`actions/upload-artifact@v6` 和 `actions/download-artifact@v7`。
 
 ## 代码风格与命名约定
 
@@ -18,7 +18,7 @@ Linux、macOS 和 Windows 的编译前提、编译命令、注意事项与验证
 
 ## 文档同步
 
-`README.md` 是英文文档，`README_zh.md` 是对应的中文文档。更新构建方式、功能说明、配置字段、运行行为或用户可见命令时，必须同时更新两份 README，保持内容一致。Hooks 配置示例维护在 [docs/HOOKS.md](docs/HOOKS.md) 和 [docs/HOOKS_zh.md](docs/HOOKS_zh.md)；新增或修改 AI 工具 hooks 时，同步更新这两份文档和 `AiToolStrategy` 模板。`CLAUDE.md` 和 `.claude/rules/**` 是 Claude 专用指南；其中影响本仓库的项目事实变化时，应同步反映到本文件。仅修复某一语言的表达问题时，可只改对应文件。
+`README.md` 是英文文档，`README_zh.md` 是对应的中文文档。更新构建方式、功能说明、配置字段、运行行为或用户可见命令时，必须同时更新两份 README，保持内容一致。Hooks 配置示例维护在 [docs/HOOKS.md](docs/HOOKS.md) 和 [docs/HOOKS_zh.md](docs/HOOKS_zh.md)；新增或修改 AI 工具 hooks 时，同步更新这两份文档和 `AiToolStrategy` 模板。`CLAUDE.md`、`.claude/rules/**` 和 `.claude/commands/**` 是 Claude 专用指南，默认只作参考；其中影响本仓库的项目事实变化时，应同步反映到本文件。仅修复某一语言的表达问题时，可只改对应文件。
 
 ## 配置与资源注意事项
 
