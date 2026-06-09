@@ -14,6 +14,7 @@ add_executable(test_traffic_light_widget test_traffic_light_widget.cpp ../src/Tr
 target_link_libraries(test_traffic_light_widget PRIVATE tl4ai_core Qt6::Test Qt6::Widgets)
 target_include_directories(test_traffic_light_widget PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_traffic_light_widget COMMAND test_traffic_light_widget)
+set_tests_properties(test_traffic_light_widget PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
 # tl4ai-ctl integration test needs the ctl binary
 add_executable(test_tl4ai_ctl test_tl4ai_ctl.cpp)
