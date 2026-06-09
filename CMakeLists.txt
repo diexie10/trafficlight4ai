@@ -17,16 +17,25 @@ if(BUILD_TESTING)
 endif()
 add_subdirectory(tools)
 
-install(TARGETS trafficlight4ai tl4ai-ctl
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+if(APPLE)
+    install(TARGETS trafficlight4ai tl4ai-ctl
+        BUNDLE DESTINATION .
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+else()
+    install(TARGETS trafficlight4ai tl4ai-ctl
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
 install(FILES README.md README_zh.md LICENSE
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
 )
-install(FILES packaging/linux/trafficlight4ai.desktop
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
-)
-install(FILES resources/images/app-icon.png
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps
-    RENAME trafficlight4ai.png
-)
+if(UNIX AND NOT APPLE)
+    install(FILES packaging/linux/trafficlight4ai.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+    )
+    install(FILES resources/images/app-icon.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps
+        RENAME trafficlight4ai.png
+    )
+endif()

@@ -34,15 +34,15 @@ AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，
 - [`trafficlight4ai-0.2.1-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-linux-amd64.AppImage) — 通用 Linux AppImage。
 - [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/SHA256SUMS.txt) — 发布包校验和。
 
-Linux 发行版安装包是动态链接构建，主要面向对应发行版家族。其它发行版可优先使用 AppImage，或按 [docs/BUILD_zh.md](docs/BUILD_zh.md) 从源码编译。
+Linux 发行版安装包是动态链接构建，主要面向对应发行版家族。其它发行版可优先使用 AppImage，或按 [docs/BUILD_zh.md](docs/BUILD_zh.md) 从源码编译。macOS 发布包已在 Release workflow 中支持，会从 macOS 支持合入后的新版本开始生成。
 
 Windows（最低 Windows 10）上运行 `bin/trafficlight4ai.exe`。它会作为 GUI 程序启动，不应弹出命令行窗口。可在 PowerShell、cmd 或 AI 工具 hooks 中调用 `bin/tl4ai-ctl.exe red/yellow/green` 来切换灯状态。如果 Windows 提示缺少 MSVC 运行时 DLL，请安装 Microsoft Visual C++ Redistributable 2022 x64。
 
 ## 从源码编译
 
-Linux 和 Windows 的编译前提、编译命令、打包注意事项和验证方式见 [docs/BUILD_zh.md](docs/BUILD_zh.md)。
+Linux、macOS 和 Windows 的编译前提、编译命令、打包注意事项和验证方式见 [docs/BUILD_zh.md](docs/BUILD_zh.md)。
 
-源码构建已在 GitHub Actions（`build.yml`）中验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage（Ubuntu 22.04）和 Windows。该 workflow 在 PR 到 main 时自动运行全平台验证，也可手动触发单平台或全平台编译。构建文档中列出了各发行版依赖包名和 openSUSE 的 GCC 13 要求。
+源码构建已在 GitHub Actions（`build.yml`）中验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage（Ubuntu 22.04）、macOS arm64 和 Windows。该 workflow 在 PR 到 main 时自动运行全平台验证，也可手动触发单平台或全平台编译。构建文档中列出了各发行版依赖包名、macOS 打包注意事项和 openSUSE 的 GCC 13 要求。
 
 编译后生成两个可执行文件：
 

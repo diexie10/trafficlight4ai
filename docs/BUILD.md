@@ -1,6 +1,6 @@
 # Build Guide
 
-This document explains how to build trafficlight4ai from source on Linux and Windows.
+This document explains how to build trafficlight4ai from source on Linux, macOS, and Windows.
 
 ## Prerequisites
 
@@ -63,6 +63,19 @@ Windows-specific tool roles:
 - `aqtinstall` installs the matching Qt MSVC package without using the Qt GUI installer.
 - `windeployqt` copies Qt DLLs and plugins next to the executables so the package can run on another Windows machine.
 
+macOS requirements:
+
+- macOS 14 or later for the current GitHub-hosted arm64 build runner
+- Xcode Command Line Tools
+- CMake 3.20+
+- Qt 6 for macOS, including Multimedia and Linguist tools
+
+macOS-specific tool roles:
+
+- Xcode Command Line Tools provide Apple Clang, SDK headers, and command-line packaging tools.
+- `macdeployqt` copies Qt frameworks and plugins into `trafficlight4ai.app`.
+- `ditto` creates the release zip while preserving macOS bundle metadata.
+
 ## Linux Build
 
 Debug build:
@@ -120,6 +133,31 @@ Run locally:
 .\windows-package\bin\tl4ai-ctl.exe red
 ```
 
+## macOS Build
+
+Install prerequisites with Homebrew or another package manager, then point CMake at your Qt installation:
+
+```bash
+brew install cmake qt
+cmake -S . -B build-macos -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(brew --prefix qt)" -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+cmake --build build-macos --config Release --parallel
+```
+
+Run locally:
+
+```bash
+open build-macos/src/trafficlight4ai.app
+./build-macos/tools/tl4ai-ctl red
+```
+
+Release zip packaging:
+
+```bash
+packaging/macos/build-zip.sh 0.2.2 arm64
+```
+
+The package contains `trafficlight4ai.app`, `docs/`, and a `bin/tl4ai-ctl` wrapper that executes the CLI embedded inside the app bundle.
+
 ## Release Packaging
 
 The `Release Packages` GitHub Actions workflow builds and publishes the release assets for a requested version. For `0.2.1`, the expected assets are:
@@ -134,6 +172,8 @@ The `Release Packages` GitHub Actions workflow builds and publishes the release 
 
 The Linux package scripts live in `packaging/linux/`. They use CMake install rules to stage `/usr/bin`, desktop metadata, the application icon, README files, and the license before producing the distro-specific package.
 
+macOS packages are built by `packaging/macos/build-zip.sh` and published as `trafficlight4ai-<version>-macos-arm64.zip` for new releases after macOS support lands.
+
 ## Build Notes
 
 - Debug builds keep `qDebug()` output.
@@ -147,6 +187,7 @@ The Linux package scripts live in `packaging/linux/`. They use CMake install rul
 - On Windows, `trafficlight4ai.exe` must be built with `WIN32_EXECUTABLE TRUE` so it does not open a console window.
 - `tl4ai-ctl` is intentionally a CLI executable and should remain callable from hooks, PowerShell, or cmd.
 - The Windows GitHub Actions workflow uses `-DBUILD_TESTING=OFF`, MSVC, and `windeployqt` to produce the release artifact.
+- The macOS GitHub Actions workflow builds an arm64 `.app` bundle on `macos-latest`; `macdeployqt` deploys Qt frameworks into the bundle and fixes the embedded `tl4ai-ctl` CLI.
 
 ## Verification
 
@@ -165,3 +206,9 @@ Windows:
 - Run `tl4ai-ctl.exe red`, `yellow`, and `green`; the GUI should change state.
 - Open settings and verify window size, animation mode, language switching, and sound preview.
 - If Windows reports missing MSVC runtime DLLs, install Microsoft Visual C++ Redistributable 2022 x64.
+
+macOS:
+
+- Open `trafficlight4ai.app`; it should show the floating light and a menu bar status item.
+- Run `bin/tl4ai-ctl red`, `yellow`, and `green` from the packaged zip; the GUI state should change.
+- If Gatekeeper blocks a locally built unsigned app, allow it from System Settings or run it from a trusted build location.

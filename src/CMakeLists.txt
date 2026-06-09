@@ -45,6 +45,15 @@ target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets Qt6::Multi
 set_target_properties(trafficlight4ai PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
+if(APPLE)
+    set_target_properties(trafficlight4ai PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_BUNDLE_NAME "trafficlight4ai"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "dev.yhz61010.trafficlight4ai"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+    )
+endif()
 target_compile_definitions(trafficlight4ai PRIVATE
     $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
 )

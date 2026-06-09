@@ -34,15 +34,15 @@ Prebuilt archives are available from GitHub Releases:
 - [`trafficlight4ai-0.2.1-linux-amd64.AppImage`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/trafficlight4ai-0.2.1-linux-amd64.AppImage) — generic Linux AppImage.
 - [`SHA256SUMS.txt`](https://github.com/yhz61010/trafficlight4ai/releases/download/v0.2.1/SHA256SUMS.txt) — checksums for release archives.
 
-Linux distro packages are dynamically linked and target the named distribution family. For other distributions, use the AppImage or build from source using [docs/BUILD.md](docs/BUILD.md).
+Linux distro packages are dynamically linked and target the named distribution family. For other distributions, use the AppImage or build from source using [docs/BUILD.md](docs/BUILD.md). macOS release packages are supported by the release workflow for new releases after macOS support lands.
 
 On Windows (10 or later), run `bin/trafficlight4ai.exe`. It is built as a GUI application and should not open a console window. Use `bin/tl4ai-ctl.exe red/yellow/green` from PowerShell, cmd, or AI tool hooks to change the light state. If Windows reports missing MSVC runtime DLLs, install the Microsoft Visual C++ Redistributable 2022 x64.
 
 ## Build From Source
 
-See [docs/BUILD.md](docs/BUILD.md) for Linux and Windows prerequisites, build commands, packaging notes, and verification steps.
+See [docs/BUILD.md](docs/BUILD.md) for Linux, macOS, and Windows prerequisites, build commands, packaging notes, and verification steps.
 
-Source builds are verified in GitHub Actions (`build.yml`) on Ubuntu 24.04, Fedora 41, Arch Linux latest, openSUSE Leap 15.6, AppImage (Ubuntu 22.04), and Windows. The workflow runs automatically on pull requests to main, and can be triggered manually to build a single platform or all platforms. The build guide lists distribution-specific packages and the openSUSE GCC 13 requirement.
+Source builds are verified in GitHub Actions (`build.yml`) on Ubuntu 24.04, Fedora 41, Arch Linux latest, openSUSE Leap 15.6, AppImage (Ubuntu 22.04), macOS arm64, and Windows. The workflow runs automatically on pull requests to main, and can be triggered manually to build a single platform or all platforms. The build guide lists distribution-specific packages, macOS packaging notes, and the openSUSE GCC 13 requirement.
 
 The build produces two executables:
 
