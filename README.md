@@ -183,6 +183,27 @@ trafficlight4ai uses a strategy pattern to support multiple AI tools. To add a n
 
 No changes are needed to IPC, state machine, or GUI code — the strategy pattern handles everything.
 
+## GitHub Personal Access Token (PAT) Permissions
+
+If you use `GH_TOKEN` to push code or trigger release workflows, your PAT needs the following permissions:
+
+### Fine-grained tokens (recommended)
+
+| Permission | Access | Purpose |
+|------------|--------|---------|
+| Contents | Read and write | Push commits, update release notes |
+| Actions | Read and write | Trigger release workflow |
+| Metadata | Read-only | Required by default |
+
+Set **Repository access** to "Only select repositories" and choose this repo.
+
+### Tokens (classic)
+
+| Scope | Purpose |
+|-------|---------|
+| `repo` | Push code and update releases |
+| `workflow` | Trigger workflow dispatch (also needed when pushing changes to `.github/workflows/`) |
+
 ## License
 
 MIT

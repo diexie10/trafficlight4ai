@@ -183,6 +183,27 @@ trafficlight4ai 使用策略模式支持多种 AI 工具。添加新工具只需
 
 无需修改 IPC、状态机或 GUI 代码，策略模式会处理一切。
 
+## GitHub 个人访问令牌（PAT）权限
+
+如果使用 `GH_TOKEN` 推送代码或触发发布 workflow，PAT 需要以下权限：
+
+### Fine-grained tokens（推荐）
+
+| 权限 | 访问级别 | 用途 |
+|------|---------|------|
+| Contents | Read and write | 推送代码、更新 Release 说明 |
+| Actions | Read and write | 触发发布 workflow |
+| Metadata | Read-only | 默认必需 |
+
+**Repository access** 设为 "Only select repositories" 并选择本仓库。
+
+### Tokens (classic)
+
+| Scope | 用途 |
+|-------|------|
+| `repo` | 推送代码、更新 Release |
+| `workflow` | 触发 workflow dispatch（推送 `.github/workflows/` 变更时也需要） |
+
 ## 许可证
 
 MIT
