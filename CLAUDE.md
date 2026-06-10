@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、Claude Code、Qoder CN、Copilot 等）提供可视化红绿灯状态指示器。
+trafficlight4ai 是一个 C++ Qt6 桌面应用，为 AI 编码工具（Codex、Claude Code、Qoder CN、Copilot、Gemini 等）提供可视化红绿灯状态指示器。
 
 - **红灯闪烁**：AI 工具正在工作中
 - **黄灯闪烁**：AI 工具等待用户确认

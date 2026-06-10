@@ -7,7 +7,9 @@ trafficlight4ai/
 ├── .github/workflows/             # CI（build.yml 编译验证 + release-packages.yml 发布打包）
 ├── docs/
 │   ├── BUILD.md / BUILD_zh.md     # 跨平台构建指南（双语）
-│   └── ...                        # 问题记录与设计说明
+│   ├── HOOKS.md / HOOKS_zh.md     # AI 工具 Hooks 配置示例（双语）
+│   ├── KNOWN_ISSUES.md            # 已知平台问题
+│   └── PROJECT_STRUCTURE.md       # 本文件
 ├── src/
 │   ├── CMakeLists.txt             # tl4ai_core 静态库 + trafficlight4ai 可执行文件
 │   ├── StateManager.h/cpp         # 状态机（纯逻辑，含超时机制）
