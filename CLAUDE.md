@@ -187,3 +187,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 - IpcServer 客户端读取需聚合至换行符或断开，不可在首次 `readyRead` 后立即处理（防止分片写入丢命令）
 - 发布新 Release 后，同步更新 README.md、README_zh.md 中的版本号和下载链接（BUILD 文档已用 `<version>` 占位符，无需更新）
 - 更新 README.md 时必须同步更新 README_zh.md，保持双语内容一致
+
+## 项目记忆
+
+项目级记忆存储在 `.claude/memory/` 目录中，包含跨会话的协作约定和工作流偏好。新会话开始时，请先读取 `.claude/memory/MEMORY.md` 了解已有的记忆内容。
