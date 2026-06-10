@@ -209,12 +209,12 @@ void SettingsDialog::retranslateUi()
 
     // Sound controls
     m_yellowSoundCheck->setText(tr("Enable"));
-    m_yellowSoundEdit->setPlaceholderText(tr("Leave empty for system beep"));
+    m_yellowSoundEdit->setPlaceholderText(tr("Default: yellow.ogg"));
     m_yellowPreviewBtn->setText(tr("Preview"));
     m_yellowBrowseBtn->setText(tr("Browse"));
 
     m_greenSoundCheck->setText(tr("Enable"));
-    m_greenSoundEdit->setPlaceholderText(tr("Leave empty for system beep"));
+    m_greenSoundEdit->setPlaceholderText(tr("Default: green.ogg"));
     m_greenPreviewBtn->setText(tr("Preview"));
     m_greenBrowseBtn->setText(tr("Browse"));
 
@@ -443,21 +443,25 @@ void SettingsDialog::onGreenSoundToggled(bool checked)
 
 void SettingsDialog::onPreviewYellowSound()
 {
-    playSound(m_yellowSoundEdit->text().trimmed(), this);
+    QString path = m_yellowSoundEdit->text().trimmed();
+    if (path.isEmpty()) path = kDefaultYellowSound;
+    playSound(path, this);
 }
 
 void SettingsDialog::onPreviewGreenSound()
 {
-    playSound(m_greenSoundEdit->text().trimmed(), this);
+    QString path = m_greenSoundEdit->text().trimmed();
+    if (path.isEmpty()) path = kDefaultGreenSound;
+    playSound(path, this);
 }
 
 void SettingsDialog::updatePreviewButtons()
 {
     const QString yellowPath = m_yellowSoundEdit->text().trimmed();
-    m_yellowPreviewBtn->setEnabled(!yellowPath.isEmpty() && QFile::exists(yellowPath));
+    m_yellowPreviewBtn->setEnabled(yellowPath.isEmpty() || QFile::exists(yellowPath));
 
     const QString greenPath = m_greenSoundEdit->text().trimmed();
-    m_greenPreviewBtn->setEnabled(!greenPath.isEmpty() && QFile::exists(greenPath));
+    m_greenPreviewBtn->setEnabled(greenPath.isEmpty() || QFile::exists(greenPath));
 }
 
 void SettingsDialog::onBrowseYellowSound()
@@ -513,7 +517,7 @@ void SettingsDialog::onShowHooksTemplate()
 
     auto *textEdit = new QTextEdit();
     textEdit->setReadOnly(true);
-    textEdit->setPlainText(strategy->hooksTemplate());
+    textEdit->setPlainText(AiToolRegistry::resolvedTemplate(strategy));
 
     auto *copyBtn = new QPushButton(tr("Copy"));
     auto *closeBtn = new QPushButton(tr("Close"));
@@ -562,11 +566,11 @@ void SettingsDialog::onEditHooksConfig()
                 hooksObj["hooks"] = doc.object()["hooks"];
                 content = QJsonDocument(hooksObj).toJson(QJsonDocument::Indented);
             } else {
-                content = strategy->hooksTemplate();
+                content = AiToolRegistry::resolvedTemplate(strategy);
             }
         }
     } else {
-        content = strategy->hooksTemplate();
+        content = AiToolRegistry::resolvedTemplate(strategy);
     }
 
     // Build editor dialog

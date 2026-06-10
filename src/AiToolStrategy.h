@@ -3,6 +3,8 @@
 #include <QString>
 #include <QDir>
 #include <QList>
+#include <QFile>
+#include <QCoreApplication>
 #include <memory>
 
 class AiToolStrategy {
@@ -206,5 +208,22 @@ public:
                 return s;
         }
         return nullptr;
+    }
+
+    static QString resolvedCtlPath()
+    {
+        const QString dir = QCoreApplication::applicationDirPath();
+#ifdef Q_OS_WIN
+        const QString path = dir + "/tl4ai-ctl.exe";
+#else
+        const QString path = dir + "/tl4ai-ctl";
+#endif
+        return QFile::exists(path) ? path : QString("tl4ai-ctl");
+    }
+
+    static QString resolvedTemplate(const AiToolStrategy *strategy)
+    {
+        return strategy->hooksTemplate().replace(
+            QLatin1String("tl4ai-ctl"), resolvedCtlPath());
     }
 };

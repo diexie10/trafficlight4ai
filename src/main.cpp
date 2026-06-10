@@ -84,10 +84,13 @@ int main(int argc, char *argv[])
     // Sound notifications on state change
     QObject::connect(&stateManager, &StateManager::stateChanged,
                      [&config](LightState state) {
-        if (state == LightState::WaitingConfirm && config.yellowSoundEnabled())
-            playSound(config.yellowSoundFile());
-        else if (state == LightState::Idle && config.greenSoundEnabled())
-            playSound(config.greenSoundFile());
+        if (state == LightState::WaitingConfirm && config.yellowSoundEnabled()) {
+            QString f = config.yellowSoundFile();
+            playSound(f.isEmpty() ? kDefaultYellowSound : f);
+        } else if (state == LightState::Idle && config.greenSoundEnabled()) {
+            QString f = config.greenSoundFile();
+            playSound(f.isEmpty() ? kDefaultGreenSound : f);
+        }
     });
 
     // Connect animation alpha to tray icon blinking

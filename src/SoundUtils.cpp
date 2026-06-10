@@ -8,11 +8,15 @@
 
 void playSound(const QString &filePath, QObject *errorContext)
 {
-    if (!filePath.isEmpty() && QFile::exists(filePath)) {
+    const bool isResource = filePath.startsWith(QLatin1String(":/"));
+    if (!filePath.isEmpty() && (isResource || QFile::exists(filePath))) {
         auto *player = new QMediaPlayer();
         auto *audioOutput = new QAudioOutput(player);
         player->setAudioOutput(audioOutput);
-        player->setSource(QUrl::fromLocalFile(filePath));
+        if (isResource)
+            player->setSource(QUrl("qrc" + filePath));
+        else
+            player->setSource(QUrl::fromLocalFile(filePath));
 
         QObject::connect(player, &QMediaPlayer::errorOccurred,
                          player, [player, errorContext, filePath]

@@ -5,4 +5,8 @@
     <file>images/light_yellow.png</file>
     <file>images/light_green.png</file>
   </qresource>
+  <qresource prefix="/effects">
+    <file>effects/yellow.ogg</file>
+    <file>effects/green.ogg</file>
+  </qresource>
 </RCC>
