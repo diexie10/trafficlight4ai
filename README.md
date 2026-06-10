@@ -140,6 +140,21 @@ Config file: `~/.config/trafficlight4ai/config.json`
 }
 ```
 
+### Fields
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `language` | `"en"` | UI language (`en` / `zh` / `ja`) |
+| `aiTool` | `"codex"` | AI tool (`codex` / `claude-code` / `qoder-cn` / `copilot`) |
+| `timeoutSec` | `300` | Seconds before auto-idle (0 to disable) |
+| `window.size` | `"medium"` | Window size (`xsmall` / `small` / `medium` / `large` / `xlarge`) |
+| `window.posX` / `posY` | `20` | Window position |
+| `animation.mode` | `"breathing"` | Animation mode (`breathing` / `classic`) |
+| `animation.periodMs` | `1000` | Animation period (200–5000 ms) |
+| `socket.path` | platform-specific | See below |
+| `sound.yellowEnabled` / `greenEnabled` | `true` | Sound notification toggle |
+| `sound.yellowFile` / `greenFile` | `""` | Custom sound file path (WAV/MP3/OGG); empty = system beep |
+
 The default socket path is platform-specific: Linux uses `$XDG_RUNTIME_DIR/trafficlight4ai.sock` (fallback `/tmp/trafficlight4ai-$UID.sock`), macOS uses `$TMPDIR/trafficlight4ai.sock`, and Windows uses the named pipe `trafficlight4ai`. It can also be overridden via `TL4AI_SOCKET` environment variable.
 
 ## Tests

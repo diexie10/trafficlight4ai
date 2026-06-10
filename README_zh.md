@@ -140,6 +140,21 @@ tl4ai-ctl green    # 绿灯常亮
 }
 ```
 
+### 字段说明
+
+| 字段 | 默认值 | 说明 |
+|------|--------|------|
+| `language` | `"en"` | 界面语言（`en` / `zh` / `ja`） |
+| `aiTool` | `"codex"` | AI 工具（`codex` / `claude-code` / `qoder-cn` / `copilot`） |
+| `timeoutSec` | `300` | 超时回绿灯秒数，0 禁用 |
+| `window.size` | `"medium"` | 窗口大小（`xsmall` / `small` / `medium` / `large` / `xlarge`） |
+| `window.posX` / `posY` | `20` | 窗口位置 |
+| `animation.mode` | `"breathing"` | 动画模式（`breathing` / `classic`） |
+| `animation.periodMs` | `1000` | 动画周期（200~5000 ms） |
+| `socket.path` | 平台相关 | 见下方说明 |
+| `sound.yellowEnabled` / `greenEnabled` | `true` | 提示音开关 |
+| `sound.yellowFile` / `greenFile` | `""` | 自定义音效路径（WAV/MP3/OGG），空用系统 beep |
+
 默认 socket 路径因平台而异：Linux 使用 `$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`），macOS 使用 `$TMPDIR/trafficlight4ai.sock`，Windows 使用命名管道 `trafficlight4ai`。也可通过 `TL4AI_SOCKET` 环境变量覆盖。
 
 ## 测试

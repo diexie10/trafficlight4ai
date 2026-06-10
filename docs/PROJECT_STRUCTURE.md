@@ -41,3 +41,30 @@ trafficlight4ai/
     ├── resources.qrc
     └── images/                    # 红绿灯 PNG + 应用图标
 ```
+
+## 核心类
+
+| 类 | 职责 | 依赖 |
+|---|------|------|
+| `StateManager` | 状态机（Working/WaitingConfirm/Idle），超时自动回 Idle | Qt Core |
+| `ConfigManager` | JSON 配置读写（`~/.config/trafficlight4ai/config.json`） | Qt Core |
+| `IpcServer` | QLocalServer 监听本地 IPC socket，解析指令转发给 StateManager | Qt Network |
+| `AiToolStrategy` | 策略接口，封装各 AI 工具的差异（hooks 模板、默认超时等） | 无 |
+| `TrafficLightWidget` | 自定义 QWidget，绘制三灯 UI，支持呼吸灯/经典闪烁 | Qt Widgets |
+| `FloatingWindow` | 无边框置顶窗口，可拖动，记忆位置 | Qt Widgets |
+| `TrayIcon` | 系统托盘图标，颜色随状态变化，右键菜单 | Qt Widgets |
+| `SettingsDialog` | 设置对话框，实时预览配置变更，取消可撤销，含查看/编辑 Hooks 配置 | Qt Widgets |
+| `SoundUtils` | 音效播放（QMediaPlayer，支持 WAV/MP3/OGG，fallback 系统 beep） | Qt Multimedia |
+
+## 测试
+
+使用 Qt Test（QTest），每个测试为独立可执行文件：
+
+| 测试 | 覆盖范围 |
+|------|---------|
+| `test_state_manager` | 状态切换、signal 发射、命令解析、超时机制 |
+| `test_config_manager` | 默认值、读写持久化、容错回退、参数校验、aiTool/timeoutSec |
+| `test_ipc_server` | socket 收发、无效指令、旧 socket 清理、restart |
+| `test_ai_tool_strategy` | 事件名验证、hooks 模板内容、Registry 查找、hooksConfigPath/hooksIsEntireFile |
+| `test_traffic_light_widget` | sizePresetFromString 字符串到枚举转换（需 offscreen 平台） |
+| `test_tl4ai_ctl` | CLI 集成测试，需要编译后的 tl4ai-ctl 二进制 |
