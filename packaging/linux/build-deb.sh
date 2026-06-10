@@ -40,6 +40,11 @@ deps="$(dpkg-shlibdeps -O "${root_dir}/usr/bin/trafficlight4ai" "${root_dir}/usr
     | sed -n 's/^shlibs:Depends=//p')"
 popd >/dev/null
 
+# Ubuntu 24.04 generates t64-suffixed names (e.g. libqt6gui6t64) that do not
+# exist on 25.04+ where the suffix was dropped.  Add non-t64 alternatives so
+# the deb installs on both.
+deps="$(echo "${deps}" | sed -E 's/(lib[a-z0-9+.-]+)6t64( \([^)]*\))/\16t64\2 | \16\2/g')"
+
 installed_size="$(du -sk "${root_dir}" | awk '{print $1}')"
 cat > "${root_dir}/DEBIAN/control" <<EOF
 Package: ${package}
