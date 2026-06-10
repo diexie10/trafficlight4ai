@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-A visual traffic light status indicator for AI coding tools (Codex, Claude Code, Qoder CN, Copilot, and more).
+A visual traffic light status indicator for AI coding tools (Codex, Claude Code, Qoder CN, Copilot, Gemini, and more).
 
 [中文文档](README_zh.md)
 
@@ -84,7 +84,7 @@ cp build/tools/tl4ai-ctl ~/.local/bin/
 
 ### 3. Configure hooks for your AI tool
 
-See [docs/HOOKS.md](docs/HOOKS.md) for hooks configuration examples for each supported AI tool (Codex, Claude Code, Qoder CN, Copilot). You can also view and edit these templates directly in the Settings dialog.
+See [docs/HOOKS.md](docs/HOOKS.md) for hooks configuration examples for each supported AI tool (Codex, Claude Code, Qoder CN, Copilot, Gemini). You can also view and edit these templates directly in the Settings dialog.
 
 ### 4. Test manually
 
@@ -99,7 +99,7 @@ tl4ai-ctl green    # Green light steady
 - **Floating window** — Draggable, always-on-top, remembers position
 - **System tray icon** — Color changes with state, right-click menu
 - **Settings dialog** — Live preview, cancel to undo
-  - AI tool selection (Codex / Claude Code / Qoder CN / Copilot)
+  - AI tool selection (Codex / Claude Code / Qoder CN / Copilot / Gemini)
   - Timeout auto-idle (default 5 min, 0 to disable)
   - Window size (extra small / small / medium / large / extra large)
   - Animation mode (breathing / classic blink)
@@ -145,7 +145,7 @@ Config file: `~/.config/trafficlight4ai/config.json`
 | Field | Default | Description |
 |-------|---------|-------------|
 | `language` | `"en"` | UI language (`en` / `zh` / `ja`) |
-| `aiTool` | `"codex"` | AI tool (`codex` / `claude-code` / `qoder-cn` / `copilot`) |
+| `aiTool` | `"codex"` | AI tool (`codex` / `claude-code` / `qoder-cn` / `copilot` / `gemini`) |
 | `timeoutSec` | `300` | Seconds before auto-idle (0 to disable) |
 | `window.size` | `"medium"` | Window size (`xsmall` / `small` / `medium` / `large` / `xlarge`) |
 | `window.posX` / `posY` | `20` | Window position |

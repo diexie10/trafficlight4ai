@@ -145,6 +145,47 @@ public:
     bool hooksIsEntireFile() const override { return true; }
 };
 
+class GeminiStrategy : public AiToolStrategy {
+public:
+    QString id() const override { return "gemini"; }
+    QString displayName() const override { return "Gemini"; }
+    int defaultTimeoutSec() const override { return 300; }
+    QString hooksTemplate() const override
+    {
+        return R"({
+  "hooks": {
+    "BeforeAgent": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }]
+      }
+    ],
+    "BeforeTool": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }]
+      }
+    ]
+  }
+})";
+    }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.gemini/settings.json"; }
+    bool hooksIsEntireFile() const override { return false; }
+};
+
 class AiToolRegistry {
 public:
     static const QList<AiToolStrategy *> &strategies()
@@ -153,7 +194,8 @@ public:
         static ClaudeCodeStrategy claude;
         static QoderCnStrategy qoderCn;
         static CopilotStrategy copilot;
-        static QList<AiToolStrategy *> list = {&codex, &claude, &qoderCn, &copilot};
+        static GeminiStrategy gemini;
+        static QList<AiToolStrategy *> list = {&codex, &claude, &qoderCn, &copilot, &gemini};
         return list;
     }
 

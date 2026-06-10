@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code、Qoder CN、Copilot 等）。
+AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code、Qoder CN、Copilot、Gemini 等）。
 
 [English](README.md)
 
@@ -84,7 +84,7 @@ cp build/tools/tl4ai-ctl ~/.local/bin/
 
 ### 3. 配置 AI 工具的 hooks
 
-各 AI 工具（Codex、Claude Code、Qoder CN、Copilot）的 hooks 配置示例请参阅 [docs/HOOKS_zh.md](docs/HOOKS_zh.md)。也可以在设置对话框中直接查看和编辑模板。
+各 AI 工具（Codex、Claude Code、Qoder CN、Copilot、Gemini）的 hooks 配置示例请参阅 [docs/HOOKS_zh.md](docs/HOOKS_zh.md)。也可以在设置对话框中直接查看和编辑模板。
 
 ### 4. 手动测试
 
@@ -99,7 +99,7 @@ tl4ai-ctl green    # 绿灯常亮
 - **悬浮窗口** — 可拖动、始终置顶、记忆位置
 - **系统托盘图标** — 颜色随状态变化，右键菜单
 - **设置对话框** — 实时预览，取消可撤销
-  - AI 工具选择（Codex / Claude Code / Qoder CN / Copilot）
+  - AI 工具选择（Codex / Claude Code / Qoder CN / Copilot / Gemini）
   - 超时自动回绿灯（默认 5 分钟，0 禁用）
   - 窗口大小（超小 / 小 / 中 / 大 / 超大）
   - 动画模式（呼吸灯 / 经典闪烁）
@@ -145,7 +145,7 @@ tl4ai-ctl green    # 绿灯常亮
 | 字段 | 默认值 | 说明 |
 |------|--------|------|
 | `language` | `"en"` | 界面语言（`en` / `zh` / `ja`） |
-| `aiTool` | `"codex"` | AI 工具（`codex` / `claude-code` / `qoder-cn` / `copilot`） |
+| `aiTool` | `"codex"` | AI 工具（`codex` / `claude-code` / `qoder-cn` / `copilot` / `gemini`） |
 | `timeoutSec` | `300` | 超时回绿灯秒数，0 禁用 |
 | `window.size` | `"medium"` | 窗口大小（`xsmall` / `small` / `medium` / `large` / `xlarge`） |
 | `window.posX` / `posY` | `20` | 窗口位置 |

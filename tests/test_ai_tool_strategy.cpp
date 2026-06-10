@@ -268,6 +268,74 @@ private slots:
         QCOMPARE(copilot.defaultTimeoutSec(), 300);
     }
 
+    void geminiTemplateContainsBeforeAgent()
+    {
+        GeminiStrategy gemini;
+        QVERIFY(gemini.hooksTemplate().contains("BeforeAgent"));
+    }
+
+    void geminiTemplateHasRedYellowGreen()
+    {
+        GeminiStrategy gemini;
+        const QString tmpl = gemini.hooksTemplate();
+        QVERIFY(tmpl.contains("tl4ai-ctl red"));
+        QVERIFY(tmpl.contains("tl4ai-ctl yellow"));
+        QVERIFY(tmpl.contains("tl4ai-ctl green"));
+    }
+
+    void geminiTemplateOnlyUsesValidEvents()
+    {
+        const QStringList geminiEvents = {
+            "SessionStart", "SessionEnd", "BeforeAgent", "AfterAgent",
+            "BeforeModel", "AfterModel", "BeforeToolSelection",
+            "BeforeTool", "AfterTool", "PreCompress", "Notification"
+        };
+
+        GeminiStrategy gemini;
+        const QString tmpl = gemini.hooksTemplate();
+        QRegularExpression re(R"RE("(\w+)":\s*\[)RE");
+        auto it = re.globalMatch(tmpl);
+        while (it.hasNext()) {
+            auto match = it.next();
+            QString event = match.captured(1);
+            if (event == "hooks")
+                continue;
+            QVERIFY2(geminiEvents.contains(event),
+                      qPrintable("Invalid Gemini event: " + event));
+        }
+    }
+
+    void geminiHooksConfigPath()
+    {
+        GeminiStrategy gemini;
+        QVERIFY(gemini.hooksConfigPath().endsWith("/.gemini/settings.json"));
+    }
+
+    void geminiHooksIsNotEntireFile()
+    {
+        GeminiStrategy gemini;
+        QCOMPARE(gemini.hooksIsEntireFile(), false);
+    }
+
+    void geminiDisplayName()
+    {
+        GeminiStrategy gemini;
+        QCOMPARE(gemini.displayName(), QString("Gemini"));
+    }
+
+    void geminiDefaultTimeout()
+    {
+        GeminiStrategy gemini;
+        QCOMPARE(gemini.defaultTimeoutSec(), 300);
+    }
+
+    void registryFindsGemini()
+    {
+        auto *s = AiToolRegistry::find("gemini");
+        QVERIFY(s != nullptr);
+        QCOMPARE(s->id(), QString("gemini"));
+    }
+
     void registryFindsQoderCn()
     {
         auto *s = AiToolRegistry::find("qoder-cn");

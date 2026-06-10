@@ -112,3 +112,39 @@
   }
 }
 ```
+
+## Gemini
+
+添加到 `~/.gemini/settings.json`：
+
+```json
+{
+  "hooks": {
+    "BeforeAgent": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }]
+      }
+    ],
+    "BeforeTool": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl red" }]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl yellow" }]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [{ "type": "command", "command": "tl4ai-ctl green" }]
+      }
+    ]
+  }
+}
+```
