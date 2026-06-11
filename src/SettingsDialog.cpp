@@ -40,31 +40,38 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
 
     // Language
     m_langCombo = new QComboBox();
+    m_langCombo->setObjectName("languageCombo");
     m_langCombo->addItem("English", "en");
     m_langCombo->addItem(QString::fromUtf8("中文"), "zh");
     m_langCombo->addItem(QString::fromUtf8("日本語"), "ja");
 
     // AI tool
     m_aiToolCombo = new QComboBox();
+    m_aiToolCombo->setObjectName("aiToolCombo");
     for (auto *s : AiToolRegistry::strategies())
         m_aiToolCombo->addItem(s->displayName(), s->id());
 
     // Timeout
     m_timeoutSpin = new QSpinBox();
+    m_timeoutSpin->setObjectName("timeoutSpin");
     m_timeoutSpin->setRange(0, 3600);
     m_timeoutSpin->setSingleStep(30);
 
     // Window size
     m_sizeCombo = new QComboBox();
+    m_sizeCombo->setObjectName("windowSizeCombo");
 
     // Animation mode
     m_modeCombo = new QComboBox();
+    m_modeCombo->setObjectName("animationModeCombo");
 
     // Animation period
     m_periodSlider = new QSlider(Qt::Horizontal);
+    m_periodSlider->setObjectName("animationPeriodSlider");
     m_periodSlider->setRange(200, 5000);
     m_periodSlider->setSingleStep(100);
     m_periodSpin = new QSpinBox();
+    m_periodSpin->setObjectName("animationPeriodSpin");
     m_periodSpin->setRange(200, 5000);
     m_periodSpin->setSingleStep(100);
     m_periodSpin->setSuffix(" ms");
@@ -75,13 +82,18 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
 
     // Socket path
     m_socketEdit = new QLineEdit();
+    m_socketEdit->setObjectName("socketEdit");
 
     // Yellow sound
     m_yellowSoundCheck = new QCheckBox();
+    m_yellowSoundCheck->setObjectName("yellowSoundCheck");
     m_yellowSoundEdit = new QLineEdit();
+    m_yellowSoundEdit->setObjectName("yellowSoundEdit");
     m_yellowPreviewBtn = new QPushButton();
+    m_yellowPreviewBtn->setObjectName("yellowPreviewButton");
     m_yellowPreviewBtn->setEnabled(false);
     m_yellowBrowseBtn = new QPushButton();
+    m_yellowBrowseBtn->setObjectName("yellowBrowseButton");
     auto *yellowSoundLayout = new QHBoxLayout();
     yellowSoundLayout->addWidget(m_yellowSoundCheck);
     yellowSoundLayout->addWidget(m_yellowSoundEdit);
@@ -90,10 +102,14 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
 
     // Green sound
     m_greenSoundCheck = new QCheckBox();
+    m_greenSoundCheck->setObjectName("greenSoundCheck");
     m_greenSoundEdit = new QLineEdit();
+    m_greenSoundEdit->setObjectName("greenSoundEdit");
     m_greenPreviewBtn = new QPushButton();
+    m_greenPreviewBtn->setObjectName("greenPreviewButton");
     m_greenPreviewBtn->setEnabled(false);
     m_greenBrowseBtn = new QPushButton();
+    m_greenBrowseBtn->setObjectName("greenBrowseButton");
     auto *greenSoundLayout = new QHBoxLayout();
     greenSoundLayout->addWidget(m_greenSoundCheck);
     greenSoundLayout->addWidget(m_greenSoundEdit);
@@ -114,9 +130,13 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
 
     // Buttons
     m_hooksBtn = new QPushButton();
+    m_hooksBtn->setObjectName("hooksButton");
     m_editHooksBtn = new QPushButton();
+    m_editHooksBtn->setObjectName("editHooksButton");
     m_okBtn = new QPushButton();
+    m_okBtn->setObjectName("okButton");
     m_cancelBtn = new QPushButton();
+    m_cancelBtn->setObjectName("cancelButton");
     auto *btnLayout = new QHBoxLayout();
     btnLayout->addWidget(m_hooksBtn);
     btnLayout->addWidget(m_editHooksBtn);
@@ -516,10 +536,12 @@ void SettingsDialog::onShowHooksTemplate()
         return;
 
     auto *dlg = new QDialog(this);
+    dlg->setObjectName("hooksTemplateDialog");
     dlg->setWindowTitle(tr("Recommended Hooks - %1").arg(strategy->displayName()));
     dlg->setMinimumSize(450, 350);
 
     auto *textEdit = new QTextEdit();
+    textEdit->setObjectName("hooksTemplateTextEdit");
     textEdit->setReadOnly(true);
     textEdit->setPlainText(AiToolRegistry::resolvedTemplate(strategy));
 
@@ -579,20 +601,25 @@ void SettingsDialog::onEditHooksConfig()
 
     // Build editor dialog
     auto *dlg = new QDialog(this);
+    dlg->setObjectName("hooksConfigEditorDialog");
     dlg->setWindowTitle(tr("Edit Hooks Config - %1").arg(strategy->displayName()));
     dlg->setMinimumSize(500, 400);
 
     auto *textEdit = new QTextEdit();
+    textEdit->setObjectName("hooksConfigEditorTextEdit");
     textEdit->setPlainText(content);
     QFont monoFont("monospace");
     monoFont.setStyleHint(QFont::Monospace);
     textEdit->setFont(monoFont);
 
     auto *pathLabel = new QLabel(configPath);
+    pathLabel->setObjectName("hooksConfigPathLabel");
     pathLabel->setWordWrap(true);
 
     auto *saveBtn = new QPushButton(tr("Save"));
+    saveBtn->setObjectName("hooksConfigSaveButton");
     auto *cancelBtn = new QPushButton(tr("Cancel"));
+    cancelBtn->setObjectName("hooksConfigCancelButton");
 
     connect(saveBtn, &QPushButton::clicked, dlg, [this, dlg, textEdit, configPath, entireFile]() {
         const QString text = textEdit->toPlainText().trimmed();
