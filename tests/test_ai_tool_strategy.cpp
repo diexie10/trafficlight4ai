@@ -374,6 +374,11 @@ private slots:
     {
         QVERIFY(!AiToolRegistry::strategies().isEmpty());
     }
+
+    void registryStrategiesCount()
+    {
+        QCOMPARE(AiToolRegistry::strategies().size(), 5);
+    }
 };
 
 QTEST_MAIN(TestAiToolStrategy)

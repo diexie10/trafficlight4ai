@@ -45,8 +45,7 @@ private slots:
         IpcServer server(&sm, socketPath());
 
         QCOMPARE(runCtl({"red"}, socketPath()), 0);
-        QTest::qWait(200);
-        QCOMPARE(sm.state(), LightState::Working);
+        QTRY_COMPARE_WITH_TIMEOUT(sm.state(), LightState::Working, 2000);
     }
 
     void sendsYellowCommand()
@@ -55,8 +54,7 @@ private slots:
         IpcServer server(&sm, socketPath());
 
         QCOMPARE(runCtl({"yellow"}, socketPath()), 0);
-        QTest::qWait(200);
-        QCOMPARE(sm.state(), LightState::WaitingConfirm);
+        QTRY_COMPARE_WITH_TIMEOUT(sm.state(), LightState::WaitingConfirm, 2000);
     }
 
     void sendsGreenCommand()
@@ -66,20 +64,38 @@ private slots:
 
         sm.setState(LightState::Working);
         QCOMPARE(runCtl({"green"}, socketPath()), 0);
-        QTest::qWait(200);
-        QCOMPARE(sm.state(), LightState::Idle);
+        QTRY_COMPARE_WITH_TIMEOUT(sm.state(), LightState::Idle, 2000);
     }
 
     void exitZeroWhenServerNotRunning()
     {
         // No server listening - should still exit 0 silently
-        QCOMPARE(runCtl({"red"}, "/tmp/nonexistent_tl4ai_test.sock"), 0);
+        QCOMPARE(runCtl({"red"}, m_tempDir.path() + "/no_server_here.sock"), 0);
     }
 
     void exitZeroWithNoArgs()
     {
         // No arguments - should exit 0 without crashing
         QCOMPARE(runCtl({}, socketPath()), 0);
+    }
+
+    void unknownCommandIgnored()
+    {
+        StateManager sm;
+        IpcServer server(&sm, socketPath());
+
+        QCOMPARE(runCtl({"purple"}, socketPath()), 0);
+        QTRY_VERIFY_WITH_TIMEOUT(true, 500);
+        QCOMPARE(sm.state(), LightState::Idle);
+    }
+
+    void mixedCaseCommand()
+    {
+        StateManager sm;
+        IpcServer server(&sm, socketPath());
+
+        QCOMPARE(runCtl({"Red"}, socketPath()), 0);
+        QTRY_COMPARE_WITH_TIMEOUT(sm.state(), LightState::Working, 2000);
     }
 };
 

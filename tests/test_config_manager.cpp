@@ -6,6 +6,15 @@
 #include <unistd.h>
 #include "ConfigManager.h"
 
+struct EnvGuard {
+    QByteArray key, original;
+    bool had;
+    explicit EnvGuard(const char *k) : key(k), had(qEnvironmentVariableIsSet(k)), original(qgetenv(k)) {
+        qunsetenv(k);
+    }
+    ~EnvGuard() { had ? qputenv(key.constData(), original) : qunsetenv(key.constData()); }
+};
+
 class TestConfigManager : public QObject {
     Q_OBJECT
 
@@ -73,20 +82,21 @@ private slots:
         QCOMPARE(cm.socketPath(), expectedDefaultSocketPath());
     }
 
+    void socketPathEnvVarOverride()
+    {
+        qputenv("TL4AI_SOCKET", "/tmp/custom_tl4ai.sock");
+        ConfigManager cm(m_configPath);
+        QCOMPARE(cm.socketPath(), QString("/tmp/custom_tl4ai.sock"));
+        qunsetenv("TL4AI_SOCKET");
+    }
+
     void defaultSocketPathWithoutXdgRuntimeDir()
     {
-        const bool hadRuntimeEnv = qEnvironmentVariableIsSet("XDG_RUNTIME_DIR");
-        const QByteArray originalRuntimeEnv = qgetenv("XDG_RUNTIME_DIR");
-        qunsetenv("XDG_RUNTIME_DIR");
+        EnvGuard guard("XDG_RUNTIME_DIR");
 
         ConfigManager cm(m_configPath);
         // On macOS, $TMPDIR takes over; on Linux, falls back to /tmp
         QCOMPARE(cm.socketPath(), expectedDefaultSocketPath());
-
-        if (hadRuntimeEnv)
-            qputenv("XDG_RUNTIME_DIR", originalRuntimeEnv);
-        else
-            qunsetenv("XDG_RUNTIME_DIR");
     }
 
     void setAndGetWindowSize()
@@ -306,9 +316,7 @@ private slots:
 
     void normalizeLegacyDefaultSocketPath()
     {
-        const bool hadSocketEnv = qEnvironmentVariableIsSet("TL4AI_SOCKET");
-        const QByteArray originalSocketEnv = qgetenv("TL4AI_SOCKET");
-        qunsetenv("TL4AI_SOCKET");
+        EnvGuard guard("TL4AI_SOCKET");
 
         QFile f(m_configPath);
         f.open(QIODevice::WriteOnly);
@@ -317,11 +325,6 @@ private slots:
 
         ConfigManager cm(m_configPath);
         QCOMPARE(cm.socketPath(), expectedDefaultSocketPath());
-
-        if (hadSocketEnv)
-            qputenv("TL4AI_SOCKET", originalSocketEnv);
-        else
-            qunsetenv("TL4AI_SOCKET");
     }
 
     void defaultLanguage()

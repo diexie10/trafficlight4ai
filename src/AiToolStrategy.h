@@ -218,7 +218,9 @@ public:
 #else
         const QString path = dir + "/tl4ai-ctl";
 #endif
-        return QFile::exists(path) ? path : QString("tl4ai-ctl");
+        if (!QFile::exists(path))
+            return QString("tl4ai-ctl");
+        return path.contains(' ') ? ('"' + path + '"') : path;
     }
 
     static QString resolvedTemplate(const AiToolStrategy *strategy)

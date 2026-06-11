@@ -4,6 +4,7 @@
 #include <QLocalSocket>
 #include <QFile>
 #include <QtGlobal>
+#include <memory>
 #ifdef Q_OS_UNIX
 #include <sys/stat.h>
 #endif
@@ -139,31 +140,30 @@ void IpcServer::connectServer()
 
 void IpcServer::onNewConnection()
 {
+    static constexpr int kMaxCommandBytes = 64;
+
     while (QLocalSocket *client = m_server->nextPendingConnection()) {
-        auto *buf = new QByteArray();
+        auto buf = std::make_shared<QByteArray>();
 
         auto finishClient = [this, client, buf]() {
-            // Disconnect all signals first to prevent re-entry
-            client->disconnect(this);
-            client->disconnect(client);
+            // Disconnect all signals from client to this to prevent re-entry
+            QObject::disconnect(client, nullptr, this, nullptr);
             if (!buf->isEmpty())
                 m_stateManager->handleCommand(QString::fromUtf8(*buf));
-            delete buf;
             client->disconnectFromServer();
             client->deleteLater();
         };
 
         auto tryProcess = [this, client, buf, finishClient]() {
-            buf->append(client->read(64 - buf->size()));
-            if (buf->contains('\n') || buf->size() >= 64)
+            buf->append(client->read(kMaxCommandBytes - buf->size()));
+            if (buf->contains('\n') || buf->size() >= kMaxCommandBytes)
                 finishClient();
         };
 
         if (client->bytesAvailable()) {
-            buf->append(client->read(64));
-            if (buf->contains('\n') || buf->size() >= 64) {
+            buf->append(client->read(kMaxCommandBytes));
+            if (buf->contains('\n') || buf->size() >= kMaxCommandBytes) {
                 m_stateManager->handleCommand(QString::fromUtf8(*buf));
-                delete buf;
                 client->disconnectFromServer();
                 client->deleteLater();
             } else {

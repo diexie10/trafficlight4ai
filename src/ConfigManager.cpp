@@ -87,11 +87,21 @@ void ConfigManager::load()
         file.close();
 
         if (err.error == QJsonParseError::NoError && doc.isObject()) {
-            // Apply defaults first, then overlay loaded values to fill missing keys
+            // Apply defaults first, then recursively merge loaded values
             applyDefaults();
             const QJsonObject obj = doc.object();
-            for (auto it = obj.begin(); it != obj.end(); ++it)
-                m_root[it.key()] = it.value();
+            for (auto it = obj.begin(); it != obj.end(); ++it) {
+                if (it.value().isObject() && m_root[it.key()].isObject()) {
+                    // Merge nested object: loaded keys override, default keys preserved
+                    QJsonObject merged = m_root[it.key()].toObject();
+                    const QJsonObject loaded = it.value().toObject();
+                    for (auto sit = loaded.begin(); sit != loaded.end(); ++sit)
+                        merged[sit.key()] = sit.value();
+                    m_root[it.key()] = merged;
+                } else {
+                    m_root[it.key()] = it.value();
+                }
+            }
             loaded = true;
         }
     }

@@ -19,19 +19,21 @@ private:
 
     void sendCommand(const QByteArray &data)
     {
-        sendCommandTo(m_socketPath, data);
+        QVERIFY(sendCommandTo(m_socketPath, data));
     }
 
-    void sendCommandTo(const QString &path, const QByteArray &data)
+    bool sendCommandTo(const QString &path, const QByteArray &data)
     {
         QLocalSocket socket;
         socket.connectToServer(path);
-        QVERIFY(socket.waitForConnected(1000));
+        if (!socket.waitForConnected(1000))
+            return false;
         socket.write(data);
         socket.flush();
         socket.waitForBytesWritten(1000);
         socket.disconnectFromServer();
         QTest::qWait(100);
+        return true;
     }
 
     bool tryConnect(const QString &path)

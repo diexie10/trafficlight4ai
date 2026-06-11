@@ -29,7 +29,7 @@ static void loadLanguage(QApplication &app, const QString &lang)
     }
 
     if (lang != "en") {
-        s_translator = new QTranslator(&app);
+        s_translator = new QTranslator();
         if (s_translator->load(":/i18n/trafficlight4ai_" + lang + ".qm")) {
             app.installTranslator(s_translator);
         } else {

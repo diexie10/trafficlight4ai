@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <QSignalSpy>
 #include "TrafficLightWidget.h"
 
 class TestTrafficLightWidget : public QObject {
@@ -38,6 +39,32 @@ private slots:
     void sizePresetFromStringEmpty()
     {
         QCOMPARE(TrafficLightWidget::sizePresetFromString(""), TrafficLightWidget::Small);
+    }
+
+    void stateChangedToWorkingEmitsAlpha()
+    {
+        TrafficLightWidget w;
+        QSignalSpy spy(&w, &TrafficLightWidget::activeAlphaChanged);
+        w.onStateChanged(LightState::Working);
+        QTRY_VERIFY_WITH_TIMEOUT(!spy.isEmpty(), 2000);
+    }
+
+    void stateChangedToIdleStopsAnimation()
+    {
+        TrafficLightWidget w;
+        w.onStateChanged(LightState::Working);
+        QTest::qWait(100);
+
+        w.onStateChanged(LightState::Idle);
+        QTest::qWait(500);
+        QCOMPARE(w.activeAlpha(), 1.0);
+    }
+
+    void activeAlphaRoundTrip()
+    {
+        TrafficLightWidget w;
+        w.setActiveAlpha(0.5);
+        QCOMPARE(w.activeAlpha(), 0.5);
     }
 };
 
