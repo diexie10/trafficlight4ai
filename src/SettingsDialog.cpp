@@ -296,6 +296,8 @@ void SettingsDialog::showEvent(QShowEvent *event)
     m_greenSoundCheck->setChecked(m_config->greenSoundEnabled());
     m_greenSoundCheck->blockSignals(false);
     m_greenSoundEdit->setText(m_config->greenSoundFile());
+
+    updatePreviewButtons();
 }
 
 void SettingsDialog::takeSnapshot()

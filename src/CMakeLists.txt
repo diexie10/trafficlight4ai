@@ -28,6 +28,13 @@ qt_add_resources(trafficlight4ai "images"
         "${CMAKE_SOURCE_DIR}/resources/images/light_yellow.png"
         "${CMAKE_SOURCE_DIR}/resources/images/light_green.png"
 )
+qt_add_resources(trafficlight4ai "effects"
+    PREFIX "/effects"
+    BASE "${CMAKE_SOURCE_DIR}/resources"
+    FILES
+        "${CMAKE_SOURCE_DIR}/resources/effects/yellow.ogg"
+        "${CMAKE_SOURCE_DIR}/resources/effects/green.ogg"
+)
 set(TS_FILES
     "${CMAKE_SOURCE_DIR}/translations/trafficlight4ai_zh.ts"
     "${CMAKE_SOURCE_DIR}/translations/trafficlight4ai_ja.ts"
