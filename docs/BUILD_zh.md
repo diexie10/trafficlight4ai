@@ -24,8 +24,11 @@
 Linux 依赖：
 
 ```bash
-# Ubuntu/Debian/Linux Mint
+# Ubuntu 22.04 (Qt 6.2)
 sudo apt install cmake g++ libgl1-mesa-dev qt6-base-dev qt6-l10n-tools qt6-multimedia-dev qt6-tools-dev qt6-tools-dev-tools
+
+# Ubuntu 24.04+ / Debian 13+ / Linux Mint 22+ (Qt 6.4+)
+sudo apt install cmake g++ qt6-base-dev qt6-multimedia-dev qt6-tools-dev
 
 # Fedora
 sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel qt6-qttools-devel
