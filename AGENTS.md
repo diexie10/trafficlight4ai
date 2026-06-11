@@ -2,11 +2,11 @@
 
 ## 项目结构与模块组织
 
-本项目是 Qt 6 桌面工具，使用 CMake 和 C++17 构建，目标平台为 Linux、macOS 12+ 和 Windows 10+。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`AiToolStrategy` 封装 Codex、Claude Code、Qoder CN、Copilot 的 hooks 差异，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供基于 Qt `QLocalSocket` 的 CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放 PNG 图标，`translations/` 存放中文和日语 `.ts` 翻译，`packaging/linux/` 存放 deb/rpm/AppImage/Arch 打包脚本，`packaging/macos/` 存放 macOS zip 打包脚本，`docs/` 存放构建、hooks、问题记录和设计说明，`.claude/rules/` 与 `.claude/commands/` 存放 Claude 专用协作规则和命令。
+本项目是 Qt 6 桌面工具，使用 CMake 和 C++17 构建，目标平台为 Linux、macOS 12+ 和 Windows 10+。`src/` 包含 GUI 主程序与核心逻辑：`tl4ai_core` 覆盖 `StateManager`、`ConfigManager`、`IpcServer`，`AiToolStrategy` 封装 Codex、Claude Code、Qoder CN、Copilot、Gemini 的 hooks 差异，`TrafficLightWidget`、`FloatingWindow`、`TrayIcon`、`SettingsDialog`、`SoundUtils` 负责界面、托盘、设置和提示音。`tools/` 提供基于 Qt `QLocalSocket` 的 CLI `tl4ai-ctl`。`tests/` 是 Qt Test/CTest 测试。`resources/images/` 存放 PNG 图标，`resources/effects/` 存放内置 OGG 提示音，`translations/` 存放中文和日语 `.ts` 翻译，`packaging/linux/` 存放 deb/rpm/AppImage/Arch 打包脚本，`packaging/macos/` 存放 macOS zip 打包脚本，`docs/` 存放构建、hooks、问题记录和设计说明，`.claude/rules/`、`.claude/commands/` 与 `.claude/memory/` 存放 Claude 专用协作规则、命令和记忆。
 
 ## 构建与验证文档
 
-Linux、macOS 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。`Build` workflow 验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage、macOS arm64 和 Windows；openSUSE Leap 15.6 必须使用 `gcc13/gcc13-c++` 并以 `CC=gcc-13 CXX=g++-13` 配置 CMake。GitHub Actions 中优先使用 Node 24 兼容的官方 actions 版本，例如 `actions/checkout@v6`、`actions/upload-artifact@v6` 和 `actions/download-artifact@v7`。
+Linux、macOS 和 Windows 的编译前提、编译命令、注意事项与验证方式统一维护在 [docs/BUILD_zh.md](docs/BUILD_zh.md)，英文版为 [docs/BUILD.md](docs/BUILD.md)。不要在 README、AGENTS 或 CLAUDE 中重复粘贴完整编译步骤；编译流程变化时优先更新这两份构建文档。`Build` workflow 验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage、macOS arm64 和 Windows；`Package Test` workflow 通过复用 `Package Jobs` 生成可下载 artifact；`Release Packages` workflow 生成 Release 资产并创建 GitHub Release。openSUSE Leap 15.6 必须使用 `gcc13/gcc13-c++` 并以 `CC=gcc-13 CXX=g++-13` 配置 CMake。GitHub Actions 中优先使用 Node 24 兼容的官方 actions 版本，例如 `actions/checkout@v6`、`actions/upload-artifact@v6` 和 `actions/download-artifact@v7`。
 
 ## 代码风格与命名约定
 
@@ -18,11 +18,11 @@ Linux、macOS 和 Windows 的编译前提、编译命令、注意事项与验证
 
 ## 文档同步
 
-`README.md` 是英文文档，`README_zh.md` 是对应的中文文档。更新构建方式、功能说明、配置字段、运行行为或用户可见命令时，必须同时更新两份 README，保持内容一致。Hooks 配置示例维护在 [docs/HOOKS.md](docs/HOOKS.md) 和 [docs/HOOKS_zh.md](docs/HOOKS_zh.md)；新增或修改 AI 工具 hooks 时，同步更新这两份文档和 `AiToolStrategy` 模板。`CLAUDE.md`、`.claude/rules/**` 和 `.claude/commands/**` 是 Claude 专用指南，默认只作参考；其中影响本仓库的项目事实变化时，应同步反映到本文件。仅修复某一语言的表达问题时，可只改对应文件。
+`README.md` 是英文文档，`README_zh.md` 是对应的中文文档。更新构建方式、功能说明、配置字段、运行行为或用户可见命令时，必须同时更新两份 README，保持内容一致。Hooks 配置示例维护在 [docs/HOOKS.md](docs/HOOKS.md) 和 [docs/HOOKS_zh.md](docs/HOOKS_zh.md)；新增或修改 AI 工具 hooks 时，同步更新这两份文档和 `AiToolStrategy` 模板，设置对话框会直接展示这些策略模板。`CLAUDE.md` 和 `.claude/**` 是 Claude 专用指南、命令与记忆，默认只作参考；其中影响本仓库的项目事实变化时，应同步反映到本文件。仅修复某一语言的表达问题时，可只改对应文件。
 
 ## 配置与资源注意事项
 
-运行配置位于 `~/.config/trafficlight4ai/config.json`，socket 路径或名称可用 `TL4AI_SOCKET` 覆盖。当前配置包含 `language`、`aiTool`（`codex`/`claude-code`/`qoder-cn`/`copilot`）、`timeoutSec`、`window.size`（`xsmall`/`small`/`medium`/`large`/`xlarge`）、`animation.mode`、`animation.periodMs`、`socket.path` 和 `sound.*`。不要提交个人配置、机器相关 socket 路径或本机音频路径。新增图片请放入 `resources/images/` 并在 Qt 资源配置中注册。
+运行配置位于 `~/.config/trafficlight4ai/config.json`，socket 路径或名称可用 `TL4AI_SOCKET` 覆盖。当前配置包含 `language`（`en`/`zh`/`ja`）、`aiTool`（`codex`/`claude-code`/`qoder-cn`/`copilot`/`gemini`）、`timeoutSec`、`window.size`（`xsmall`/`small`/`medium`/`large`/`xlarge`）、`window.posX`/`window.posY`、`animation.mode`（`breathing`/`classic`）、`animation.periodMs`、`socket.path` 和 `sound.*`。默认 socket 路径是 Linux `$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/trafficlight4ai-$UID.sock`）、macOS `$TMPDIR/trafficlight4ai.sock`、Windows 命名管道 `trafficlight4ai`。不要提交个人配置、机器相关 socket 路径或本机音频路径。新增图片请放入 `resources/images/` 并在 Qt 资源配置中注册；新增内置提示音请放入 `resources/effects/` 并在 Qt 资源配置中注册。
 
 ## 实现注意事项
 
@@ -30,7 +30,7 @@ Debug 构建保留 `qDebug()` 输出；Release 构建通过 `QT_NO_DEBUG_OUTPUT`
 
 ## 发布注意事项
 
-GitHub Release 由 `Release Packages` workflow 生成并发布，资产应包含 Windows zip、macOS arm64 zip、Ubuntu/Debian `.deb`、Fedora `.rpm`、openSUSE `.rpm`、Arch `.pkg.tar.zst`、通用 Linux `.AppImage` 和 `SHA256SUMS.txt`。发布或更新 Release 资产后，必须同步 `README.md`、`README_zh.md`、`docs/BUILD.md`、`docs/BUILD_zh.md` 中的版本号和下载链接。Linux 打包脚本位于 `packaging/linux/`，依赖 CMake install 规则暂存二进制、desktop 文件、图标、README 和许可证。macOS 打包脚本位于 `packaging/macos/`，输出 `.app` bundle 和 `bin/tl4ai-ctl` 包装脚本。AppImage 脚本固定 linuxdeploy/type2-runtime 版本并做 SHA256 校验。`dist/` 是本地发布产物目录，已被 `.gitignore` 忽略，不要提交。
+GitHub Release 由 `Release Packages` workflow 生成并发布，资产应包含 Windows zip、macOS arm64 zip、Ubuntu/Debian `.deb`、Fedora `.rpm`、openSUSE `.rpm`、Arch `.pkg.tar.zst`、通用 Linux `.AppImage` 和 `SHA256SUMS.txt`。发布或更新 Release 资产后，必须同步 `README.md` 和 `README_zh.md` 中的具体版本号和下载链接；`docs/BUILD.md` 与 `docs/BUILD_zh.md` 当前使用 `<version>` 占位符和 GitHub Releases 页面链接，只有资产命名、平台矩阵、打包方式或验证方式变化时才需要同步。Linux 打包脚本位于 `packaging/linux/`，依赖 CMake install 规则暂存二进制、desktop 文件、图标、README 和许可证。macOS 打包脚本位于 `packaging/macos/`，输出 `.app` bundle、`docs/` 和 `bin/tl4ai-ctl` 包装脚本。AppImage 脚本固定 linuxdeploy/type2-runtime 版本并做 SHA256 校验。`dist/` 是本地发布产物目录，已被 `.gitignore` 忽略，不要提交。
 
 ## 提交与 Pull Request 规范
 
