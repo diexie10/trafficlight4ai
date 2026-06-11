@@ -74,7 +74,7 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 
 - 每个测试方法使用独立的临时文件路径（`init()` slot 生成唯一路径），避免测试间污染
 - 构造 stale Unix socket 需用 POSIX `socket()/bind()/close()`，`QLocalServer::close()` 会自动 unlink
-- IpcServer 测试中 `sendCommand` 后需 `QTest::qWait(100)` 等待事件循环处理
+- IpcServer 测试中 `sendCommand` 后需等待事件循环处理，优先使用 `QTRY_COMPARE_WITH_TIMEOUT` 而非固定 `qWait`
 - Qt Widgets 相关测试需在 CMake 中设置 `QT_QPA_PLATFORM=offscreen`，否则在 CI 无显示器环境下会 abort
 
 ## 已知平台问题
