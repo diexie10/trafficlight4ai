@@ -43,7 +43,18 @@ Windows（最低 Windows 10）上运行 `bin/trafficlight4ai.exe`。它会作为
 
 Linux、macOS 和 Windows 的编译前提、编译命令、打包注意事项和验证方式见 [docs/BUILD_zh.md](docs/BUILD_zh.md)。
 
-源码构建已在 GitHub Actions（`build.yml`）中验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage（Ubuntu 22.04）、macOS arm64 和 Windows。该 workflow 在 PR 到 main 时自动运行全平台验证，也可手动触发单平台或全平台编译。构建文档中列出了各发行版依赖包名、macOS 打包注意事项和 openSUSE 的 GCC 13 要求。
+源码构建已在 GitHub Actions 中验证 Ubuntu 24.04、Fedora 41、Arch Linux latest、openSUSE Leap 15.6、AppImage（Ubuntu 22.04）、macOS arm64 和 Windows。构建文档中列出了各发行版依赖包名、macOS 打包注意事项和 openSUSE 的 GCC 13 要求。
+
+### CI/CD 工作流
+
+| 工作流 | 用途 | 触发方式 |
+|--------|------|---------|
+| `build.yml` | 编译验证 + 测试，可选平台，不生成安装包 | PR 到 main 自动触发 / 手动选平台 |
+| `package-jobs.yml` | 可复用工作流，包含 7 个平台的打包 job | 被其他工作流调用，不直接触发 |
+| `package-test.yml` | 打包验证，可选平台，生成可下载的 artifact，不创建 Release | 手动触发（选平台 + 填版本号） |
+| `release-packages.yml` | 正式发布：全平台打包 + 创建 GitHub Release + 上传资产 | 手动触发（版本号 + notes） |
+
+`package-test.yml` 和 `release-packages.yml` 都调用 `package-jobs.yml`，后者额外包含 Release 创建步骤。
 
 编译后生成两个可执行文件：
 

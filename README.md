@@ -43,7 +43,18 @@ On Windows (10 or later), run `bin/trafficlight4ai.exe`. It is built as a GUI ap
 
 See [docs/BUILD.md](docs/BUILD.md) for Linux, macOS, and Windows prerequisites, build commands, packaging notes, and verification steps.
 
-Source builds are verified in GitHub Actions (`build.yml`) on Ubuntu 24.04, Fedora 41, Arch Linux latest, openSUSE Leap 15.6, AppImage (Ubuntu 22.04), macOS arm64, and Windows. The workflow runs automatically on pull requests to main, and can be triggered manually to build a single platform or all platforms. The build guide lists distribution-specific packages, macOS packaging notes, and the openSUSE GCC 13 requirement.
+Source builds are verified in GitHub Actions on Ubuntu 24.04, Fedora 41, Arch Linux latest, openSUSE Leap 15.6, AppImage (Ubuntu 22.04), macOS arm64, and Windows. The build guide lists distribution-specific packages, macOS packaging notes, and the openSUSE GCC 13 requirement.
+
+### CI/CD Workflows
+
+| Workflow | Purpose | Trigger |
+|----------|---------|---------|
+| `build.yml` | Compile verification + tests, selectable platform, no packages | PR to main (auto) / manual |
+| `package-jobs.yml` | Reusable workflow with 7 platform packaging jobs | Called by other workflows |
+| `package-test.yml` | Package verification, selectable platform, generates downloadable artifacts without creating a Release | Manual (select platform + version) |
+| `release-packages.yml` | Full release: all-platform packaging + GitHub Release creation + asset upload | Manual (version + notes) |
+
+`package-test.yml` and `release-packages.yml` both call `package-jobs.yml`; the latter adds a Release creation step.
 
 The build produces two executables:
 
