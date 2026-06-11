@@ -227,6 +227,8 @@ void SettingsDialog::retranslateUi()
     // Env override placeholder
     if (!qgetenv("TL4AI_SOCKET").isEmpty())
         m_socketEdit->setPlaceholderText(tr("Controlled by TL4AI_SOCKET env var"));
+
+    updatePreviewButtons();
 }
 
 void SettingsDialog::showEvent(QShowEvent *event)
