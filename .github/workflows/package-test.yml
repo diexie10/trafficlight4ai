@@ -1,0 +1,30 @@
+name: Package Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to package
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - ubuntu
+          - fedora
+          - arch
+          - opensuse
+          - appimage
+          - macos
+          - windows
+      version:
+        description: Test version number
+        required: true
+        default: "0.0.0-test"
+
+jobs:
+  packages:
+    uses: ./.github/workflows/package-jobs.yml
+    with:
+      version: ${{ inputs.version }}
+      platform: ${{ inputs.platform }}
