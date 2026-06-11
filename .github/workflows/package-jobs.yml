@@ -75,7 +75,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ dpkg-dev qt6-base-dev qt6-multimedia-dev qt6-tools-dev
+          sudo apt-get install -y cmake g++ dpkg-dev qt6-base-dev qt6-multimedia-dev qt6-tools-dev qt6-l10n-tools
 
       - name: Build package
         run: packaging/linux/build-deb.sh "${{ inputs.version }}"
