@@ -16,6 +16,7 @@ argument-hint: [项目名称(可选)]
 - CLAUDE.md 使用中文编写。
 - 所有生成的记忆文件（包括 MEMORY.md 索引及各 feedback_*.md / user_*.md 等）使用中文编写。
 - 所有生成的文档（包括记忆文件、CLAUDE.md、MEMORY.md 等）编码格式均使用 UTF-8。
+- 生成的文档文件名格式：`YYYY-MM-DD-<kebab-case-topic>.md`（日期取今天系统日期；topic 用英文短横线命名，准确描述话题）。
 - 每一步先检查已有状态，确保幂等（多次执行不破坏已有配置）。
 - 每一步完成后简要汇报结果，再进入下一步。
 
