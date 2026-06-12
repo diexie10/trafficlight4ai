@@ -66,6 +66,36 @@ private slots:
         w.setActiveAlpha(0.5);
         QCOMPARE(w.activeAlpha(), 0.5);
     }
+
+    void classicAnimationCanRestartWhileActive()
+    {
+        TrafficLightWidget w;
+        QSignalSpy spy(&w, &TrafficLightWidget::activeAlphaChanged);
+
+        w.onStateChanged(LightState::Working);
+        w.setAnimationMode("classic");
+        w.setAnimationPeriodMs(300);
+
+        QTRY_VERIFY_WITH_TIMEOUT(!spy.isEmpty(), 1000);
+    }
+
+    void paintEventRendersAllStates()
+    {
+        TrafficLightWidget w;
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+
+        QVERIFY(!w.grab().isNull());
+
+        w.onStateChanged(LightState::Working);
+        QVERIFY(!w.grab().isNull());
+
+        w.onStateChanged(LightState::WaitingConfirm);
+        QVERIFY(!w.grab().isNull());
+
+        w.onStateChanged(LightState::Idle);
+        QVERIFY(!w.grab().isNull());
+    }
 };
 
 QTEST_MAIN(TestTrafficLightWidget)

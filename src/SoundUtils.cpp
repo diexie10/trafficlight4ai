@@ -6,17 +6,28 @@
 #include <QMessageBox>
 #include <QUrl>
 
+QUrl soundUrlForPath(const QString &filePath)
+{
+    if (filePath.isEmpty())
+        return {};
+
+    if (filePath.startsWith(QLatin1String(":/")))
+        return QUrl("qrc" + filePath);
+
+    if (QFile::exists(filePath))
+        return QUrl::fromLocalFile(filePath);
+
+    return {};
+}
+
 void playSound(const QString &filePath, QObject *errorContext)
 {
-    const bool isResource = filePath.startsWith(QLatin1String(":/"));
-    if (!filePath.isEmpty() && (isResource || QFile::exists(filePath))) {
+    const QUrl url = soundUrlForPath(filePath);
+    if (url.isValid()) {
         auto *player = new QMediaPlayer();
         auto *audioOutput = new QAudioOutput(player);
         player->setAudioOutput(audioOutput);
-        if (isResource)
-            player->setSource(QUrl("qrc" + filePath));
-        else
-            player->setSource(QUrl::fromLocalFile(filePath));
+        player->setSource(url);
 
         QObject::connect(player, &QMediaPlayer::errorOccurred,
                          player, [player, errorContext, filePath]
