@@ -42,37 +42,58 @@ argument-hint: [项目名称(可选)]
 
 ---
 
-### Step 1: 询问外部文档路径
+### Step 1: 询问文档保存路径
 
-向用户询问本项目的外部文档路径。AI 工具生成的文档、记忆同步等都将使用此路径。
+向用户询问本项目 AI 工具生成的文档保存在哪里。使用 `AskUserQuestion` 工具呈现选项。
 
-**建议路径推导逻辑**：
+**外部路径推导逻辑**（用于选项 2 的建议路径）：
 - 如果 `$ARGUMENTS` 非空，建议路径：`~/yhz61010/Documents/$ARGUMENTS/`
 - 如果 `$ARGUMENTS` 为空，尝试从 `git remote get-url origin` 提取仓库名作为项目名建议
 
-**向用户展示**：
-```
-请输入本项目的外部文档路径。AI 工具生成的文档将统一保存在此路径下，
-不同 AI 工具（Claude Code、Codex 等）可以共享此路径下的文档。
+**选项**：
+- 选项 1（推荐）：保存到当前项目 `docs/` 目录
+- 选项 2：保存到外部路径（描述中展示推导出的建议路径，如 `~/yhz61010/Documents/<项目名>/`）
+- 用户也可通过 "Other" 输入自定义路径
 
-建议路径：<推导出的建议路径>
+**如果用户选择选项 1**：
+- `$EXT_DOC_PATH` = 项目根目录下 `docs/`
+- `$DOC_IS_LOCAL` = `true`
+- 生成的文档直接放在 `docs/` 下（如 `docs/2026-06-12-xxx.md`）
+- superpowers 产物直接放在 `docs/superpowers/`（如 `docs/superpowers/specs/`、`docs/superpowers/plans/`）
+- **不创建** Claude/、Codex/、Leo-Documents/ 等子目录（这些仅在外部路径模式下创建）
 
-请输入路径（直接回车使用建议路径）：
-```
+**如果用户选择选项 2 或自定义路径**：
+- `$EXT_DOC_PATH` = 用户选择的外部路径
 
-**验证**：
+**验证**（仅外部路径需要）：
 - 必须是绝对路径（以 `/` 开头）
 - `~` 需展开为实际 HOME 路径
 - 去除尾部 `/`
-- 如果路径不存在，询问："目录不存在，是否创建？(Y/n)"
+- 如果路径不存在，询问是否创建
 
 将结果记为 `$EXT_DOC_PATH`，后续步骤使用。
 
 ---
 
-### Step 2: 创建外部目录结构
+### Step 2: 创建目录结构
 
-使用 `mkdir -p` 创建以下标准目录结构：
+根据 Step 1 的选择，创建不同的目录结构。
+
+**如果 `$DOC_IS_LOCAL` = `true`（项目内 docs/ 模式）**：
+
+仅创建 superpowers 子目录，生成的文档直接放在 `$EXT_DOC_PATH/` 下：
+
+```
+$EXT_DOC_PATH/                      # 即 docs/
+├── superpowers/                    # superpowers 插件产物
+│   ├── plans/                      # 实现计划
+│   └── specs/                      # 设计规范
+└── (生成的文档直接放在这里)        # 如 2026-06-12-xxx.md
+```
+
+**如果 `$DOC_IS_LOCAL` = `false`（外部路径模式）**：
+
+创建完整的标准目录结构：
 
 ```
 $EXT_DOC_PATH/
@@ -84,6 +105,8 @@ $EXT_DOC_PATH/
 │       ├── plans/                  # 实现计划
 │       └── specs/                  # 设计规范
 ```
+
+使用 `mkdir -p` 创建所有目录。
 
 **执行后汇报**：列出哪些目录是新创建的，哪些已经存在。
 
