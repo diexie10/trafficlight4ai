@@ -17,6 +17,7 @@ argument-hint: [项目名称(可选)]
 - 所有生成的记忆文件（包括 MEMORY.md 索引及各 feedback_*.md / user_*.md 等）使用中文编写。
 - 所有生成的文档（包括记忆文件、CLAUDE.md、MEMORY.md 等）编码格式均使用 UTF-8。
 - 生成的文档文件名格式：`YYYY-MM-DD-<kebab-case-topic>.md`（日期取今天系统日期；topic 用英文短横线命名，准确描述话题）。
+- **交互方式**：所有需要用户做出选择的地方，必须使用 `AskUserQuestion` 工具呈现选项。该工具支持方向键选择、默认选项高亮（推荐项放在第一个并标注 "(推荐)"），并自动提供 "Other" 选项让用户手动输入自定义内容。禁止使用纯文本方式让用户输入数字或 y/N 来选择。
 - 每一步先检查已有状态，确保幂等（多次执行不破坏已有配置）。
 - 每一步完成后简要汇报结果，再进入下一步。
 
@@ -104,6 +105,28 @@ $EXT_DOC_PATH/
 4. 通过 `git config user.name "<name>"` 和 `git config user.email "<email>"` 设置（**项目级**，不加 `--global`）。
 
 将用户名记为 `$GIT_USER_NAME`，邮箱记为 `$GIT_USER_EMAIL`。
+
+5. 询问 commit message 语言：
+   ```
+   Git commit message 使用什么语言编写？
+   1. 英文（默认）
+   2. 中文
+
+   请选择 (1/2，默认 1)：
+   ```
+   将用户选择记录为 `$COMMIT_MSG_LANG`（`english` 或 `chinese`）。
+
+6. 询问代码注释语言：
+   ```
+   代码注释使用什么语言编写？
+   1. 英文（默认）
+   2. 中文
+
+   请选择 (1/2，默认 1)：
+   ```
+   将用户选择记录为 `$CODE_COMMENT_LANG`（`english` 或 `chinese`）。
+
+这两项选择需要在 Step 7 中写入对应的记忆文件，并在 Step 9 更新 CLAUDE.md 时体现。
 
 ---
 
@@ -329,7 +352,39 @@ type: user
 用户希望所有对话都使用中文进行。
 ```
 
-**重要**：以上文件中的 `$EXT_DOC_PATH` 和 `$MEMORY_PATH` 替换为 Step 1 和 Step 5 获取的**实际绝对路径**。
+**7f. `feedback_commit_msg_lang.md`**：
+
+```markdown
+---
+name: Commit Message 语言
+description: Git commit message 使用的语言（英文或中文）
+type: feedback
+---
+
+Git commit message 使用 $COMMIT_MSG_LANG 编写。
+
+**Why:** 根据用户选择统一项目的 commit message 语言风格。
+
+**How to apply:** 提交代码时，commit message 使用用户选择的语言。遵循 conventional-style 前缀（feat:/fix:/docs: 等）。
+```
+
+**7g. `feedback_code_comment_lang.md`**：
+
+```markdown
+---
+name: 代码注释语言
+description: 代码注释使用的语言（英文或中文）
+type: feedback
+---
+
+代码注释使用 $CODE_COMMENT_LANG 编写。
+
+**Why:** 根据用户选择统一项目的代码注释语言风格。
+
+**How to apply:** 编写或修改代码注释时，使用用户选择的语言。
+```
+
+**重要**：以上文件中的 `$EXT_DOC_PATH`、`$MEMORY_PATH`、`$COMMIT_MSG_LANG`、`$CODE_COMMENT_LANG` 替换为前面步骤获取的**实际值**。
 
 ---
 
@@ -345,6 +400,8 @@ type: user
 - [文档输出位置](feedback_doc_output.md) — 生成文档和 superpowers 产物保存到外部路径
 - [记忆存放位置](feedback_memory_location.md) — 本项目记忆的存放位置
 - [中文交流偏好](user_language.md) — 用户偏好使用中文对话
+- [Commit Message 语言](feedback_commit_msg_lang.md) — commit message 使用的语言
+- [代码注释语言](feedback_code_comment_lang.md) — 代码注释使用的语言
 ```
 
 如果 GH_TOKEN 已配置（Step 4），还需添加：
@@ -437,6 +494,8 @@ type: user
     ├── feedback_claude_md_sync.md  → CLAUDE.md 同步规则
     ├── feedback_doc_output.md      → 文档输出位置
     ├── feedback_memory_location.md → 记忆存放位置
+    ├── feedback_commit_msg_lang.md → Commit Message 语言
+    ├── feedback_code_comment_lang.md → 代码注释语言
     └── user_language.md            → 中文交流偏好
 
 Git 用户：$GIT_USER_NAME <$GIT_USER_EMAIL>
@@ -449,6 +508,39 @@ GH_TOKEN：[已配置（敏感，未同步到外部路径） / 未配置]
 ```
 
 **注意**：总结中的 `$EXT_DOC_PATH`、`$MEMORY_PATH`、`$GIT_USER_NAME`、`$GIT_USER_EMAIL` 等占位符必须替换为实际值。
+
+---
+
+### Step 12: 检查并更新 AI 工具入口文件
+
+在最终总结输出后，检查项目中的 AI 工具入口文件，确认是否需要根据本次命令的执行结果进行更新。
+
+**需要检查的入口文件**：
+- `CLAUDE.md` — Claude Code 的项目入口文件
+- `AGENTS.md` — 多 AI 工具共享的仓库指南文件
+- `.claude/settings.local.json` — Claude Code 项目级配置
+- 其他项目中已存在的 AI 工具入口文件（如 `.codex/` 相关配置）
+
+**检查逻辑**：
+
+1. 逐一读取上述文件（如果存在），对照本次命令执行的最终结果，检查以下内容是否需要更新：
+   - 外部文档路径是否已正确写入
+   - 记忆存储位置是否已正确写入
+   - AI 交互规则（"若有不明白或不明确的地方..."）是否已写入
+   - 新会话读取外部记忆的指引是否已写入
+   - Git 用户信息、commit message 语言、代码注释语言等配置是否已体现
+   - 项目类型（GitHub/内部）和 GH_TOKEN 使用方式是否已体现
+
+2. 如果发现某个入口文件**需要更新**，使用 `AskUserQuestion` 工具向用户展示：
+   - 需要更新的文件名
+   - 具体需要新增或修改的内容摘要
+   - 选项：立即更新 / 跳过
+
+3. 如果发现某个入口文件**已经是最新**（本次 Step 9 已更新过或内容已一致），跳过并汇报"已是最新"。
+
+4. 如果项目中不存在 `AGENTS.md`，询问用户是否需要创建。
+
+**更新后**：将更新过的入口文件同步到 `$EXT_DOC_PATH/`（如 CLAUDE.md → `$EXT_DOC_PATH/CLAUDE.md`）。
 
 ## 边界与禁止事项
 
