@@ -10,14 +10,23 @@ target_compile_definitions(tl4ai_core PRIVATE
     $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
 )
 
-# GUI executable
-add_executable(trafficlight4ai
-    main.cpp
+# GUI library (shared by the app and GUI-focused tests)
+add_library(tl4ai_gui STATIC
     TrafficLightWidget.cpp
     FloatingWindow.cpp
     TrayIcon.cpp
     SettingsDialog.cpp
     SoundUtils.cpp
+)
+target_include_directories(tl4ai_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(tl4ai_gui PUBLIC tl4ai_core Qt6::Widgets Qt6::Multimedia)
+target_compile_definitions(tl4ai_gui PRIVATE
+    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+)
+
+# GUI executable
+add_executable(trafficlight4ai
+    main.cpp
 )
 qt_add_resources(trafficlight4ai "images"
     PREFIX "/images"
@@ -48,7 +57,7 @@ qt_add_resources(trafficlight4ai "i18n"
     BASE "${CMAKE_CURRENT_BINARY_DIR}"
     FILES ${QM_FILES}
 )
-target_link_libraries(trafficlight4ai PRIVATE tl4ai_core Qt6::Widgets Qt6::Multimedia)
+target_link_libraries(trafficlight4ai PRIVATE tl4ai_gui)
 set_target_properties(trafficlight4ai PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
