@@ -88,12 +88,28 @@ Linux 默认路径：`$XDG_RUNTIME_DIR/trafficlight4ai.sock`（fallback `/tmp/tr
 - 头文件中使用的 Qt 类型必须显式 `#include`，不要依赖间接包含（CI 容器环境下隐式包含可能不存在）
 - 所有 UI 文本使用 `tr()` 包裹（国际化），同步更新 `translations/` 下的 `.ts` 文件
 - 新增测试使用 `add_tl4ai_test(test_<component>)` 宏注册，测试槽函数按行为命名（如 `duplicateCommandRefreshesTimeout`）
-- Git 提交使用 conventional-style 前缀：`feat:` / `fix:` / `refactor:` / `docs:` / `test:` / `chore:` / `perf:` / `ci:` / `debug:`，标题用祈使语气
+- Git commit message 使用英文编写，conventional-style 前缀：`feat:` / `fix:` / `refactor:` / `docs:` / `test:` / `chore:` / `perf:` / `ci:` / `debug:`，标题用祈使语气
+- 代码注释使用英文编写
 - IpcServer 客户端读取需聚合至换行符或断开，不可在首次 `readyRead` 后立即处理（防止分片写入丢命令）
 - 发布新 Release 后，同步更新 README.md、README_zh.md 中的版本号和下载链接（BUILD 文档已用 `<version>` 占位符，无需更新）
 - 更新 README.md 时必须同步更新 README_zh.md，保持双语内容一致
 - 修改外迁文档（`docs/PROJECT_STRUCTURE.md`、`docs/KNOWN_ISSUES.md`）时需与代码实际状态保持一致
 
+## 外部文档路径
+
+本项目的 AI 生成文档统一管理在项目 `docs/` 目录下：
+
+| 路径 | 用途 |
+|------|------|
+| `docs/superpowers/` | superpowers 插件产物（specs/、plans/） |
+
+## AI 交互规则
+
+- 若有不明白或不明确的地方，一定要先问我。不要自己幻想或无中生有。
+- 用户偏好使用中文对话。
+
 ## 项目记忆
 
-项目级记忆存储在 `.claude/memory/` 目录中，包含跨会话的协作约定和工作流偏好。新会话开始时，请先读取 `.claude/memory/MEMORY.md` 了解已有的记忆内容。
+项目级记忆存储在 `.claude/memory/` 目录中，包含跨会话的协作约定和工作流偏好。
+
+新会话开始时，请先读取 `.claude/memory/MEMORY.md` 了解已有的记忆内容。
