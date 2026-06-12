@@ -22,6 +22,14 @@ private:
         return m_tempDir.path() + "/config_" + QString::number(m_testIndex++) + ".json";
     }
 
+    static QAction *requireAction(QMenu *menu, const char *name)
+    {
+        auto *action = menu->findChild<QAction *>(name);
+        if (!action)
+            qFatal("Missing menu action: %s", name);
+        return action;
+    }
+
 private slots:
     void constructCreatesIconAndMenu()
     {
@@ -50,14 +58,13 @@ private slots:
 
         auto *menu = tray.contextMenu();
         QVERIFY(menu != nullptr);
-        QVERIFY(menu->actions().size() >= 2);
 
         QVERIFY(!window.isVisible());
-        menu->actions().at(0)->trigger();
+        requireAction(menu, "toggleWindowAction")->trigger();
         QVERIFY(window.isVisible());
 
         QVERIFY(!settings.isVisible());
-        menu->actions().at(1)->trigger();
+        requireAction(menu, "settingsAction")->trigger();
         QVERIFY(settings.isVisible());
     }
 

@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <QCoreApplication>
 #include <QTemporaryDir>
 #include <QFile>
 #include "SoundUtils.h"
@@ -19,6 +20,7 @@ private slots:
 
     void resourcePathReturnsQrcUrl()
     {
+        // URL mapping is pure path logic; this test binary does not embed the app qrc resources.
         QCOMPARE(soundUrlForPath(":/effects/effects/yellow.ogg"),
                  QUrl("qrc:/effects/effects/yellow.ogg"));
     }
@@ -41,6 +43,8 @@ private slots:
     {
         playSound(QString());
         playSound("/tmp/trafficlight4ai-missing-playback.ogg");
+        QCoreApplication::processEvents();
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
     }
 
 };

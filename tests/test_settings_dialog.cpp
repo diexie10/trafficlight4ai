@@ -128,7 +128,9 @@ private slots:
         QCOMPARE(requireChild<QComboBox>(&dialog, "languageCombo")->currentData().toString(), QString("ja"));
         QCOMPARE(requireChild<QComboBox>(&dialog, "aiToolCombo")->currentData().toString(), QString("gemini"));
         QCOMPARE(requireChild<QSpinBox>(&dialog, "timeoutSpin")->value(), 600);
-        QCOMPARE(requireChild<QComboBox>(&dialog, "windowSizeCombo")->currentIndex(), 3);
+        const QStringList sizes = {"xsmall", "small", "medium", "large", "xlarge"};
+        QCOMPARE(requireChild<QComboBox>(&dialog, "windowSizeCombo")->currentIndex(),
+                 sizes.indexOf("large"));
         QCOMPARE(requireChild<QComboBox>(&dialog, "animationModeCombo")->currentIndex(), 1);
         QCOMPARE(requireChild<QSlider>(&dialog, "animationPeriodSlider")->value(), 2200);
         QCOMPARE(requireChild<QSpinBox>(&dialog, "animationPeriodSpin")->value(), 2200);

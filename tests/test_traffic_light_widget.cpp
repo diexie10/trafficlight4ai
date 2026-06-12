@@ -52,12 +52,13 @@ private slots:
     void stateChangedToIdleStopsAnimation()
     {
         TrafficLightWidget w;
+        QSignalSpy spy(&w, &TrafficLightWidget::activeAlphaChanged);
+
         w.onStateChanged(LightState::Working);
-        QTest::qWait(100);
+        QTRY_VERIFY_WITH_TIMEOUT(!spy.isEmpty(), 2000);
 
         w.onStateChanged(LightState::Idle);
-        QTest::qWait(500);
-        QCOMPARE(w.activeAlpha(), 1.0);
+        QTRY_COMPARE_WITH_TIMEOUT(w.activeAlpha(), 1.0, 1000);
     }
 
     void activeAlphaRoundTrip()

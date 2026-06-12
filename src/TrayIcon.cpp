@@ -17,11 +17,13 @@ TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObje
     connect(this, &QObject::destroyed, menu, &QObject::deleteLater);
 
     m_toggleAction = menu->addAction(tr("Show/Hide"));
+    m_toggleAction->setObjectName("toggleWindowAction");
     connect(m_toggleAction, &QAction::triggered, this, [this]() {
         m_window->setVisible(!m_window->isVisible());
     });
 
     m_settingsAction = menu->addAction(tr("Settings"));
+    m_settingsAction->setObjectName("settingsAction");
     connect(m_settingsAction, &QAction::triggered, settingsDialog, [settingsDialog]() {
         settingsDialog->show();
         settingsDialog->raise();
@@ -31,6 +33,7 @@ TrayIcon::TrayIcon(FloatingWindow *window, SettingsDialog *settingsDialog, QObje
     menu->addSeparator();
 
     m_quitAction = menu->addAction(tr("Quit"));
+    m_quitAction->setObjectName("quitAction");
     connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     setContextMenu(menu);
