@@ -203,9 +203,8 @@ public:
  *   🔴 执行工具（读写文件/跑命令）
  */
 const CTL = require("child_process");
-const path = require("path");
-const baseDir = path.dirname(process.execPath);
-const CTL_PATH = path.join(baseDir, "tl4ai-ctl.exe");
+// tl4ai-ctl 会被 Settings 对话框自动替换为完整路径
+const CTL_PATH = "tl4ai-ctl";
 
 function setLight(color) {
   try {
