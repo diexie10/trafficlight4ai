@@ -188,6 +188,52 @@ public:
     bool hooksIsEntireFile() const override { return false; }
 };
 
+class OpenCodeStrategy : public AiToolStrategy {
+public:
+    QString id() const override { return "opencode"; }
+    QString displayName() const override { return "OpenCode"; }
+    int defaultTimeoutSec() const override { return 300; }
+    QString hooksTemplate() const override
+    {
+        return R"(/**
+ * trafficlight4ai — OpenCode 插件
+ * 根据 OpenCode 状态自动切换桌面红绿灯：
+ *   🟢 空闲/完成
+ *   🟡 AI 思考中/等待确认
+ *   🔴 执行工具（读写文件/跑命令）
+ */
+const CTL = require("child_process");
+const path = require("path");
+const baseDir = path.dirname(process.execPath);
+const CTL_PATH = path.join(baseDir, "tl4ai-ctl.exe");
+
+function setLight(color) {
+  try {
+    CTL.execFileSync(CTL_PATH, [color], { timeout: 3000, windowsHide: true });
+  } catch (_) {}
+}
+
+module.exports = {
+  TrafficLightPlugin: async () => {
+    setLight("green");
+    return {
+      "session.created": async () => { setLight("green"); },
+      "session.idle": async () => { setLight("green"); },
+      "session.error": async () => { setLight("red"); },
+      "session.deleted": async () => { setLight("green"); },
+      "message.updated": async () => { setLight("yellow"); },
+      "tool.execute.before": async () => { setLight("red"); },
+      "tool.execute.after": async () => { setLight("yellow"); },
+      "permission.asked": async () => { setLight("yellow"); },
+      "permission.replied": async () => { setLight("green"); },
+    };
+  },
+};)";
+    }
+    QString hooksConfigPath() const override { return QDir::homePath() + "/.config/opencode/plugins/trafficlight4ai.js"; }
+    bool hooksIsEntireFile() const override { return true; }
+};
+
 class AiToolRegistry {
 public:
     static const QList<AiToolStrategy *> &strategies()
@@ -197,7 +243,8 @@ public:
         static QoderCnStrategy qoderCn;
         static CopilotStrategy copilot;
         static GeminiStrategy gemini;
-        static QList<AiToolStrategy *> list = {&codex, &claude, &qoderCn, &copilot, &gemini};
+        static OpenCodeStrategy opencode;
+        static QList<AiToolStrategy *> list = {&codex, &claude, &qoderCn, &copilot, &gemini, &opencode};
         return list;
     }
 
