@@ -207,9 +207,7 @@ public:
  * If tl4ai-ctl is not in PATH, set TL4AI_CTL_PATH env var.
  */
 
-import { execFileSync, spawn } from "child_process";
-import { existsSync } from "fs";
-import { join, dirname } from "path";
+import { execFileSync } from "child_process";
 
 const CTL_PATH = process.env.TL4AI_CTL_PATH || "tl4ai-ctl";
 
@@ -218,18 +216,6 @@ function setLight(color) {
     execFileSync(CTL_PATH, [color], { timeout: 3000, windowsHide: true });
   } catch (_) {}
 }
-
-// ── Auto-start GUI (derived from CTL_PATH) ──
-(function ensureGui() {
-  const dir = dirname(CTL_PATH);
-  if (!dir || dir === ".") return;
-  // tools/tl4ai-ctl(.exe) → src/trafficlight4ai(.exe)
-  const gui = join(dir.replace(/[/\\]tools[/\\]?/, "\\src\\"), "trafficlight4ai");
-  const exe = existsSync(gui) ? gui : gui + ".exe";
-  if (!existsSync(exe)) return;
-  const child = spawn(exe, [], { detached: true, stdio: "ignore", windowsHide: true });
-  child.unref();
-})();
 
 const TrafficLightPlugin = async () => {
   setLight("green");
