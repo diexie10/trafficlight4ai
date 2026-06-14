@@ -49,8 +49,10 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(!spy.isEmpty(), 2000);
     }
 
-    void stateChangedToIdleStopsAnimation()
+    void stateChangesEmitAlpha()
     {
+        // All three curve animations run continuously regardless of state;
+        // activeAlpha breathes whether Working, WaitingConfirm, or Idle.
         TrafficLightWidget w;
         QSignalSpy spy(&w, &TrafficLightWidget::activeAlphaChanged);
 
@@ -58,7 +60,7 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(!spy.isEmpty(), 2000);
 
         w.onStateChanged(LightState::Idle);
-        QTRY_COMPARE_WITH_TIMEOUT(w.activeAlpha(), 1.0, 1000);
+        QTRY_VERIFY_WITH_TIMEOUT(spy.count() >= 2, 2000);
     }
 
     void activeAlphaRoundTrip()

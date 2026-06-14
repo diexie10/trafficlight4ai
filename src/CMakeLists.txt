@@ -12,6 +12,7 @@ target_compile_definitions(tl4ai_core PRIVATE
 
 # GUI library (shared by the app and GUI-focused tests)
 add_library(tl4ai_gui STATIC
+    ParticleSystem.cpp
     TrafficLightWidget.cpp
     FloatingWindow.cpp
     TrayIcon.cpp
