@@ -12,6 +12,7 @@ class QPushButton;
 class QFormLayout;
 class ConfigManager;
 class TrafficLightWidget;
+class FloatingWindow;
 class IpcServer;
 class StateManager;
 
@@ -20,6 +21,7 @@ class SettingsDialog : public QDialog {
 
 public:
     explicit SettingsDialog(ConfigManager *config, TrafficLightWidget *lightWidget,
+                            FloatingWindow *floatingWindow,
                             IpcServer *ipcServer, StateManager *stateManager,
                             QWidget *parent = nullptr);
 
@@ -42,6 +44,7 @@ private slots:
     void onWindowSizeChanged(int index);
     void onAnimationModeChanged(int index);
     void onAnimationPeriodChanged(int value);
+    void onStayOnTopToggled(bool checked);
     void onYellowSoundToggled(bool checked);
     void onGreenSoundToggled(bool checked);
     void onPreviewYellowSound();
@@ -61,6 +64,7 @@ private:
 
     ConfigManager *m_config;
     TrafficLightWidget *m_lightWidget;
+    FloatingWindow *m_floatingWindow;
     IpcServer *m_ipcServer;
     StateManager *m_stateManager;
 
@@ -73,6 +77,7 @@ private:
     QSlider *m_periodSlider;
     QSpinBox *m_periodSpin;
     QLineEdit *m_socketEdit;
+    QCheckBox *m_stayOnTopCheck;
     QCheckBox *m_yellowSoundCheck;
     QLineEdit *m_yellowSoundEdit;
     QPushButton *m_yellowPreviewBtn;
@@ -94,6 +99,7 @@ private:
     QString m_snapMode;
     int m_snapPeriodMs;
     QString m_snapSocketPath;
+    bool m_snapStayOnTop;
     bool m_snapYellowSoundEnabled;
     QString m_snapYellowSoundFile;
     bool m_snapGreenSoundEnabled;

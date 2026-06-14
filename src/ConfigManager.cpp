@@ -53,6 +53,7 @@ void ConfigManager::applyDefaults()
     window["size"] = "medium";
     window["posX"] = 20;
     window["posY"] = 20;
+    window["stayOnTop"] = true;
 
     QJsonObject animation;
     animation["mode"] = "breathing";
@@ -161,6 +162,19 @@ void ConfigManager::setWindowPos(int x, int y)
     QJsonObject window = m_root["window"].toObject();
     window["posX"] = x;
     window["posY"] = y;
+    m_root["window"] = window;
+    save();
+}
+
+bool ConfigManager::stayOnTop() const
+{
+    return m_root["window"].toObject()["stayOnTop"].toBool(true);
+}
+
+void ConfigManager::setStayOnTop(bool on)
+{
+    QJsonObject window = m_root["window"].toObject();
+    window["stayOnTop"] = on;
     m_root["window"] = window;
     save();
 }

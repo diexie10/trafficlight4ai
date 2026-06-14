@@ -15,6 +15,7 @@ public:
                             QWidget *parent = nullptr);
 
     void setSettingsDialog(SettingsDialog *dialog);
+    void setStayOnTop(bool on);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

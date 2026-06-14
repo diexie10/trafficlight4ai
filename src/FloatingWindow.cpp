@@ -12,8 +12,11 @@ FloatingWindow::FloatingWindow(TrafficLightWidget *lightWidget, ConfigManager *c
                                QWidget *parent)
     : QWidget(parent), m_config(config)
 {
-    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
+
+    // Apply stay-on-top from config (default true)
+    setStayOnTop(m_config->stayOnTop());
 
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -21,6 +24,14 @@ FloatingWindow::FloatingWindow(TrafficLightWidget *lightWidget, ConfigManager *c
     layout->addWidget(lightWidget);
 
     move(m_config->windowPosX(), m_config->windowPosY());
+}
+
+void FloatingWindow::setStayOnTop(bool on)
+{
+    const bool wasVisible = isVisible();
+    if (wasVisible) hide();
+    setWindowFlag(Qt::WindowStaysOnTopHint, on);
+    if (wasVisible) show();
 }
 
 void FloatingWindow::mousePressEvent(QMouseEvent *event)

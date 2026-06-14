@@ -1,6 +1,6 @@
 # trafficlight4ai
 
-AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code、Qoder CN、Copilot、Gemini 等）。
+AI 编码工具的可视化状态指示器（支持 Codex、Claude Code、Qoder CN、Copilot、Gemini 等）。
 
 [English](README.md)
 
@@ -8,11 +8,26 @@ AI 编码工具的可视化红绿灯状态指示器（支持 Codex、Claude Code
 
 当 AI 编码助手在终端中运行时，trafficlight4ai 让你一眼看到当前状态：
 
-- **红灯闪烁** — AI 正在工作（工具调用、子代理、思考中）
-- **黄灯闪烁** — AI 需要你确认（权限请求、通知）
-- **绿灯常亮** — 完成，等待你的下一个指令
+- **红色（左）** — AI 正在工作（工具调用、子代理、思考中），粒子曲线动画为伯努利双纽线
+- **黄色（中）** — AI 需要你确认（权限请求、通知），粒子曲线动画为 Lissajous 3:4
+- **绿色（右）** — 完成，等待你的下一个指令，粒子曲线动画为阿基米德螺线
 
-展现形式：桌面上的悬浮小窗口（始终置顶）+ 系统托盘图标。
+展现形式：桌面的悬浮小窗口（始终置顶，可在设置中关闭）+ 系统托盘图标。
+
+## 工作原理
+
+```
+AI 工具 Hooks → tl4ai-ctl (CLI) → 本地 IPC socket → trafficlight4ai (GUI)
+```
+
+AI 工具的 hook 机制在合适的时机触发 `tl4ai-ctl red/yellow/green`，GUI 即时更新（带 250ms 渐隐渐显动画）。
+
+## 项目来源
+
+- 原始上游： [yhz61010/trafficlight4ai](https://github.com/yhz61010/trafficlight4ai) — 经典的 PNG 红黄绿灯版本
+- 分支/衍生： [diexie10/trafficlight4ai](https://github.com/diexie10/trafficlight4ai) — 粒子曲线动画重构版
+- 基于上游的 IPC 协议、状态机、配置架构，替换了视觉效果层
+- 视觉灵感来自 [SUPERPOWERS 能力觉醒](https://github.com/obra/superpowers) 的暗色/亮色设计体系
 
 ## 工作原理
 
@@ -107,12 +122,16 @@ tl4ai-ctl green    # 绿灯常亮
 
 ## 功能特性
 
-- **悬浮窗口** — 可拖动、始终置顶、记忆位置
+- **悬浮窗口** — 可拖动、可置顶（设置中可关闭置顶）、记忆位置
+- **粒子曲线动画** — 三种数学曲线（Bernoulli 双纽线 / Lissajous 3:4 / 阿基米德螺线）独立动画
+- **状态切换渐变动画** — 250ms 渐隐渐显，过渡流畅
+- **背景粒子网络** — 漂浮小点 + 连线，增加视觉层层次感
 - **系统托盘图标** — 颜色随状态变化，右键菜单
 - **设置对话框** — 实时预览，取消可撤销
   - AI 工具选择（Codex / Claude Code / Qoder CN / Copilot / Gemini）
   - 超时自动回绿灯（默认 5 分钟，0 禁用）
   - 窗口大小（超小 / 小 / 中 / 大 / 超大）
+  - 置顶开关
   - 动画模式（呼吸灯 / 经典闪烁）
   - 动画周期（200~5000ms）
   - Socket 路径
@@ -120,6 +139,7 @@ tl4ai-ctl green    # 绿灯常亮
 - **提示音** — 黄灯（需确认）和绿灯（完成）时播放提示音，支持 WAV/MP3/OGG，fallback 系统 beep
 - **国际化** — 英语（默认）、中文、日语，运行时切换
 - **轻量 CLI** — `tl4ai-ctl` 使用 Qt Core/Network 和 `QLocalSocket` 实现跨平台本地 IPC
+- **OpenCode 集成** — 内置 OpenCode 插件，自动启动 GUI + 实时事件驱动颜色切换
 
 ## 配置文件
 
@@ -133,7 +153,8 @@ tl4ai-ctl green    # 绿灯常亮
   "window": {
     "size": "medium",
     "posX": 20,
-    "posY": 20
+    "posY": 20,
+    "stayOnTop": true
   },
   "animation": {
     "mode": "breathing",
@@ -160,6 +181,7 @@ tl4ai-ctl green    # 绿灯常亮
 | `timeoutSec` | `300` | 超时回绿灯秒数，0 禁用 |
 | `window.size` | `"medium"` | 窗口大小（`xsmall` / `small` / `medium` / `large` / `xlarge`） |
 | `window.posX` / `posY` | `20` | 窗口位置 |
+| `window.stayOnTop` | `true` | 是否置于顶层 |
 | `animation.mode` | `"breathing"` | 动画模式（`breathing` / `classic`） |
 | `animation.periodMs` | `1000` | 动画周期（200~5000 ms） |
 | `socket.path` | 平台相关 | 见下方说明 |
@@ -214,6 +236,12 @@ trafficlight4ai 使用策略模式支持多种 AI 工具。添加新工具只需
 |-------|------|
 | `repo` | 推送代码、更新 Release |
 | `workflow` | 触发 workflow dispatch（推送 `.github/workflows/` 变更时也需要） |
+
+## 致谢
+
+- [yhz61010](https://github.com/yhz61010) — 上游项目的架构设计、IPC 协议、状态机、CI/CD、打包脚本
+- [obra/superpowers](https://github.com/obra/superpowers) — 视觉设计体系参考（暗色/亮色设计令牌、高级视觉架构）
+- 本仓库的代码已根据上游 MIT 许可证发布
 
 ## 许可证
 

@@ -36,6 +36,9 @@ public:
     QString language() const;
     void setLanguage(const QString &lang);
 
+    bool stayOnTop() const;
+    void setStayOnTop(bool on);
+
     bool yellowSoundEnabled() const;
     void setYellowSoundEnabled(bool enabled);
     QString yellowSoundFile() const;

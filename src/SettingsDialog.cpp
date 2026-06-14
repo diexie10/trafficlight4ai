@@ -1,6 +1,7 @@
 #include "SettingsDialog.h"
 #include "ConfigManager.h"
 #include "TrafficLightWidget.h"
+#include "FloatingWindow.h"
 #include "IpcServer.h"
 #include "StateManager.h"
 #include "AiToolStrategy.h"
@@ -31,9 +32,11 @@
 #include <QApplication>
 
 SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightWidget,
+                               FloatingWindow *floatingWindow,
                                IpcServer *ipcServer, StateManager *stateManager,
                                QWidget *parent)
     : QDialog(parent), m_config(config), m_lightWidget(lightWidget),
+      m_floatingWindow(floatingWindow),
       m_ipcServer(ipcServer), m_stateManager(stateManager)
 {
     setMinimumSize(400, 460);
@@ -84,6 +87,10 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     m_socketEdit = new QLineEdit();
     m_socketEdit->setObjectName("socketEdit");
 
+    // Stay on top
+    m_stayOnTopCheck = new QCheckBox();
+    m_stayOnTopCheck->setObjectName("stayOnTopCheck");
+
     // Yellow sound
     m_yellowSoundCheck = new QCheckBox();
     m_yellowSoundCheck->setObjectName("yellowSoundCheck");
@@ -122,6 +129,7 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
     m_formLayout->addRow(tr("AI Tool:"), m_aiToolCombo);
     m_formLayout->addRow(tr("Timeout:"), m_timeoutSpin);
     m_formLayout->addRow(tr("Window Size:"), m_sizeCombo);
+    m_formLayout->addRow(tr("Stay on Top:"), m_stayOnTopCheck);
     m_formLayout->addRow(tr("Animation Mode:"), m_modeCombo);
     m_formLayout->addRow(tr("Animation Period:"), periodLayout);
     m_formLayout->addRow(tr("Socket Path:"), m_socketEdit);
@@ -160,6 +168,8 @@ SettingsDialog::SettingsDialog(ConfigManager *config, TrafficLightWidget *lightW
             this, &SettingsDialog::onTimeoutChanged);
     connect(m_sizeCombo, &QComboBox::currentIndexChanged,
             this, &SettingsDialog::onWindowSizeChanged);
+    connect(m_stayOnTopCheck, &QCheckBox::toggled,
+            this, &SettingsDialog::onStayOnTopToggled);
     connect(m_modeCombo, &QComboBox::currentIndexChanged,
             this, &SettingsDialog::onAnimationModeChanged);
     connect(m_periodSlider, &QSlider::valueChanged,
@@ -197,6 +207,7 @@ void SettingsDialog::retranslateUi()
     // Form labels — safely update each row's label
     const QStringList labels = {
         tr("Language:"), tr("AI Tool:"), tr("Timeout:"), tr("Window Size:"),
+        tr("Stay on Top:"),
         tr("Animation Mode:"), tr("Animation Period:"), tr("Socket Path:"),
         tr("Yellow Sound:"), tr("Green Sound:")
     };
@@ -226,6 +237,9 @@ void SettingsDialog::retranslateUi()
     m_modeCombo->addItems({tr("Breathing"), tr("Classic Blink")});
     if (modeIdx >= 0) m_modeCombo->setCurrentIndex(modeIdx);
     m_modeCombo->blockSignals(false);
+
+    // Stay on top
+    m_stayOnTopCheck->setText(tr("Always on Top"));
 
     // Sound controls
     m_yellowSoundCheck->setText(tr("Enable"));
@@ -289,6 +303,11 @@ void SettingsDialog::showEvent(QShowEvent *event)
     m_sizeCombo->setCurrentIndex(sizes.indexOf(m_config->windowSize()));
     m_sizeCombo->blockSignals(false);
 
+    // Stay on top
+    m_stayOnTopCheck->blockSignals(true);
+    m_stayOnTopCheck->setChecked(m_config->stayOnTop());
+    m_stayOnTopCheck->blockSignals(false);
+
     // Animation mode
     const QStringList modes = {"breathing", "classic"};
     m_modeCombo->blockSignals(true);
@@ -331,6 +350,7 @@ void SettingsDialog::takeSnapshot()
     m_snapMode = m_config->animationMode();
     m_snapPeriodMs = m_config->animationPeriodMs();
     m_snapSocketPath = m_config->socketPath();
+    m_snapStayOnTop = m_config->stayOnTop();
     m_snapYellowSoundEnabled = m_config->yellowSoundEnabled();
     m_snapYellowSoundFile = m_config->yellowSoundFile();
     m_snapGreenSoundEnabled = m_config->greenSoundEnabled();
@@ -368,6 +388,10 @@ void SettingsDialog::restoreSnapshot()
     m_config->setAnimationMode(m_snapMode);
     m_lightWidget->setAnimationPeriodMs(m_snapPeriodMs);
     m_config->setAnimationPeriodMs(m_snapPeriodMs);
+
+    // Restore stay on top
+    m_config->setStayOnTop(m_snapStayOnTop);
+    m_floatingWindow->setStayOnTop(m_snapStayOnTop);
 
     // Restore sound settings
     m_config->setYellowSoundEnabled(m_snapYellowSoundEnabled);
@@ -413,6 +437,12 @@ void SettingsDialog::onWindowSizeChanged(int index)
     m_lightWidget->setSizePreset(TrafficLightWidget::sizePresetFromString(sizes.at(index)));
 
     resizeFloatingWindowAt(pos, true);
+}
+
+void SettingsDialog::onStayOnTopToggled(bool checked)
+{
+    m_config->setStayOnTop(checked);
+    m_floatingWindow->setStayOnTop(checked);
 }
 
 void SettingsDialog::resizeFloatingWindowAt(const QPoint &pos, bool savePosition)

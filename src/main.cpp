@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     floatingWindow->show();
 
     // Settings dialog
-    auto *settingsDialog = new SettingsDialog(&config, lightWidget, &ipcServer, &stateManager);
+    auto *settingsDialog = new SettingsDialog(&config, lightWidget, floatingWindow, &ipcServer, &stateManager);
     floatingWindow->setSettingsDialog(settingsDialog);
 
     // Tray icon with dynamic tooltip

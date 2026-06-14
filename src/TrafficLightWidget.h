@@ -38,17 +38,16 @@ private slots:
 private:
     // Layout: three slots evenly spaced on a white rounded card
     struct Slot {
-        qreal cx;       // centre X  (fraction of width)
-        qreal cy;       // centre Y  (fraction of height)
-        qreal r;        // circle radius (fraction of width)
+        qreal cx;       // centre X (pixels from paintEvent)
+        qreal cy;       // centre Y (pixels from paintEvent)
+        qreal r;        // circle radius (pixels from paintEvent)
         const ParticleSystem *sys;
-        bool active;    // true when this slot matches m_state
     };
     void startAnimation();
     void stopAnimation();
     QSize sizeForPreset(SizePreset preset) const;
 
-    // Background particle network (drifting dots + connecting lines)
+    // Background particle network
     struct BgParticle {
         qreal x, y;
         qreal vx, vy;
@@ -64,9 +63,10 @@ private:
     // Rendering
     void drawWhiteCard(QPainter &painter) const;
     void drawSlot(QPainter &painter, const Slot &slot,
-                  qreal elapsedMs) const;
+                  qreal elapsedMs, qreal activity) const;
 
     LightState m_state = LightState::Idle;
+    LightState m_prevState = LightState::Idle;
     SizePreset m_sizePreset = Small;
     int m_animationPeriodMs = 1000;
     qreal m_activeAlpha = 1.0;
@@ -74,6 +74,11 @@ private:
     // Render loop (60 fps, always running)
     QTimer *m_renderTimer = nullptr;
     qint64 m_animationStartMs = 0;
+
+    // Fade transition between states
+    qreal m_fadeProgress = 1.0;   // 0.0 = fading, 1.0 = done
+    qint64 m_fadeStartMs = 0;
+    static constexpr qreal FADE_DURATION_MS = 250.0;
 
     // Three particle systems
     ParticleSystem m_particleRed;    // left   — Lemniscate  (Working)

@@ -4,6 +4,7 @@
 #include <QtMath>
 #include <QDebug>
 #include <QRandomGenerator>
+#include <QVarLengthArray>
 
 // ============================================================================
 // Construction
@@ -104,6 +105,8 @@ void TrafficLightWidget::drawBgParticles(QPainter &painter,
 {
     const QRectF r = rect();
     if (r.isEmpty()) return;
+    const int n = m_bgParticles.size();
+    if (n < 1) return;
 
     painter.save();
     painter.setClipRect(r);
@@ -111,40 +114,40 @@ void TrafficLightWidget::drawBgParticles(QPainter &painter,
 
     // Update positions deterministically from elapsed time
     const qreal dt = elapsedMs;
-    struct { qreal x, y, rad; } pts[35];
-    for (int i = 0; i < 35; ++i) {
+    QVarLengthArray<QPointF, 35> pos(n);
+    QVarLengthArray<qreal, 35> rad(n);
+    for (int i = 0; i < n; ++i) {
         const auto &sp = m_bgParticles[i];
         qreal nx = std::fmod(sp.x + sp.vx * dt, 1.0);
         qreal ny = std::fmod(sp.y + sp.vy * dt, 1.0);
         if (nx < 0) nx += 1.0;
         if (ny < 0) ny += 1.0;
-        pts[i].x   = r.x() + nx * r.width();
-        pts[i].y   = r.y() + ny * r.height();
-        pts[i].rad = sp.radius;
+        pos[i] = QPointF(r.x() + nx * r.width(), r.y() + ny * r.height());
+        rad[i] = sp.radius;
     }
 
     // --- Draw connecting lines between nearby particles ---
     const qreal maxDist = r.width() * 0.18;
-    painter.setPen(QPen(QColor(0, 0, 0, 8), 0.3));
-    for (int i = 0; i < 35; ++i) {
-        for (int j = i + 1; j < 35; ++j) {
-            const qreal dx = pts[i].x - pts[j].x;
-            const qreal dy = pts[i].y - pts[j].y;
+    QPen linePen(QColor(0, 0, 0, 0), 0.3);
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            const qreal dx = pos[i].x() - pos[j].x();
+            const qreal dy = pos[i].y() - pos[j].y();
             const qreal dist = std::sqrt(dx * dx + dy * dy);
             if (dist < maxDist) {
-                const qreal a = (1.0 - dist / maxDist) * 0.12;
-                painter.setPen(QPen(QColor(0, 0, 0, static_cast<int>(a * 255)), 0.3));
-                painter.drawLine(QPointF(pts[i].x, pts[i].y),
-                                 QPointF(pts[j].x, pts[j].y));
+                const int a = qRound((1.0 - dist / maxDist) * 30.0); // 0…30
+                linePen.setColor(QColor(0, 0, 0, a));
+                painter.setPen(linePen);
+                painter.drawLine(pos[i], pos[j]);
             }
         }
     }
 
     // --- Draw particle dots ---
-    for (int i = 0; i < 35; ++i) {
-        painter.setBrush(QColor(0, 0, 0, 10));
-        painter.drawEllipse(QPointF(pts[i].x, pts[i].y), pts[i].rad, pts[i].rad);
-    }
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(0, 0, 0, 10));
+    for (int i = 0; i < n; ++i)
+        painter.drawEllipse(pos[i], rad[i], rad[i]);
 
     painter.restore();
 }
@@ -176,20 +179,26 @@ void TrafficLightWidget::drawCardDecorations(QPainter &painter) const
     }
 
     // --- Ambient colour glows behind the three curve slots ---
-    const qreal glowR = r.width() * 0.22;
-    struct { int ri, gi, bi; } glowColors[3] = {
-        { 255, 80, 80 }, { 255, 184, 60 }, { 60, 200, 110 }
-    };
-    for (int i = 0; i < 3; ++i) {
-        const qreal cx = r.x() + secW * (i + 0.5);
-        const auto &gc = glowColors[i];
-        QRadialGradient grad(cx, cy, glowR);
-        grad.setColorAt(0.0, QColor(gc.ri, gc.gi, gc.bi, 14));
-        grad.setColorAt(0.5, QColor(gc.ri, gc.gi, gc.bi, 5));
-        grad.setColorAt(1.0, QColor(gc.ri, gc.gi, gc.bi, 0));
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(grad);
-        painter.drawEllipse(QPointF(cx, cy), glowR, glowR);
+    {
+        painter.save();
+        painter.setClipRect(r);
+        painter.setClipping(true);
+        const qreal glowR = r.width() * 0.22;
+        struct { int ri, gi, bi; } glowColors[3] = {
+            { 255, 80, 80 }, { 255, 184, 60 }, { 60, 200, 110 }
+        };
+        for (int i = 0; i < 3; ++i) {
+            const qreal cx = r.x() + secW * (i + 0.5);
+            const auto &gc = glowColors[i];
+            QRadialGradient grad(cx, cy, glowR);
+            grad.setColorAt(0.0, QColor(gc.ri, gc.gi, gc.bi, 14));
+            grad.setColorAt(0.5, QColor(gc.ri, gc.gi, gc.bi, 5));
+            grad.setColorAt(1.0, QColor(gc.ri, gc.gi, gc.bi, 0));
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(grad);
+            painter.drawEllipse(QPointF(cx, cy), glowR, glowR);
+        }
+        painter.restore();
     }
 
     // --- Vertical divider lines between slots ---
@@ -233,8 +242,8 @@ QSize TrafficLightWidget::sizeForPreset(SizePreset preset) const
     case Large:      targetWidth = 134; break;
     case ExtraLarge: targetWidth = 178; break;
     }
-    // Keep 2:1 aspect ratio, scaled to 0.85× of original
-    return {qRound(targetWidth * 0.85), qRound(targetWidth * 0.85 / 2)};
+    // Keep 2:1 aspect ratio, scaled to 1.02× of original
+    return {qRound(targetWidth * 1.02), qRound(targetWidth * 1.02 / 2)};
 }
 
 void TrafficLightWidget::setAnimationMode(const QString &mode)
@@ -258,6 +267,11 @@ void TrafficLightWidget::onTick()
     const qreal elapsed = static_cast<qreal>(now - m_animationStartMs);
     const qreal period  = static_cast<qreal>(m_animationPeriodMs);
 
+    // Advance fade progress
+    if (m_fadeProgress < 1.0) {
+        m_fadeProgress = qMin(static_cast<qreal>(now - m_fadeStartMs) / FADE_DURATION_MS, 1.0);
+    }
+
     // Breathing alpha for tray icon (0.3 … 1.0)
     qreal t = std::fmod(elapsed, period) / period;
     if (t < 0.0) t += 1.0;
@@ -279,9 +293,13 @@ void TrafficLightWidget::onTick()
 
 void TrafficLightWidget::onStateChanged(LightState newState)
 {
+    if (newState == m_state) return;
     qDebug("[Widget] onStateChanged: %d -> %d",
            static_cast<int>(m_state), static_cast<int>(newState));
+    m_prevState = m_state;
     m_state = newState;
+    m_fadeStartMs = QDateTime::currentMSecsSinceEpoch();
+    m_fadeProgress = 0.0;
     update();
 }
 
@@ -338,92 +356,76 @@ void TrafficLightWidget::drawWhiteCard(QPainter &painter) const
     painter.drawRoundedRect(r, rad, rad);
 }
 
-// Desaturate a color to a muted version (15% of original saturation)
-static QColor desaturated(const QColor &c, qreal factor = 0.15)
-{
-    if (c.saturation() == 0) return c;
-    int h, s, v, a;
-    c.getHsv(&h, &s, &v, &a);
-    return QColor::fromHsv(h, qBound(0, static_cast<int>(s * factor), 255), v, a);
-}
-
 void TrafficLightWidget::drawSlot(QPainter &painter, const Slot &slot,
-                                   qreal elapsedMs) const
+                                   qreal elapsedMs, qreal activity) const
 {
     // cx, cy, r are already in absolute pixel coordinates from paintEvent
     const qreal cx = slot.cx;
     const qreal cy = slot.cy;
     const qreal r  = slot.r;
 
-    const qreal inactivePathAlpha  = 0.40;
-    const qreal inactivePartAlpha  = 0.04;
-
     const ParticleSystem &sys = *slot.sys;
     const QColor origColor = sys.params().color;
-    // Inactive slots use a desaturated (muted) version of the original colour
-    const QColor color = slot.active ? origColor : desaturated(origColor, 0.30);
+
+    // Interpolate color: desatured ↔ full
+    // Interpolate path alpha: inactive (0.40) ↔ active (0.30)
+    // Interpolate particle factor: inactive (0.04) ↔ active (1.0)
+    // Interpolate center dot alpha: 0.12 ↔ 0.70
+    // Interpolate path pen: 2.0 ↔ 1.5
+    // Interpolate center dot radius: r*0.04 ↔ r*0.07
+    const qreal a = qBound(0.0, activity, 1.0);
+    const QColor color = QColor::fromHsv(
+        origColor.hue(),
+        qRound(origColor.saturation() * (0.30 + a * 0.70)),
+        origColor.value(),
+        origColor.alpha());
+    const qreal pathAlpha   = 0.40 + a * (0.30 - 0.40);   // 0.40→0.30
+    const qreal partFactor  = 0.04 + a * (1.0 - 0.04);    // 0.04→1.0
+    const qreal dotAlpha    = 0.12 + a * (0.70 - 0.12);   // 0.12→0.70
+    const qreal penWidth    = 2.0  + a * (1.5 - 2.0);     // 2.0→1.5
+    const qreal dotR        = r * (0.04 + a * (0.07 - 0.04)); // 0.04r→0.07r
 
     const QPainterPath path = sys.buildPath(elapsedMs, cx, cy, r);
 
-    if (slot.active) {
-        // === ACTIVE slot: glow + center nucleus + particles ===
-
-        // --- 1a. Outer glow layers (bloom around the curve) ---
+    // --- Glow layers: only when nearly fully active ---
+    if (a > 0.85) {
+        const qreal glowStrength = (a - 0.85) / 0.15; // 0→1 over 0.85→1.0
         QColor glowColor = origColor;
         for (int i = 3; i >= 1; --i) {
-            glowColor.setAlphaF(0.05 / i);
+            glowColor.setAlphaF((0.05 / i) * glowStrength);
             painter.setPen(QPen(glowColor, 2.0 * i + 1.0));
             painter.setBrush(Qt::NoBrush);
             painter.drawPath(path);
         }
+    }
 
-        // --- 1b. Main curve path ---
-        QColor pathColor = origColor;
-        pathColor.setAlphaF(0.30);
-        painter.setPen(QPen(pathColor, 1.5));
-        painter.setBrush(Qt::NoBrush);
-        painter.drawPath(path);
-
-        // --- 2a. Particles (full opacity, original color) ---
-        const auto data = sys.compute(elapsedMs, cx, cy, r);
-        painter.setPen(Qt::NoPen);
-        for (const auto &p : data) {
-            QColor pc = origColor;
-            pc.setAlphaF(p.opacity); // full strength per particle
-            painter.setBrush(pc);
-            painter.drawEllipse(p.pos, p.radius, p.radius);
-        }
-
-        // --- 2b. Bright center nucleus ---
-        QColor nc = origColor;
-        nc.setAlphaF(0.7);
-        painter.setBrush(nc);
-        painter.drawEllipse(QPointF(cx, cy), r * 0.07, r * 0.07);
-    } else {
-        // === INACTIVE slot: faint gray path + faint gray particles ===
-
-        // --- 1. Faint desaturated curve path ---
+    // --- Main curve path ---
+    {
         QColor pathColor = color;
-        pathColor.setAlphaF(inactivePathAlpha);
-        painter.setPen(QPen(pathColor, 2.0));
+        pathColor.setAlphaF(pathAlpha);
+        painter.setPen(QPen(pathColor, penWidth));
         painter.setBrush(Qt::NoBrush);
         painter.drawPath(path);
+    }
 
-        // --- 2. Faint gray particles ---
+    // --- Particles ---
+    {
         const auto data = sys.compute(elapsedMs, cx, cy, r);
         painter.setPen(Qt::NoPen);
         for (const auto &p : data) {
             QColor pc = color;
-            pc.setAlphaF(p.opacity * inactivePartAlpha);
+            pc.setAlphaF(p.opacity * partFactor);
             painter.setBrush(pc);
             painter.drawEllipse(p.pos, p.radius, p.radius);
         }
+    }
 
-        // --- 3. Faint desaturated centre dot ---
-        QColor nc = desaturated(origColor, 0.35);
-        nc.setAlphaF(0.12);
+    // --- Centre dot ---
+    {
+        QColor nc = color;
+        nc.setAlphaF(dotAlpha);
         painter.setBrush(nc);
-        painter.drawEllipse(QPointF(cx, cy), r * 0.04, r * 0.04);
+        painter.drawEllipse(QPointF(cx, cy), dotR, dotR);
     }
 }
 
@@ -458,18 +460,37 @@ void TrafficLightWidget::paintEvent(QPaintEvent *)
     s.cy = cy;
     s.r  = cr;
 
+    // Helper lambda: does this ParticleSystem match a given state?
+    auto sysForState = [&](const ParticleSystem *sys, LightState st) -> bool {
+        return (sys == &m_particleRed && st == LightState::Working)
+            || (sys == &m_particleYellow && st == LightState::WaitingConfirm)
+            || (sys == &m_particleGreen && st == LightState::Idle);
+    };
+
     s.cx = sectionW * 0.5;
     s.sys = &m_particleRed;
-    s.active = (m_state == LightState::Working);
-    drawSlot(painter, s, elapsed);
+    {
+        const bool isNow  = sysForState(s.sys, m_state);
+        const bool wasThen = sysForState(s.sys, m_prevState);
+        const qreal act = isNow ? m_fadeProgress : (wasThen ? 1.0 - m_fadeProgress : 0.0);
+        drawSlot(painter, s, elapsed, act);
+    }
 
     s.cx = sectionW * 1.5;
     s.sys = &m_particleYellow;
-    s.active = (m_state == LightState::WaitingConfirm);
-    drawSlot(painter, s, elapsed);
+    {
+        const bool isNow  = sysForState(s.sys, m_state);
+        const bool wasThen = sysForState(s.sys, m_prevState);
+        const qreal act = isNow ? m_fadeProgress : (wasThen ? 1.0 - m_fadeProgress : 0.0);
+        drawSlot(painter, s, elapsed, act);
+    }
 
     s.cx = sectionW * 2.5;
     s.sys = &m_particleGreen;
-    s.active = (m_state == LightState::Idle);
-    drawSlot(painter, s, elapsed);
+    {
+        const bool isNow  = sysForState(s.sys, m_state);
+        const bool wasThen = sysForState(s.sys, m_prevState);
+        const qreal act = isNow ? m_fadeProgress : (wasThen ? 1.0 - m_fadeProgress : 0.0);
+        drawSlot(painter, s, elapsed, act);
+    }
 }
