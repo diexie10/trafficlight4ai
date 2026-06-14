@@ -196,38 +196,58 @@ public:
     QString hooksTemplate() const override
     {
         return R"(/**
- * trafficlight4ai — OpenCode 插件
- * 根据 OpenCode 状态自动切换桌面红绿灯：
- *   🟢 空闲/完成
- *   🟡 AI 思考中/等待确认
- *   🔴 执行工具（读写文件/跑命令）
+ * trafficlight4ai — OpenCode Plugin
+ *
+ * Auto-switches desktop traffic light based on AI agent state:
+ *   🟢 Idle / Done
+ *   🟡 AI thinking / Waiting for confirmation
+ *   🔴 Executing tools
+ *
+ * This template requires OpenCode to be restarted after installation.
+ * If tl4ai-ctl is not in PATH, set TL4AI_CTL_PATH env var.
  */
-const CTL = require("child_process");
-// tl4ai-ctl 会被 Settings 对话框自动替换为完整路径
-const CTL_PATH = "tl4ai-ctl";
+
+import { execFileSync } from "child_process";
+
+const CTL_PATH = process.env.TL4AI_CTL_PATH || "tl4ai-ctl";
 
 function setLight(color) {
   try {
-    CTL.execFileSync(CTL_PATH, [color], { timeout: 3000, windowsHide: true });
+    execFileSync(CTL_PATH, [color], { timeout: 3000, windowsHide: true });
   } catch (_) {}
 }
 
-module.exports = {
-  TrafficLightPlugin: async () => {
-    setLight("green");
-    return {
-      "session.created": async () => { setLight("green"); },
-      "session.idle": async () => { setLight("green"); },
-      "session.error": async () => { setLight("red"); },
-      "session.deleted": async () => { setLight("green"); },
-      "message.updated": async () => { setLight("yellow"); },
-      "tool.execute.before": async () => { setLight("red"); },
-      "tool.execute.after": async () => { setLight("yellow"); },
-      "permission.asked": async () => { setLight("yellow"); },
-      "permission.replied": async () => { setLight("green"); },
-    };
-  },
-};)";
+const TrafficLightPlugin = async () => {
+  setLight("green");
+
+  return {
+    "tool.execute.before": async () => { setLight("red"); },
+    "tool.execute.after":  async () => { setLight("yellow"); },
+    "permission.ask":      async () => { setLight("yellow"); },
+
+    event: async ({ event }) => {
+      switch (event.type) {
+        case "session.status":
+          if (event.properties?.status?.type === "idle")
+            setLight("green");
+          else if (event.properties?.status?.type === "busy" ||
+                   event.properties?.status?.type === "retry")
+            setLight("yellow");
+          break;
+        case "session.idle":    setLight("green"); break;
+        case "session.error":   setLight("red");   break;
+        case "session.created": setLight("green"); break;
+        case "session.deleted": setLight("green"); break;
+        case "message.part.updated": setLight("yellow"); break;
+        case "message.updated":      setLight("yellow"); break;
+        case "permission.replied": setLight("green");  break;
+        case "permission.updated": setLight("yellow"); break;
+      }
+    },
+  };
+};
+
+export { TrafficLightPlugin };)";
     }
     QString hooksConfigPath() const override { return QDir::homePath() + "/.config/opencode/plugins/trafficlight4ai.js"; }
     bool hooksIsEntireFile() const override { return true; }
