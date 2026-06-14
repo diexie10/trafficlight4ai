@@ -55,7 +55,7 @@ TrafficLightWidget::TrafficLightWidget(QWidget *parent)
         p.ampPulse        = 0.28f;
         p.minParticleR    = 0.04f;
         p.maxParticleR    = 0.16f;
-        p.color           = QColor(255, 184, 60);     // warm amber
+        p.color           = QColor(255, 220, 40);     // bright yellow
         m_particleYellow.setParams(p);
     }
 
