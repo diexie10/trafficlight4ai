@@ -3,6 +3,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QFile>
+#include <QPointer>
 #include <QtGlobal>
 #include <memory>
 #ifdef Q_OS_UNIX
@@ -143,18 +144,23 @@ void IpcServer::onNewConnection()
     static constexpr int kMaxCommandBytes = 64;
 
     while (QLocalSocket *client = m_server->nextPendingConnection()) {
+        // QPointer 保护：如果 IpcServer 在 lambda 执行前被销毁，guard 为 null
+        const QPointer<IpcServer> guard(this);
         auto buf = std::make_shared<QByteArray>();
 
-        auto finishClient = [this, client, buf]() {
-            // Disconnect all signals from client to this to prevent re-entry
-            QObject::disconnect(client, nullptr, this, nullptr);
+        auto finishClient = [guard, client, buf]() {
+            if (!guard)
+                return; // IpcServer 已销毁
+            QObject::disconnect(client, nullptr, guard, nullptr);
             if (!buf->isEmpty())
-                m_stateManager->handleCommand(QString::fromUtf8(*buf));
+                guard->m_stateManager->handleCommand(QString::fromUtf8(*buf));
             client->disconnectFromServer();
             client->deleteLater();
         };
 
-        auto tryProcess = [this, client, buf, finishClient]() {
+        auto tryProcess = [guard, client, buf, finishClient]() {
+            if (!guard)
+                return;
             buf->append(client->read(kMaxCommandBytes - buf->size()));
             if (buf->contains('\n') || buf->size() >= kMaxCommandBytes)
                 finishClient();
@@ -163,16 +169,17 @@ void IpcServer::onNewConnection()
         if (client->bytesAvailable()) {
             buf->append(client->read(kMaxCommandBytes));
             if (buf->contains('\n') || buf->size() >= kMaxCommandBytes) {
-                m_stateManager->handleCommand(QString::fromUtf8(*buf));
+                if (guard)
+                    guard->m_stateManager->handleCommand(QString::fromUtf8(*buf));
                 client->disconnectFromServer();
                 client->deleteLater();
             } else {
-                connect(client, &QLocalSocket::readyRead, this, tryProcess);
-                connect(client, &QLocalSocket::disconnected, this, finishClient);
+                connect(client, &QLocalSocket::readyRead, guard, tryProcess);
+                connect(client, &QLocalSocket::disconnected, guard, finishClient);
             }
         } else {
-            connect(client, &QLocalSocket::readyRead, this, tryProcess);
-            connect(client, &QLocalSocket::disconnected, this, finishClient);
+            connect(client, &QLocalSocket::readyRead, guard, tryProcess);
+            connect(client, &QLocalSocket::disconnected, guard, finishClient);
         }
     }
 }

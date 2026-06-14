@@ -67,11 +67,19 @@ int main(int argc, char *argv[])
 
     QLocalSocket socket;
     socket.connectToServer(QString::fromLocal8Bit(socketPath));
-    if (!socket.waitForConnected(100))
-        return 0;
+    // Windows named pipe 需要更长时间建立连接
+    if (!socket.waitForConnected(1000)) {
+        qWarning("tl4ai-ctl: cannot connect to server at %s",
+                  socketPath.constData());
+        return 1; // 返回非零，让调用方知道失败了
+    }
 
-    socket.write(payload);
-    socket.waitForBytesWritten(100);
+    const qint64 written = socket.write(payload);
+    if (written != payload.size() || !socket.waitForBytesWritten(1000)) {
+        qWarning("tl4ai-ctl: failed to write command to server");
+        socket.disconnectFromServer();
+        return 1;
+    }
     socket.disconnectFromServer();
     return 0;
 }

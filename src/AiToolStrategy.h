@@ -266,12 +266,18 @@ public:
 #endif
         if (!QFile::exists(path))
             return QString("tl4ai-ctl");
-        return path.contains(' ') ? ('"' + path + '"') : path;
+        // 不加外层引号，resolvedTemplate 会处理 JSON 转义
+        return path;
     }
 
     static QString resolvedTemplate(const AiToolStrategy *strategy)
     {
+        const QString rawPath = resolvedCtlPath();
+        // JSON 中嵌入含空格的命令路径 → 用 \" 转义，否则外层 JSON 引号会冲突
+        const QString escaped = rawPath.contains(' ')
+            ? QStringLiteral("\\\"") + rawPath + QStringLiteral("\\\"")
+            : rawPath;
         return strategy->hooksTemplate().replace(
-            QLatin1String("tl4ai-ctl"), resolvedCtlPath());
+            QLatin1String("tl4ai-ctl"), escaped);
     }
 };
