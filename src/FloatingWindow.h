@@ -24,6 +24,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
+    TrafficLightWidget *m_lightWidget;
     ConfigManager *m_config;
     SettingsDialog *m_settingsDialog = nullptr;
     QPoint m_dragStartPos;

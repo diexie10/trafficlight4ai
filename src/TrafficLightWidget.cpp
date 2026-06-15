@@ -11,7 +11,7 @@
 // ============================================================================
 
 constexpr int kBgParticleCount = 35;
-constexpr double kBgParticleSpeedDivisor = 8000.0;
+constexpr double kBgParticleSpeedDivisor = 800000.0;
 constexpr int kBgParticleRadiusMin = 4;
 constexpr int kBgParticleRadiusMax = 11;
 constexpr double kBgParticleMaxAlpha = 30.0;
@@ -68,7 +68,7 @@ TrafficLightWidget::TrafficLightWidget(QWidget *parent)
         p.ampPulse        = 0.28f;
         p.minParticleR    = 0.04f;
         p.maxParticleR    = 0.16f;
-        p.color           = QColor(242, 172, 45);     // warm amber – balanced midpoint
+        p.color           = QColor(252, 211, 55);     // warm amber – balanced midpoint
         m_particleYellow.setParams(p);
     }
 
@@ -198,7 +198,7 @@ void TrafficLightWidget::drawCardDecorations(QPainter &painter) const
         painter.setClipping(true);
         const qreal glowR = r.width() * kGlowRadiusFactor;
         struct { int ri, gi, bi; } glowColors[3] = {
-            { 255, 80, 80 }, { 242, 172, 45 }, { 60, 200, 110 }
+            { 255, 80, 80 }, { 252, 211, 55 }, { 60, 200, 110 }
         };
         for (int i = 0; i < 3; ++i) {
             const qreal cx = r.x() + secW * (i + 0.5);
@@ -335,10 +335,17 @@ void TrafficLightWidget::startAnimation()
     m_renderTimer->start(kRenderIntervalMs);
 }
 
-[[deprecated("No longer needed — render loop runs continuously")]]
 void TrafficLightWidget::stopAnimation()
 {
-    // Intentionally a no-op — render loop runs continuously
+    m_renderTimer->stop();
+}
+
+void TrafficLightWidget::setRenderPaused(bool paused)
+{
+    if (paused)
+        m_renderTimer->stop();
+    else if (!m_renderTimer->isActive())
+        m_renderTimer->start(kRenderIntervalMs);
 }
 
 // ============================================================================

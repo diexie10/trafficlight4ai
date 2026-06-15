@@ -22,6 +22,7 @@ public:
     // Keep activeAlpha API for tray icon sync + test compatibility
     qreal activeAlpha() const;
     void setActiveAlpha(qreal alpha);
+    void setRenderPaused(bool paused);
 
 signals:
     void activeAlphaChanged(qreal alpha);

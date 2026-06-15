@@ -10,7 +10,7 @@
 
 FloatingWindow::FloatingWindow(TrafficLightWidget *lightWidget, ConfigManager *config,
                                QWidget *parent)
-    : QWidget(parent), m_config(config)
+    : QWidget(parent), m_lightWidget(lightWidget), m_config(config)
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -39,6 +39,8 @@ void FloatingWindow::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_dragging = true;
         m_dragStartPos = event->globalPosition().toPoint() - frameGeometry().topLeft();
+        if (m_lightWidget)
+            m_lightWidget->setRenderPaused(true);
         event->accept();
     }
 }
@@ -55,6 +57,8 @@ void FloatingWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && m_dragging) {
         m_dragging = false;
+        if (m_lightWidget)
+            m_lightWidget->setRenderPaused(false);
         m_config->setWindowPos(x(), y());
         event->accept();
     }
