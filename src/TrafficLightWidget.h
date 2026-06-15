@@ -75,6 +75,7 @@ private:
     // Render loop (dynamic rate)
     QTimer *m_renderTimer = nullptr;
     qint64 m_animationStartMs = 0;
+    qint64 m_pausedElapsedMs = 0;   // saved elapsed time when paused
     int m_idleFrameSkip = 0;
 
     // Fade transition between states

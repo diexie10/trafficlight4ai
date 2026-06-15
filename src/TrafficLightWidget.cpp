@@ -342,10 +342,15 @@ void TrafficLightWidget::stopAnimation()
 
 void TrafficLightWidget::setRenderPaused(bool paused)
 {
-    if (paused)
+    if (paused) {
+        // Save current elapsed position so we can resume from the same spot
+        m_pausedElapsedMs = QDateTime::currentMSecsSinceEpoch() - m_animationStartMs;
         m_renderTimer->stop();
-    else if (!m_renderTimer->isActive())
+    } else if (!m_renderTimer->isActive()) {
+        // Resume from saved position
+        m_animationStartMs = QDateTime::currentMSecsSinceEpoch() - m_pausedElapsedMs;
         m_renderTimer->start(kRenderIntervalMs);
+    }
 }
 
 // ============================================================================
