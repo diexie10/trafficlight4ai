@@ -71,9 +71,10 @@ private:
     int m_animationPeriodMs = 1000;
     qreal m_activeAlpha = 1.0;
 
-    // Render loop (60 fps, always running)
+    // Render loop (dynamic rate)
     QTimer *m_renderTimer = nullptr;
     qint64 m_animationStartMs = 0;
+    int m_idleFrameSkip = 0;
 
     // Fade transition between states
     qreal m_fadeProgress = 1.0;   // 0.0 = fading, 1.0 = done

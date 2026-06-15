@@ -11,7 +11,7 @@
 // ============================================================================
 
 constexpr int kBgParticleCount = 35;
-constexpr double kBgParticleSpeedDivisor = 285714.0;
+constexpr double kBgParticleSpeedDivisor = 8000.0;
 constexpr int kBgParticleRadiusMin = 4;
 constexpr int kBgParticleRadiusMax = 11;
 constexpr double kBgParticleMaxAlpha = 30.0;
@@ -281,11 +281,12 @@ void TrafficLightWidget::onTick()
     const qreal period  = static_cast<qreal>(m_animationPeriodMs);
 
     // Advance fade progress
-    if (m_fadeProgress < 1.0) {
+    const bool wasFading = (m_fadeProgress < 1.0);
+    if (wasFading) {
         m_fadeProgress = qMin(static_cast<qreal>(now - m_fadeStartMs) / FADE_DURATION_MS, 1.0);
     }
 
-    // Breathing alpha for tray icon (0.3 … 1.0)
+    // Breathing alpha for tray icon (0.3 … 1.0) — always computed
     qreal t = std::fmod(elapsed, period) / period;
     if (t < 0.0) t += 1.0;
     qreal alpha;
@@ -296,6 +297,14 @@ void TrafficLightWidget::onTick()
     else
         alpha = 1.0 - ((t - 0.75) / 0.25) * 0.7;
     setActiveAlpha(alpha);
+
+    // Throttle repaint: idle + no fade → skip every 3 frames (~20 fps)
+    if (m_state == LightState::Idle && !wasFading) {
+        ++m_idleFrameSkip;
+        if (m_idleFrameSkip < 3)
+            return;
+        m_idleFrameSkip = 0;
+    }
 
     update();
 }
