@@ -71,3 +71,12 @@ Testing/
 
 # Claude Code commands (symlinked to shared external directory)
 .claude/commands/leo
+
+# IDE config
+.idea/
+
+# AI-generated design docs
+docs/superpowers/
+
+# Claude personal AI configuration
+.claude/

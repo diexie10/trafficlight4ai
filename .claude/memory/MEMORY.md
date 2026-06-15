@@ -1,2 +1,0 @@
-- [记忆同步策略](feedback_memory_sync_policy.md) — 无敏感信息保存到项目记忆，有敏感信息不写入并告知
-- [GH_TOKEN 配置](feedback_gh_token.md) — 使用 GH_TOKEN 环境变量进行 GitHub 操作（敏感，未同步）
