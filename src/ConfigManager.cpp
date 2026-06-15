@@ -1,6 +1,7 @@
 #include "ConfigManager.h"
 #include <QFile>
 #include <QFileInfo>
+#include <QSaveFile>
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -44,7 +45,8 @@ ConfigManager::ConfigManager(const QString &configPath, QObject *parent)
 
 ConfigManager::~ConfigManager()
 {
-    save();
+    if (m_dirty)
+        save();
 }
 
 void ConfigManager::applyDefaults()
@@ -83,6 +85,10 @@ void ConfigManager::load()
     QFile file(m_configPath);
 
     if (file.exists() && file.open(QIODevice::ReadOnly)) {
+        if (file.size() > 64 * 1024) {
+            file.close();
+            // File too large — treat as corrupt
+        } else {
         QJsonParseError err;
         QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &err);
         file.close();
@@ -105,12 +111,21 @@ void ConfigManager::load()
             }
             loaded = true;
         }
+        }
     }
 
     if (!loaded) {
+        // If a (non-empty) config file existed but couldn't be loaded, back it up
+        QFileInfo fi(m_configPath);
+        if (fi.exists() && fi.size() > 0) {
+            QString bakPath = m_configPath + ".bak";
+            QFile::remove(bakPath);
+            QFile::rename(m_configPath, bakPath);
+        }
         applyDefaults();
         normalize();
-        save(); // create config file on first run or corrupt file
+        m_dirty = true;
+        save(); // create config file on first run or after corrupt file
     } else {
         normalize(); // only saves if values were corrected
     }
@@ -121,14 +136,18 @@ void ConfigManager::save()
     if (m_batchSave)
         return;
 
+    if (!m_dirty)
+        return;
+
     QDir dir = QFileInfo(m_configPath).absoluteDir();
     if (!dir.exists())
         dir.mkpath(".");
 
-    QFile file(m_configPath);
+    QSaveFile file(m_configPath);
     if (file.open(QIODevice::WriteOnly)) {
         file.write(QJsonDocument(m_root).toJson(QJsonDocument::Indented));
-        file.close();
+        if (file.commit())
+            m_dirty = false;
     }
 }
 
@@ -144,6 +163,7 @@ void ConfigManager::setWindowSize(const QString &size)
     QJsonObject window = m_root["window"].toObject();
     window["size"] = size;
     m_root["window"] = window;
+    m_dirty = true;
     save();
 }
 
@@ -163,6 +183,7 @@ void ConfigManager::setWindowPos(int x, int y)
     window["posX"] = x;
     window["posY"] = y;
     m_root["window"] = window;
+    m_dirty = true;
     save();
 }
 
@@ -176,6 +197,7 @@ void ConfigManager::setStayOnTop(bool on)
     QJsonObject window = m_root["window"].toObject();
     window["stayOnTop"] = on;
     m_root["window"] = window;
+    m_dirty = true;
     save();
 }
 
@@ -191,6 +213,7 @@ void ConfigManager::setAnimationMode(const QString &mode)
     QJsonObject animation = m_root["animation"].toObject();
     animation["mode"] = mode;
     m_root["animation"] = animation;
+    m_dirty = true;
     save();
 }
 
@@ -205,6 +228,7 @@ void ConfigManager::setAnimationPeriodMs(int ms)
     QJsonObject animation = m_root["animation"].toObject();
     animation["periodMs"] = ms;
     m_root["animation"] = animation;
+    m_dirty = true;
     save();
 }
 
@@ -223,6 +247,7 @@ void ConfigManager::setSocketPath(const QString &path)
     QJsonObject socket = m_root["socket"].toObject();
     socket["path"] = path;
     m_root["socket"] = socket;
+    m_dirty = true;
     save();
 }
 
@@ -234,6 +259,7 @@ QString ConfigManager::aiTool() const
 void ConfigManager::setAiTool(const QString &tool)
 {
     m_root["aiTool"] = tool;
+    m_dirty = true;
     save();
 }
 
@@ -247,6 +273,7 @@ void ConfigManager::setTimeoutSec(int sec)
     if (sec != 0)
         sec = std::clamp(sec, 30, 3600);
     m_root["timeoutSec"] = sec;
+    m_dirty = true;
     save();
 }
 
@@ -258,6 +285,7 @@ QString ConfigManager::language() const
 void ConfigManager::setLanguage(const QString &lang)
 {
     m_root["language"] = lang;
+    m_dirty = true;
     save();
 }
 
@@ -271,6 +299,7 @@ void ConfigManager::setYellowSoundEnabled(bool enabled)
     QJsonObject sound = m_root["sound"].toObject();
     sound["yellowEnabled"] = enabled;
     m_root["sound"] = sound;
+    m_dirty = true;
     save();
 }
 
@@ -284,6 +313,7 @@ void ConfigManager::setYellowSoundFile(const QString &path)
     QJsonObject sound = m_root["sound"].toObject();
     sound["yellowFile"] = path;
     m_root["sound"] = sound;
+    m_dirty = true;
     save();
 }
 
@@ -297,6 +327,7 @@ void ConfigManager::setGreenSoundEnabled(bool enabled)
     QJsonObject sound = m_root["sound"].toObject();
     sound["greenEnabled"] = enabled;
     m_root["sound"] = sound;
+    m_dirty = true;
     save();
 }
 
@@ -310,6 +341,7 @@ void ConfigManager::setGreenSoundFile(const QString &path)
     QJsonObject sound = m_root["sound"].toObject();
     sound["greenFile"] = path;
     m_root["sound"] = sound;
+    m_dirty = true;
     save();
 }
 
@@ -321,7 +353,8 @@ void ConfigManager::beginBatchSave()
 void ConfigManager::endBatchSave()
 {
     m_batchSave = false;
-    save();
+    if (m_dirty)
+        save();
 }
 
 void ConfigManager::normalize()
@@ -356,6 +389,20 @@ void ConfigManager::normalize()
         socket["path"] = defaultSocketPath();
     m_root["socket"] = socket;
 
-    if (m_root != before)
+    // Validate aiTool
+    static const QStringList kValidAiTools = {"codex", "claude-code", "qoder-cn", "copilot", "gemini", "opencode"};
+    const QString aiTool = m_root["aiTool"].toString("codex");
+    if (!kValidAiTools.contains(aiTool))
+        m_root["aiTool"] = "codex";
+
+    // Validate language
+    static const QStringList kValidLanguages = {"en", "zh", "ja"};
+    const QString lang = m_root["language"].toString("en");
+    if (!kValidLanguages.contains(lang))
+        m_root["language"] = "en";
+
+    if (m_root != before) {
+        m_dirty = true;
         save();
+    }
 }

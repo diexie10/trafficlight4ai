@@ -78,7 +78,7 @@ QVector<ParticleData> ParticleSystem::compute(qreal timeMs,
                                                qreal cx, qreal cy,
                                                qreal r) const
 {
-    if (m_params.particleCount < 1)
+    if (m_params.particleCount < 2)
         return {};
 
     const qreal scale = pulseScale(timeMs);
@@ -94,6 +94,9 @@ QVector<ParticleData> ParticleSystem::compute(qreal timeMs,
         qreal nx, ny;
         eval(p, scale, nx, ny);
 
+        // PERF: std::pow(1.0 - trail, 0.56) called per-particle per-frame.
+        //       Could be replaced with std::exp(0.56 * std::log(1.0 - trail))
+        //       if profiling shows a bottleneck.
         const qreal fade = std::pow(1.0 - trail, 0.56f);
 
         data[i].pos     = QPointF(cx + nx * r, cy + ny * r);

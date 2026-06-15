@@ -79,6 +79,9 @@ void TrayIcon::onStateChanged(LightState newState)
 
 void TrayIcon::onActiveAlphaChanged(qreal alpha)
 {
+    if (qFuzzyCompare(alpha, m_lastActiveAlpha)) return;
+    m_lastActiveAlpha = alpha;
+
     if (m_state == LightState::Idle) {
         setIcon(createIcon(m_currentColor));
         return;

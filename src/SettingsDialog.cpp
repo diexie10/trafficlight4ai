@@ -468,8 +468,21 @@ void SettingsDialog::resizeFloatingWindowAt(const QPoint &pos, bool savePosition
 void SettingsDialog::onAnimationModeChanged(int index)
 {
     const QStringList modes = {"breathing", "classic"};
-    m_config->setAnimationMode(modes.at(index));
-    m_lightWidget->setAnimationMode(modes.at(index));
+    if (index < 0 || index >= modes.size())
+        return;
+
+    // Animation mode is deprecated — the TrafficLightWidget::setAnimationMode is a
+    // no-op that ignores the mode.  Inform the user and revert.
+    QMessageBox::information(this, tr("Deprecated"),
+        tr("Animation mode selection is deprecated and no longer has effect."));
+
+    const QString prevMode = m_config->animationMode();
+    const int prevIndex = modes.indexOf(prevMode);
+    if (prevIndex >= 0 && prevIndex != index) {
+        m_modeCombo->blockSignals(true);
+        m_modeCombo->setCurrentIndex(prevIndex);
+        m_modeCombo->blockSignals(false);
+    }
 }
 
 void SettingsDialog::onAnimationPeriodChanged(int value)
@@ -664,6 +677,12 @@ void SettingsDialog::onEditHooksConfig()
         // Prepare the final content to write
         QByteArray output;
         if (entireFile) {
+            if (!editedDoc.isObject()) {
+                QMessageBox::warning(dlg, tr("Validation Error"),
+                    tr("The root value must be a JSON object when the hooks file is "
+                       "used as the entire configuration file."));
+                return;
+            }
             output = editedDoc.toJson(QJsonDocument::Indented);
         } else {
             // Read existing file to preserve non-hooks fields
@@ -677,10 +696,16 @@ void SettingsDialog::onEditHooksConfig()
             }
             // Merge hooks from edited content
             QJsonObject editedObj = editedDoc.object();
-            if (editedObj.contains("hooks"))
+            if (editedObj.contains("hooks")) {
+                if (!editedObj["hooks"].isObject()) {
+                    QMessageBox::warning(dlg, tr("Validation Error"),
+                        tr("The \"hooks\" field must be a JSON object."));
+                    return;
+                }
                 root["hooks"] = editedObj["hooks"];
-            else
+            } else {
                 root["hooks"] = editedObj;
+            }
             output = QJsonDocument(root).toJson(QJsonDocument::Indented);
         }
 

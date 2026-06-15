@@ -38,4 +38,5 @@ private:
     QAction *m_quitAction;
     QString m_aiToolName;
     mutable QPixmap m_iconPixmap{64, 64};
+    qreal m_lastActiveAlpha = 1.0;
 };

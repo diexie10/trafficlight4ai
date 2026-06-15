@@ -61,4 +61,5 @@ private:
     QString m_configPath;
     QJsonObject m_root;
     bool m_batchSave = false;
+    bool m_dirty = false;
 };

@@ -3,6 +3,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QFile>
+#include <QFileInfo>
 #include <QPointer>
 #include <QtGlobal>
 #include <memory>
@@ -42,6 +43,12 @@ static void removeStaleSocket(const QString &path)
     // Only remove actual Unix sockets, never regular files
     if (!isUnixSocket(path))
         return;
+
+    // Refuse to remove symlinks (TOCTOU safety)
+    if (QFileInfo(path).isSymLink()) {
+        qWarning("IpcServer: refusing to remove symlink: %s", qPrintable(path));
+        return;
+    }
 
     QFile::remove(path);
 #else
@@ -167,16 +174,9 @@ void IpcServer::onNewConnection()
         };
 
         if (client->bytesAvailable()) {
-            buf->append(client->read(kMaxCommandBytes));
-            if (buf->contains('\n') || buf->size() >= kMaxCommandBytes) {
-                if (guard)
-                    guard->m_stateManager->handleCommand(QString::fromUtf8(*buf));
-                client->disconnectFromServer();
-                client->deleteLater();
-            } else {
-                connect(client, &QLocalSocket::readyRead, guard, tryProcess);
-                connect(client, &QLocalSocket::disconnected, guard, finishClient);
-            }
+            connect(client, &QLocalSocket::readyRead, guard, tryProcess);
+            connect(client, &QLocalSocket::disconnected, guard, finishClient);
+            tryProcess();
         } else {
             connect(client, &QLocalSocket::readyRead, guard, tryProcess);
             connect(client, &QLocalSocket::disconnected, guard, finishClient);

@@ -7,6 +7,19 @@
 #include <QVarLengthArray>
 
 // ============================================================================
+// File-level constants
+// ============================================================================
+
+constexpr int kBgParticleCount = 35;
+constexpr double kBgParticleSpeedDivisor = 285714.0;
+constexpr int kBgParticleRadiusMin = 4;
+constexpr int kBgParticleRadiusMax = 11;
+constexpr double kBgParticleMaxAlpha = 30.0;
+constexpr double kCardCornerRadiusFactor = 0.10;
+constexpr double kGlowRadiusFactor = 0.22;
+constexpr int kRenderIntervalMs = 16;
+
+// ============================================================================
 // Construction
 // ============================================================================
 
@@ -21,7 +34,7 @@ TrafficLightWidget::TrafficLightWidget(QWidget *parent)
     m_renderTimer->setTimerType(Qt::PreciseTimer);
     connect(m_renderTimer, &QTimer::timeout, this, &TrafficLightWidget::onTick);
     m_animationStartMs = QDateTime::currentMSecsSinceEpoch();
-    m_renderTimer->start(16);
+    m_renderTimer->start(kRenderIntervalMs);
 
     // ---- Left   – Red   – Bernoulli Lemniscate ---------------------------
     {
@@ -89,14 +102,14 @@ TrafficLightWidget::TrafficLightWidget(QWidget *parent)
 
 void TrafficLightWidget::initBgParticles()
 {
-    m_bgParticles.resize(35);
+    m_bgParticles.resize(kBgParticleCount);
     auto *rg = QRandomGenerator::global();
     for (auto &p : m_bgParticles) {
         p.x      = rg->bounded(1.0);
         p.y      = rg->bounded(1.0);
-        p.vx     = (rg->bounded(200) - 100) / 285714.0; // 0.35× of original
-        p.vy     = (rg->bounded(200) - 100) / 285714.0;
-        p.radius = rg->bounded(4, 11) / 10.0;
+        p.vx     = (rg->bounded(200) - 100) / kBgParticleSpeedDivisor; // 0.35× of original
+        p.vy     = (rg->bounded(200) - 100) / kBgParticleSpeedDivisor;
+        p.radius = rg->bounded(kBgParticleRadiusMin, kBgParticleRadiusMax) / 10.0;
     }
 }
 
@@ -135,7 +148,7 @@ void TrafficLightWidget::drawBgParticles(QPainter &painter,
             const qreal dy = pos[i].y() - pos[j].y();
             const qreal dist = std::sqrt(dx * dx + dy * dy);
             if (dist < maxDist) {
-                const int a = qRound((1.0 - dist / maxDist) * 30.0); // 0…30
+                const int a = qRound((1.0 - dist / maxDist) * kBgParticleMaxAlpha); // 0…30
                 linePen.setColor(QColor(0, 0, 0, a));
                 painter.setPen(linePen);
                 painter.drawLine(pos[i], pos[j]);
@@ -159,7 +172,7 @@ void TrafficLightWidget::drawBgParticles(QPainter &painter,
 void TrafficLightWidget::drawCardDecorations(QPainter &painter) const
 {
     const QRectF r = rect();
-    const qreal rad = qMin(r.width(), r.height()) * 0.10;
+    const qreal rad = qMin(r.width(), r.height()) * kCardCornerRadiusFactor;
     const qreal secW = r.width() / 3.0;
     const qreal cy   = r.height() / 2.0;
 
@@ -183,7 +196,7 @@ void TrafficLightWidget::drawCardDecorations(QPainter &painter) const
         painter.save();
         painter.setClipRect(r);
         painter.setClipping(true);
-        const qreal glowR = r.width() * 0.22;
+        const qreal glowR = r.width() * kGlowRadiusFactor;
         struct { int ri, gi, bi; } glowColors[3] = {
             { 255, 80, 80 }, { 255, 184, 60 }, { 60, 200, 110 }
         };
@@ -310,12 +323,13 @@ void TrafficLightWidget::onStateChanged(LightState newState)
 void TrafficLightWidget::startAnimation()
 {
     m_animationStartMs = QDateTime::currentMSecsSinceEpoch();
-    m_renderTimer->start(16);
+    m_renderTimer->start(kRenderIntervalMs);
 }
 
+[[deprecated("No longer needed — render loop runs continuously")]]
 void TrafficLightWidget::stopAnimation()
 {
-    // keep running — all three curves animate regardless of state
+    // Intentionally a no-op — render loop runs continuously
 }
 
 // ============================================================================
@@ -329,6 +343,7 @@ qreal TrafficLightWidget::activeAlpha() const
 
 void TrafficLightWidget::setActiveAlpha(qreal alpha)
 {
+    if (qFuzzyCompare(m_activeAlpha, alpha)) return;
     m_activeAlpha = alpha;
     emit activeAlphaChanged(m_activeAlpha);
 }
@@ -340,7 +355,7 @@ void TrafficLightWidget::setActiveAlpha(qreal alpha)
 void TrafficLightWidget::drawWhiteCard(QPainter &painter) const
 {
     const QRectF r = rect();
-    const qreal rad = qMin(r.width(), r.height()) * 0.10;
+    const qreal rad = qMin(r.width(), r.height()) * kCardCornerRadiusFactor;
 
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::NoPen);

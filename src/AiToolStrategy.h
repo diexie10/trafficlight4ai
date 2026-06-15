@@ -214,7 +214,9 @@ const CTL_PATH = process.env.TL4AI_CTL_PATH || "tl4ai-ctl";
 function setLight(color) {
   try {
     execFileSync(CTL_PATH, [color], { timeout: 3000, windowsHide: true });
-  } catch (_) {}
+  } catch (e) {
+    console.warn("[trafficlight4ai] setLight failed:", e.message);
+  }
 }
 
 const TrafficLightPlugin = async () => {
