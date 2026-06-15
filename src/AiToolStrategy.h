@@ -208,8 +208,13 @@ public:
  */
 
 import { execFileSync } from "child_process";
+import { existsSync } from "fs";
 
 const CTL_PATH = process.env.TL4AI_CTL_PATH || "tl4ai-ctl";
+
+// Startup health check
+if (!existsSync(CTL_PATH))
+  console.warn("[trafficlight4ai] tl4ai-ctl not found. Set TL4AI_CTL_PATH env var.");
 
 function setLight(color) {
   try {
