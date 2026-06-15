@@ -68,7 +68,7 @@ TrafficLightWidget::TrafficLightWidget(QWidget *parent)
         p.ampPulse        = 0.28f;
         p.minParticleR    = 0.04f;
         p.maxParticleR    = 0.16f;
-        p.color           = QColor(255, 220, 40);     // bright yellow
+        p.color           = QColor(242, 172, 45);     // warm amber – balanced midpoint
         m_particleYellow.setParams(p);
     }
 
@@ -198,7 +198,7 @@ void TrafficLightWidget::drawCardDecorations(QPainter &painter) const
         painter.setClipping(true);
         const qreal glowR = r.width() * kGlowRadiusFactor;
         struct { int ri, gi, bi; } glowColors[3] = {
-            { 255, 80, 80 }, { 255, 184, 60 }, { 60, 200, 110 }
+            { 255, 80, 80 }, { 242, 172, 45 }, { 60, 200, 110 }
         };
         for (int i = 0; i < 3; ++i) {
             const qreal cx = r.x() + secW * (i + 0.5);
